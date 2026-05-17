@@ -1,27 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkButtons from './components/bookmarks/BookmarkButtons';
+
+const themes = [
+  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
+  "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
+  "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
+  "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"
+];
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
+    // Load Name from chrome storage
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(['userName'], (result) => {
         if (result.userName) setUserName(result.userName);
       });
     }
+
+    // Load Theme from localStorage
+    const savedTheme = localStorage.getItem('app-theme') || 'light';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
   const saveSettings = () => {
+    // Save Name to chrome storage
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ userName });
     }
+
+    // Save Theme to localStorage
+    localStorage.setItem('app-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+
     setShowSettings(false);
+  };
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   return (
@@ -105,7 +130,7 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
               <div className="form-control">
                 <label className="label">
                   <span className="label-text font-bold flex items-center gap-2"><User size={16} /> User Name</span>
@@ -116,6 +141,22 @@ const App: React.FC = () => {
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-bold flex items-center gap-2"><Palette size={16} /> App Theme</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={theme}
+                  onChange={(e) => handleThemeChange(e.target.value)}
+                >
+                  {themes.map(t => (
+                    <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                  ))}
+                </select>
+                <span className="label-text-alt mt-1 text-base-content/40">Select your favorite DaisyUI theme.</span>
               </div>
 
               <div className="form-control">
