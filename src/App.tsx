@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
+import BookmarkButtons from './components/bookmarks/BookmarkButtons';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
 
@@ -53,6 +54,15 @@ const App: React.FC = () => {
             <Bookmark size={20} />
             <span className="font-medium hidden lg:block text-base-content text-left flex-1">Bookmarks</span>
           </button>
+          <button
+            onClick={() => setActiveTab('buttons')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'buttons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <Layout size={20} />
+            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Buttons</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-base-300">
@@ -76,7 +86,9 @@ const App: React.FC = () => {
             </div>
           </header>
 
-          {activeTab === 'dock' ? <Dock /> : <BookmarkManager />}
+          {activeTab === 'dock' && <Dock />}
+          {activeTab === 'bookmark' && <BookmarkManager />}
+          {activeTab === 'buttons' && <BookmarkButtons />}
         </div>
       </main>
 
