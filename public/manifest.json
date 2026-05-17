@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmark Organizer",
+  "version": "1.0.0",
+  "description": "A bookmark organizer with a customizable dashboard (Dock).",
+  "permissions": ["bookmarks", "storage"],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "action": {
+    "default_title": "Bookmark Organizer"
+  },
+  "icons": {
+    "128": "favicon.svg"
+  }
+}
