@@ -5,6 +5,7 @@ interface BookmarkItem {
   id: string;
   title: string;
   url: string;
+  parentId?: string;
 }
 
 const BookmarkButtons: React.FC = () => {
@@ -16,7 +17,12 @@ const BookmarkButtons: React.FC = () => {
       let flat: BookmarkItem[] = [];
       for (const node of nodes) {
         if (node.url) {
-          flat.push({ id: node.id, title: node.title || node.url, url: node.url });
+          flat.push({
+            id: node.id,
+            title: node.title || node.url,
+            url: node.url,
+            parentId: node.parentId
+          });
         }
         if (node.children) {
           flat = [...flat, ...flattenBookmarks(node.children)];
@@ -35,11 +41,11 @@ const BookmarkButtons: React.FC = () => {
     } else {
       // Mock data
       const mock = [
-        { id: '1', title: 'Apple', url: 'https://apple.com' },
-        { id: '2', title: 'Google', url: 'https://google.com' },
-        { id: '3', title: 'Yahoo', url: 'https://yahoo.co.jp' },
-        { id: '4', title: 'あいうえお銀行', url: 'https://example.com' },
-        { id: '5', title: 'かきくけこ通販', url: 'https://example.com' },
+        { id: '1', title: 'Apple', url: 'https://apple.com', parentId: 'f1' },
+        { id: '2', title: 'Google', url: 'https://google.com', parentId: 'f1' },
+        { id: '3', title: 'Yahoo', url: 'https://yahoo.co.jp', parentId: 'f2' },
+        { id: '4', title: 'あいうえお銀行', url: 'https://example.com', parentId: 'f3' },
+        { id: '5', title: 'かきくけこ通販', url: 'https://example.com', parentId: 'f3' },
       ];
       mock.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
       setBookmarks(mock);
@@ -50,6 +56,29 @@ const BookmarkButtons: React.FC = () => {
     b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     b.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const getFolderColor = (parentId?: string) => {
+    if (!parentId) return 'btn-primary';
+
+    const colors = [
+      'btn-primary',
+      'btn-secondary',
+      'btn-accent',
+      'btn-info',
+      'btn-success',
+      'btn-warning',
+      'btn-error',
+    ];
+
+    // Simple hash function for the parentId string
+    let hash = 0;
+    for (let i = 0; i < parentId.length; i++) {
+      hash = parentId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
 
   return (
     <div className="space-y-6">
@@ -74,7 +103,7 @@ const BookmarkButtons: React.FC = () => {
           <button
             key={bookmark.id}
             onClick={() => window.open(bookmark.url, '_blank')}
-            className="btn btn-outline btn-primary normal-case font-medium gap-2 group hover:shadow-md transition-all"
+            className={`btn btn-outline ${getFolderColor(bookmark.parentId)} normal-case font-medium gap-2 group hover:shadow-md transition-all`}
           >
             <span className="truncate max-w-[150px]">{bookmark.title}</span>
             <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
