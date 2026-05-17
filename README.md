@@ -71,3 +71,11 @@ export default defineConfig([
   },
 ])
 ```
+
+```
+npm run install
+npm run build
+
+上記コマンドを入力後に、distを.zipにします。
+ブラウザの拡張機能の読み込みでdist.zipを解凍したファイルを参照すると追加が完了します。
+```
