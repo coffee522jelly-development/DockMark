@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
-import BookmarkButtons from './components/bookmarks/BookmarkButtons';
+import BookmarkGallery from './components/bookmarks/BookmarkGallery';
 
 const themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -12,7 +12,7 @@ const themes = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'gallery'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -80,13 +80,13 @@ const App: React.FC = () => {
             <span className="font-medium hidden lg:block text-base-content text-left flex-1">Bookmarks</span>
           </button>
           <button
-            onClick={() => setActiveTab('buttons')}
+            onClick={() => setActiveTab('gallery')}
             className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
-              activeTab === 'buttons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+              activeTab === 'gallery' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
             <Layout size={20} />
-            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Buttons</span>
+            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Gallery</span>
           </button>
         </nav>
 
@@ -113,7 +113,7 @@ const App: React.FC = () => {
 
           {activeTab === 'dock' && <Dock />}
           {activeTab === 'bookmark' && <BookmarkManager />}
-          {activeTab === 'buttons' && <BookmarkButtons />}
+          {activeTab === 'gallery' && <BookmarkGallery />}
         </div>
       </main>
 

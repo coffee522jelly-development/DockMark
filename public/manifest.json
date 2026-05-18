@@ -3,7 +3,7 @@
   "name": "Bookmark Organizer",
   "version": "1.0.0",
   "description": "A bookmark organizer with a customizable dashboard (Dock).",
-  "permissions": ["bookmarks", "storage", "geolocation"],
+  "permissions": ["bookmarks", "storage", "geolocation", "favicon"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
