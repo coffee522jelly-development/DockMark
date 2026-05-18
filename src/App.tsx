@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkGallery from './components/bookmarks/BookmarkGallery';
@@ -12,10 +12,11 @@ const themes = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'gallery'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
+  const [initialSettings, setInitialSettings] = useState({ userName: 'User', theme: 'light' });
 
   useEffect(() => {
     // Load Name from chrome storage
@@ -49,6 +50,18 @@ const App: React.FC = () => {
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 
+  const openSettings = () => {
+    setInitialSettings({ userName, theme });
+    setShowSettings(true);
+  };
+
+  const cancelSettings = () => {
+    setUserName(initialSettings.userName);
+    setTheme(initialSettings.theme);
+    document.documentElement.setAttribute('data-theme', initialSettings.theme);
+    setShowSettings(false);
+  };
+
   return (
     <div className="flex h-screen bg-base-200">
       {/* Sidebar */}
@@ -68,7 +81,7 @@ const App: React.FC = () => {
             }`}
           >
             <LayoutGrid size={20} />
-            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Dock</span>
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'dock' ? 'text-primary-content' : 'text-base-content'}`}>Dock</span>
           </button>
           <button
             onClick={() => setActiveTab('bookmark')}
@@ -77,22 +90,49 @@ const App: React.FC = () => {
             }`}
           >
             <Bookmark size={20} />
-            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Bookmarks</span>
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'bookmark' ? 'text-primary-content' : 'text-base-content'}`}>Bookmarks</span>
           </button>
           <button
-            onClick={() => setActiveTab('gallery')}
+            onClick={() => setActiveTab('buttons')}
             className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
-              activeTab === 'gallery' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+              activeTab === 'buttons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
             <Layout size={20} />
-            <span className="font-medium hidden lg:block text-base-content text-left flex-1">Gallery</span>
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'buttons' ? 'text-primary-content' : 'text-base-content'}`}>Buttons</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('cards')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'cards' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <Grid size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'cards' ? 'text-primary-content' : 'text-base-content'}`}>Cards</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('icons')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'icons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <ImageIcon size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'icons' ? 'text-primary-content' : 'text-base-content'}`}>Icons</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('tables')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'tables' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <Table size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'tables' ? 'text-primary-content' : 'text-base-content'}`}>Tables</span>
           </button>
         </nav>
 
         <div className="p-4 border-t border-base-300">
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={openSettings}
             className="w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
           >
             <Settings size={20} />
@@ -113,7 +153,10 @@ const App: React.FC = () => {
 
           {activeTab === 'dock' && <Dock />}
           {activeTab === 'bookmark' && <BookmarkManager />}
-          {activeTab === 'gallery' && <BookmarkGallery />}
+          {activeTab === 'buttons' && <BookmarkGallery viewMode="buttons" />}
+          {activeTab === 'cards' && <BookmarkGallery viewMode="cards" />}
+          {activeTab === 'icons' && <BookmarkGallery viewMode="icons" />}
+          {activeTab === 'tables' && <BookmarkGallery viewMode="tables" />}
         </div>
       </main>
 
@@ -125,7 +168,7 @@ const App: React.FC = () => {
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <Settings size={20} className="text-primary" /> Settings
               </h3>
-              <button onClick={() => setShowSettings(false)} className="btn btn-ghost btn-sm btn-circle">
+              <button onClick={cancelSettings} className="btn btn-ghost btn-sm btn-circle">
                 <X size={20} />
               </button>
             </div>
@@ -185,7 +228,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="p-6 bg-base-200 border-t border-base-300 flex justify-end gap-3">
-              <button onClick={() => setShowSettings(false)} className="btn btn-ghost">Cancel</button>
+              <button onClick={cancelSettings} className="btn btn-ghost">Cancel</button>
               <button onClick={saveSettings} className="btn btn-primary">Save Changes</button>
             </div>
           </div>

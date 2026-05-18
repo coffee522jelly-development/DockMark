@@ -10,6 +10,7 @@ interface Todo {
 const TodoWidget: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -17,22 +18,26 @@ const TodoWidget: React.FC = () => {
         if (result && Array.isArray(result.todos)) {
           setTodos(result.todos);
         }
+        setIsLoaded(true);
       });
     } else {
       const savedTodos = localStorage.getItem('todos');
       if (savedTodos) {
         setTodos(JSON.parse(savedTodos));
       }
+      setIsLoaded(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ todos });
     } else {
       localStorage.setItem('todos', JSON.stringify(todos));
     }
-  }, [todos]);
+  }, [todos, isLoaded]);
 
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Search, Grid, Image as ImageIcon, MousePointer2 } from 'lucide-react';
+import { ExternalLink, Search } from 'lucide-react';
 
 interface BookmarkItem {
   id: string;
@@ -8,10 +8,15 @@ interface BookmarkItem {
   parentId?: string;
 }
 
-const BookmarkGallery: React.FC = () => {
+export type BookmarkViewMode = 'buttons' | 'cards' | 'icons' | 'tables';
+
+interface BookmarkGalleryProps {
+  viewMode: BookmarkViewMode;
+}
+
+const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'buttons' | 'cards' | 'icons'>('buttons');
 
   useEffect(() => {
     const flattenBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[]): BookmarkItem[] => {
@@ -85,31 +90,7 @@ const BookmarkGallery: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-base-100 p-4 rounded-2xl shadow-sm border border-base-300">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-base-content whitespace-nowrap">Bookmark Gallery</h2>
-
-          <div className="join bg-base-200 p-1">
-            <button
-              onClick={() => setViewMode('buttons')}
-              className={`join-item btn btn-sm ${viewMode === 'buttons' ? 'btn-primary' : 'btn-ghost'}`}
-              title="Buttons Mode"
-            >
-              <MousePointer2 size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`join-item btn btn-sm ${viewMode === 'cards' ? 'btn-primary' : 'btn-ghost'}`}
-              title="Cards Mode"
-            >
-              <Grid size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('icons')}
-              className={`join-item btn btn-sm ${viewMode === 'icons' ? 'btn-primary' : 'btn-ghost'}`}
-              title="Icons Mode"
-            >
-              <ImageIcon size={16} />
-            </button>
-          </div>
+          <h2 className="text-2xl font-bold text-base-content whitespace-nowrap capitalize">Bookmark {viewMode}</h2>
         </div>
 
         <div className="relative w-full md:w-64">
@@ -118,7 +99,7 @@ const BookmarkGallery: React.FC = () => {
           </span>
           <input
             type="text"
-            placeholder="Search buttons..."
+            placeholder={`Search ${viewMode}...`}
             className="input input-bordered w-full pl-10 h-10 text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -185,6 +166,48 @@ const BookmarkGallery: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {viewMode === 'tables' && (
+          <div className="overflow-x-auto bg-base-100 rounded-2xl border border-base-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <table className="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th className="w-16 text-center">Icon</th>
+                  <th>Title</th>
+                  <th>URL</th>
+                  <th className="w-20 text-center">Open</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBookmarks.map((bookmark) => {
+                  const domain = new URL(bookmark.url).hostname;
+                  const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
+                  return (
+                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors">
+                      <td className="text-center">
+                        <div className="avatar">
+                          <div className="w-8 h-8 rounded-lg bg-base-300 flex items-center justify-center p-1">
+                            <img src={faviconUrl} alt="favicon" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="font-bold">{bookmark.title}</td>
+                      <td className="text-sm text-base-content/50 truncate max-w-xs">{bookmark.url}</td>
+                      <td className="text-center">
+                        <button
+                          onClick={() => window.open(bookmark.url, '_blank')}
+                          className="btn btn-ghost btn-sm btn-circle text-primary"
+                        >
+                          <ExternalLink size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 
