@@ -12,9 +12,11 @@ const BookmarkItem: React.FC<{
   node: BookmarkNode,
   depth: number,
   onDelete: (id: string) => void,
-  onEdit: (node: BookmarkNode) => void
-}> = ({ node, depth, onDelete, onEdit }) => {
+  onEdit: (node: BookmarkNode) => void,
+  onMove: (id: string, parentId: string) => void
+}> = ({ node, depth, onDelete, onEdit, onMove }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const isFolder = !!node.children;
 
   const handleClick = () => {
@@ -25,17 +27,63 @@ const BookmarkItem: React.FC<{
     }
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (isFolder) return; // Only allow dragging bookmark items as requested
+    e.dataTransfer.setData('bookmarkId', node.id);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Add a ghost image or just styling
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = '0.5';
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    target.style.opacity = '1';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (isFolder) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    if (isFolder) {
+      e.preventDefault();
+      setIsDragOver(false);
+      const draggedId = e.dataTransfer.getData('bookmarkId');
+      if (draggedId && draggedId !== node.id) {
+        onMove(draggedId, node.id);
+      }
+    }
+  };
+
   return (
     <div className="select-none">
       <div
-        className={`flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer group transition-colors`}
+        draggable={!isFolder}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer group transition-all ${
+          isDragOver ? 'bg-primary/20 ring-2 ring-primary ring-inset' : ''
+        }`}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
         onClick={handleClick}
       >
         {isFolder ? (
           <>
             {isOpen ? <ChevronDown size={16} className="text-base-content/40" /> : <ChevronRight size={16} className="text-base-content/40" />}
-            <Folder size={18} className="text-primary fill-primary/20" />
+            <Folder size={18} className={`text-primary ${isDragOver ? 'fill-primary/40 scale-110' : 'fill-primary/20'} transition-transform`} />
           </>
         ) : (
           <>
@@ -79,7 +127,7 @@ const BookmarkItem: React.FC<{
       {isFolder && isOpen && node.children && (
         <div className="mt-1">
           {node.children.map(child => (
-            <BookmarkItem key={child.id} node={child} depth={depth + 1} onDelete={onDelete} onEdit={onEdit} />
+            <BookmarkItem key={child.id} node={child} depth={depth + 1} onDelete={onDelete} onEdit={onEdit} onMove={onMove} />
           ))}
         </div>
       )}
@@ -148,6 +196,47 @@ const BookmarkList: React.FC = () => {
     (document.getElementById('edit_modal') as HTMLDialogElement).showModal();
   };
 
+  const handleMove = (id: string, parentId: string) => {
+    if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+      chrome.bookmarks.move(id, { parentId }, () => {
+        fetchBookmarks();
+      });
+    } else {
+      // Mock move for dev
+      console.log(`Moving ${id} to ${parentId}`);
+      setBookmarks(prev => {
+        let movedNode: BookmarkNode | null = null;
+
+        const findAndRemove = (nodes: BookmarkNode[]): BookmarkNode[] => {
+          return nodes.filter(n => {
+            if (n.id === id) {
+              movedNode = n;
+              return false;
+            }
+            if (n.children) n.children = findAndRemove(n.children);
+            return true;
+          });
+        };
+
+        const addNode = (nodes: BookmarkNode[]): BookmarkNode[] => {
+          return nodes.map(n => {
+            if (n.id === parentId && n.children) {
+              return { ...n, children: [...n.children, movedNode!] };
+            }
+            if (n.children) return { ...n, children: addNode(n.children) };
+            return n;
+          });
+        };
+
+        const cleaned = findAndRemove([...prev]);
+        if (movedNode) {
+          return addNode(cleaned);
+        }
+        return cleaned;
+      });
+    }
+  };
+
   const saveEdit = () => {
     if (editingNode) {
       if (typeof chrome !== 'undefined' && chrome.bookmarks) {
@@ -169,7 +258,7 @@ const BookmarkList: React.FC = () => {
     <div className="space-y-2">
       {bookmarks.length > 0 ? (
         bookmarks.map(node => (
-          <BookmarkItem key={node.id} node={node} depth={0} onDelete={handleDelete} onEdit={handleEdit} />
+          <BookmarkItem key={node.id} node={node} depth={0} onDelete={handleDelete} onEdit={handleEdit} onMove={handleMove} />
         ))
       ) : (
         <div className="text-center py-10 text-base-content/40">No bookmarks found.</div>
