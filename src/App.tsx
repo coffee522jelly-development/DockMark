@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table, FileText } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkGallery from './components/bookmarks/BookmarkGallery';
+import Snippets from './components/snippets/Snippets';
 
 const themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -12,7 +13,7 @@ const themes = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -128,6 +129,15 @@ const App: React.FC = () => {
             <Table size={20} />
             <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'tables' ? 'text-primary-content' : 'text-base-content'}`}>Tables</span>
           </button>
+          <button
+            onClick={() => setActiveTab('snippets')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'snippets' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <FileText size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'snippets' ? 'text-primary-content' : 'text-base-content'}`}>Snippets</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-base-300">
@@ -157,6 +167,7 @@ const App: React.FC = () => {
           {activeTab === 'cards' && <BookmarkGallery viewMode="cards" />}
           {activeTab === 'icons' && <BookmarkGallery viewMode="icons" />}
           {activeTab === 'tables' && <BookmarkGallery viewMode="tables" />}
+          {activeTab === 'snippets' && <Snippets />}
         </div>
       </main>
 

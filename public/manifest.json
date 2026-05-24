@@ -3,8 +3,12 @@
   "name": "DockMark",
   "version": "1.0.0",
   "description": "A productivity dashboard and bookmark organizer for your new tab.",
-  "permissions": ["bookmarks", "storage", "geolocation", "favicon"],
+  "permissions": ["bookmarks", "storage", "geolocation", "favicon", "contextMenus"],
   "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
