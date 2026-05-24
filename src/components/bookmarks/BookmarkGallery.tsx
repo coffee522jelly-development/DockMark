@@ -282,12 +282,26 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                         </div>
                       </td>
                       <td className="font-bold py-3 max-w-0">
-                        <div className="truncate w-full" title={bookmark.title}>
+                        <a
+                          href={bookmark.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="truncate w-full block hover:underline hover:text-primary transition-all"
+                          title={bookmark.title}
+                        >
                           {bookmark.title}
-                        </div>
+                        </a>
                       </td>
                       <td className="text-sm text-base-content/50 py-3 max-w-0">
-                        <div className="truncate w-full" title={bookmark.url}>{bookmark.url}</div>
+                        <a
+                          href={bookmark.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="truncate w-full block hover:underline hover:text-primary transition-all"
+                          title={bookmark.url}
+                        >
+                          {bookmark.url}
+                        </a>
                       </td>
                       <td className="text-right pr-4 py-3">
                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
