@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Search, Trash2, FileText, Download } from 'lucide-react';
+import { ExternalLink, Search, Trash2, Save, Download } from 'lucide-react';
 import TurndownService from 'turndown';
 
 interface BookmarkItem {
@@ -51,8 +51,8 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
         { id: '1', title: 'Apple', url: 'https://apple.com', parentId: 'f1' },
         { id: '2', title: 'Google', url: 'https://google.com', parentId: 'f1' },
         { id: '3', title: 'Yahoo', url: 'https://yahoo.co.jp', parentId: 'f2' },
-        { id: '4', title: 'あいうえお銀行 - とても長い名前の銀行口座で、テストのためにわざと長くしています。どこまで表示されるかな？', url: 'https://example.com/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow', parentId: 'f3' },
-        { id: '5', title: 'Super Long Bookmark Title That Should Definitely Be Truncated In The Table View To Prevent Any Horizontal Scrolling Issues And Keep The UI Clean', url: 'https://extremely-long-domain-name-that-goes-on-and-on-and-on-without-any-spaces-to-test-word-breaking.example.com/path?query=123&another_long_parameter=abcdefghijklmnopqrstuvwxyz1234567890', parentId: 'f3' },
+        { id: '4', title: 'あいうえお銀行 - とても長い名前の銀行口座で、テストのためにわざと長くしています。どこまで表示されるかな？あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ', url: 'https://example.com/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow', parentId: 'f3' },
+        { id: '5', title: 'SuperLongBookmarkTitleThatShouldDefinitelyBeTruncatedInTheTableViewToPreventAnyHorizontalScrollingIssuesAndKeepTheUICleanWithoutAnySpacesToForceTheIssue', url: 'https://extremely-long-domain-name-that-goes-on-and-on-and-on-without-any-spaces-to-test-word-breaking.example.com/path?query=123&another_long_parameter=abcdefghijklmnopqrstuvwxyz1234567890&extremely_long_parameter_without_spaces_to_test_overflow_behavior_in_browsers_that_struggle_with_this', parentId: 'f3' },
       ];
       mock.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
       setBookmarks(mock);
@@ -180,7 +180,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                     className={`btn btn-ghost btn-xs btn-circle ${isProcessing === bookmark.id ? 'loading loading-spinner' : ''}`}
                     title="Save as Markdown"
                   >
-                    {!isProcessing && <FileText size={14} />}
+                    {!isProcessing && <Save size={14} />}
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }}
@@ -223,7 +223,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                         className="btn btn-circle btn-xs btn-ghost bg-base-100 shadow-sm"
                         title="Save as Markdown"
                       >
-                        {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={12} />}
+                        {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={12} />}
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }}
@@ -281,12 +281,12 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                           </div>
                         </div>
                       </td>
-                      <td className="font-bold py-3">
+                      <td className="font-bold py-3 max-w-0">
                         <div className="truncate w-full" title={bookmark.title}>
                           {bookmark.title}
                         </div>
                       </td>
-                      <td className="text-sm text-base-content/50 py-3">
+                      <td className="text-sm text-base-content/50 py-3 max-w-0">
                         <div className="truncate w-full" title={bookmark.url}>{bookmark.url}</div>
                       </td>
                       <td className="text-right pr-4 py-3">
@@ -303,7 +303,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                             className="btn btn-ghost btn-xs btn-circle"
                             title="Save as Markdown"
                           >
-                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
+                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}
                           </button>
                           <button
                             onClick={() => handleDelete(bookmark.id)}
