@@ -51,8 +51,8 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
         { id: '1', title: 'Apple', url: 'https://apple.com', parentId: 'f1' },
         { id: '2', title: 'Google', url: 'https://google.com', parentId: 'f1' },
         { id: '3', title: 'Yahoo', url: 'https://yahoo.co.jp', parentId: 'f2' },
-        { id: '4', title: 'あいうえお銀行', url: 'https://example.com', parentId: 'f3' },
-        { id: '5', title: 'かきくけこ通販', url: 'https://example.com', parentId: 'f3' },
+        { id: '4', title: 'あいうえお銀行 - とても長い名前の銀行口座で、テストのためにわざと長くしています。どこまで表示されるかな？', url: 'https://example.com/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow', parentId: 'f3' },
+        { id: '5', title: 'Super Long Bookmark Title That Should Definitely Be Truncated In The Table View To Prevent Any Horizontal Scrolling Issues And Keep The UI Clean', url: 'https://extremely-long-domain-name-that-goes-on-and-on-and-on-without-any-spaces-to-test-word-breaking.example.com/path?query=123&another_long_parameter=abcdefghijklmnopqrstuvwxyz1234567890', parentId: 'f3' },
       ];
       mock.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
       setBookmarks(mock);
@@ -259,68 +259,66 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
 
         {viewMode === 'tables' && (
           <div className="bg-base-100 rounded-2xl border border-base-300 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="table table-zebra w-full table-fixed md:table-auto">
-                <thead>
-                  <tr>
-                    <th className="w-16 text-center">Icon</th>
-                    <th className="w-1/3 min-w-[150px]">Title</th>
-                    <th className="hidden md:table-cell">URL</th>
-                    <th className="w-32 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBookmarks.map((bookmark) => {
-                    const domain = new URL(bookmark.url).hostname;
-                    const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
-                    return (
-                      <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
-                        <td className="text-center">
-                          <div className="avatar">
-                            <div className="w-8 h-8 rounded-lg bg-base-300 flex items-center justify-center p-1">
-                              <img src={faviconUrl} alt="favicon" />
-                            </div>
+            <table className="table table-zebra w-full table-fixed">
+              <thead>
+                <tr>
+                  <th className="w-12 text-center"></th>
+                  <th className="w-[40%]">Title</th>
+                  <th className="w-[45%]">URL</th>
+                  <th className="w-28 text-right pr-4"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBookmarks.map((bookmark) => {
+                  const domain = new URL(bookmark.url).hostname;
+                  const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
+                  return (
+                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
+                      <td className="text-center px-2">
+                        <div className="avatar">
+                          <div className="w-6 h-6 rounded bg-base-300 flex items-center justify-center p-0.5">
+                            <img src={faviconUrl} alt="favicon" />
                           </div>
-                        </td>
-                        <td className="font-bold">
-                          <div className="truncate max-w-full" title={bookmark.title}>
-                            {bookmark.title}
-                          </div>
-                        </td>
-                        <td className="text-sm text-base-content/50 hidden md:table-cell">
-                          <div className="truncate max-w-xs">{bookmark.url}</div>
-                        </td>
-                        <td className="text-center">
-                          <div className="flex justify-center gap-1">
-                            <button
-                              onClick={() => window.open(bookmark.url, '_blank')}
-                              className="btn btn-ghost btn-xs btn-circle text-primary"
-                              title="Open"
-                            >
-                              <ExternalLink size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleDownloadMarkdown(bookmark)}
-                              className="btn btn-ghost btn-xs btn-circle"
-                              title="Save as Markdown"
-                            >
-                              {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
-                            </button>
-                            <button
-                              onClick={() => handleDelete(bookmark.id)}
-                              className="btn btn-ghost btn-xs btn-circle text-error"
-                              title="Delete"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </td>
+                      <td className="font-bold py-3">
+                        <div className="truncate w-full" title={bookmark.title}>
+                          {bookmark.title}
+                        </div>
+                      </td>
+                      <td className="text-sm text-base-content/50 py-3">
+                        <div className="truncate w-full" title={bookmark.url}>{bookmark.url}</div>
+                      </td>
+                      <td className="text-right pr-4 py-3">
+                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => window.open(bookmark.url, '_blank')}
+                            className="btn btn-ghost btn-xs btn-circle text-primary"
+                            title="Open"
+                          >
+                            <ExternalLink size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDownloadMarkdown(bookmark)}
+                            className="btn btn-ghost btn-xs btn-circle"
+                            title="Save as Markdown"
+                          >
+                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(bookmark.id)}
+                            className="btn btn-ghost btn-xs btn-circle text-error"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 
