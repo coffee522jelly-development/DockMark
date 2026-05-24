@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Search } from 'lucide-react';
+import { ExternalLink, Search, Trash2, FileText, Download } from 'lucide-react';
+import TurndownService from 'turndown';
 
 interface BookmarkItem {
   id: string;
@@ -17,8 +18,9 @@ interface BookmarkGalleryProps {
 const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchBookmarks = () => {
     const flattenBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[]): BookmarkItem[] => {
       let flat: BookmarkItem[] = [];
       for (const node of nodes) {
@@ -40,7 +42,6 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
     if (typeof chrome !== 'undefined' && chrome.bookmarks) {
       chrome.bookmarks.getTree((tree) => {
         const flatList = flattenBookmarks(tree);
-        // Sort by title (ABC / あいうえお order)
         flatList.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
         setBookmarks(flatList);
       });
@@ -56,7 +57,62 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
       mock.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
       setBookmarks(mock);
     }
+  };
+
+  useEffect(() => {
+    fetchBookmarks();
   }, []);
+
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this bookmark?')) {
+      if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+        chrome.bookmarks.remove(id, () => {
+          fetchBookmarks();
+        });
+      } else {
+        setBookmarks(prev => prev.filter(b => b.id !== id));
+      }
+    }
+  };
+
+  const handleDownloadMarkdown = async (bookmark: BookmarkItem) => {
+    setIsProcessing(bookmark.id);
+    try {
+      const response = await fetch(bookmark.url);
+      const html = await response.text();
+
+      const turndownService = new TurndownService({
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced'
+      });
+
+      // Basic cleanup to get better markdown
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Remove scripts, styles, etc.
+      const toRemove = doc.querySelectorAll('script, style, noscript, iframe, header, footer, nav');
+      toRemove.forEach(el => el.remove());
+
+      const markdown = turndownService.turndown(doc.body.innerHTML);
+      const finalMarkdown = `# ${bookmark.title}\n\nSource: [${bookmark.url}](${bookmark.url})\n\n---\n\n${markdown}`;
+
+      const blob = new Blob([finalMarkdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${bookmark.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to save as markdown:', error);
+      alert('Failed to fetch content. This might be due to CORS restrictions or the site being offline.');
+    } finally {
+      setIsProcessing(null);
+    }
+  };
 
   const filteredBookmarks = bookmarks.filter(b =>
     b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,14 +167,30 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
         {viewMode === 'buttons' && (
           <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {filteredBookmarks.map((bookmark) => (
-              <button
-                key={bookmark.id}
-                onClick={() => window.open(bookmark.url, '_blank')}
-                className={`btn btn-outline ${getFolderColor(bookmark.parentId)} normal-case font-medium gap-2 group hover:shadow-md transition-all`}
-              >
-                <span className="truncate max-w-[150px]">{bookmark.title}</span>
-                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
+              <div key={bookmark.id} className="group relative">
+                <button
+                  onClick={() => window.open(bookmark.url, '_blank')}
+                  className={`btn btn-outline ${getFolderColor(bookmark.parentId)} normal-case font-medium pr-16 group-hover:shadow-md transition-all text-left block h-auto py-2 min-h-[2.5rem]`}
+                >
+                  <span className="truncate max-w-[150px] block">{bookmark.title}</span>
+                </button>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }}
+                    className={`btn btn-ghost btn-xs btn-circle ${isProcessing === bookmark.id ? 'loading loading-spinner' : ''}`}
+                    title="Save as Markdown"
+                  >
+                    {!isProcessing && <FileText size={14} />}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }}
+                    className="btn btn-ghost btn-xs btn-circle text-error"
+                    title="Delete"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -144,7 +216,23 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                   </figure>
-                  <div className="card-body p-4">
+                  <div className="card-body p-4 relative">
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }}
+                        className="btn btn-circle btn-xs btn-ghost bg-base-100 shadow-sm"
+                        title="Save as Markdown"
+                      >
+                        {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={12} />}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }}
+                        className="btn btn-circle btn-xs btn-ghost bg-base-100 shadow-sm text-error"
+                        title="Delete"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center flex-shrink-0">
                         <img
@@ -177,7 +265,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                   <th className="w-16 text-center">Icon</th>
                   <th>Title</th>
                   <th>URL</th>
-                  <th className="w-20 text-center">Open</th>
+                  <th className="w-32 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,7 +273,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                   const domain = new URL(bookmark.url).hostname;
                   const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
                   return (
-                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors">
+                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
                       <td className="text-center">
                         <div className="avatar">
                           <div className="w-8 h-8 rounded-lg bg-base-300 flex items-center justify-center p-1">
@@ -196,12 +284,29 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                       <td className="font-bold">{bookmark.title}</td>
                       <td className="text-sm text-base-content/50 truncate max-w-xs">{bookmark.url}</td>
                       <td className="text-center">
-                        <button
-                          onClick={() => window.open(bookmark.url, '_blank')}
-                          className="btn btn-ghost btn-sm btn-circle text-primary"
-                        >
-                          <ExternalLink size={16} />
-                        </button>
+                        <div className="flex justify-center gap-1">
+                          <button
+                            onClick={() => window.open(bookmark.url, '_blank')}
+                            className="btn btn-ghost btn-xs btn-circle text-primary"
+                            title="Open"
+                          >
+                            <ExternalLink size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDownloadMarkdown(bookmark)}
+                            className="btn btn-ghost btn-xs btn-circle"
+                            title="Save as Markdown"
+                          >
+                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(bookmark.id)}
+                            className="btn btn-ghost btn-xs btn-circle text-error"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -215,28 +320,43 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {filteredBookmarks.map((bookmark) => {
               const url = new URL(bookmark.url);
-              // Construct chrome-extension://_favicon/ URL
               const chromeExtensionId = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : '';
               const faviconUrl = `chrome-extension://${chromeExtensionId}/_favicon/?pageUrl=${encodeURIComponent(bookmark.url)}&size=64`;
 
               return (
-                <div
-                  key={bookmark.id}
-                  onClick={() => window.open(bookmark.url, '_blank')}
-                  className="tooltip tooltip-bottom"
-                  data-tip={bookmark.title}
-                >
-                  <button className="btn btn-ghost btn-circle p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300">
-                    <img
-                      src={faviconUrl}
-                      alt={bookmark.title}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        // Fallback to Google S2 if chrome-extension favicon fails (e.g. in dev)
-                        (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
-                      }}
-                    />
-                  </button>
+                <div key={bookmark.id} className="group relative">
+                  <div
+                    onClick={() => window.open(bookmark.url, '_blank')}
+                    className="tooltip tooltip-bottom"
+                    data-tip={bookmark.title}
+                  >
+                    <button className="btn btn-ghost btn-circle p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300">
+                      <img
+                        src={faviconUrl}
+                        alt={bookmark.title}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                        }}
+                      />
+                    </button>
+                  </div>
+                  <div className="absolute -top-2 -right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }}
+                      className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300"
+                      title="Markdown"
+                    >
+                      {isProcessing === bookmark.id ? <span className="loading loading-spinner w-3 h-3"></span> : <Download size={10} />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }}
+                      className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300 text-error"
+                      title="Delete"
+                    >
+                      <Trash2 size={10} />
+                    </button>
+                  </div>
                 </div>
               );
             })}

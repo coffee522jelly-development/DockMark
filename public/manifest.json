@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "A bookmark organizer with a customizable dashboard (Dock).",
   "permissions": ["bookmarks", "storage", "geolocation", "favicon"],
+  "host_permissions": ["<all_urls>"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
