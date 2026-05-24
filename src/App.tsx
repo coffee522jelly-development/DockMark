@@ -4,6 +4,7 @@ import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkGallery from './components/bookmarks/BookmarkGallery';
 import Snippets from './components/snippets/Snippets';
+import RssManager from './components/rss/RssManager';
 
 const themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -13,7 +14,7 @@ const themes = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -149,6 +150,15 @@ const App: React.FC = () => {
             <FileText size={20} />
             <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'snippets' ? 'text-primary-content' : 'text-base-content'}`}>Snippets</span>
           </button>
+          <button
+            onClick={() => setActiveTab('rss')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'rss' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <Rss size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'rss' ? 'text-primary-content' : 'text-base-content'}`}>RSS Feeds</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-base-300">
@@ -179,6 +189,7 @@ const App: React.FC = () => {
           {activeTab === 'icons' && <BookmarkGallery viewMode="icons" />}
           {activeTab === 'tables' && <BookmarkGallery viewMode="tables" />}
           {activeTab === 'snippets' && <Snippets />}
+          {activeTab === 'rss' && <RssManager />}
         </div>
       </main>
 
