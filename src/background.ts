@@ -2,14 +2,22 @@
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "save-snippet",
+    id: "saveSnippet",
     title: "スニペットを保存 (DockMark)",
     contexts: ["selection"]
+  });
+
+  chrome.contextMenus.create({
+    id: "openSnippets",
+    title: "スニペット一覧を開く (DockMark)",
+    contexts: ["all"]
   });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "save-snippet" && info.selectionText) {
+  if (info.menuItemId === "openSnippets") {
+    chrome.tabs.create({ url: 'index.html?view=snippets' });
+  } else if (info.menuItemId === "saveSnippet" && info.selectionText) {
     const snippet = {
       id: Date.now().toString(),
       text: info.selectionText,
@@ -23,7 +31,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       snippets.unshift(snippet);
       chrome.storage.local.set({ snippets }, () => {
         console.log("Snippet saved:", snippet);
-        // Optional: Notify the user if we have a way to do so
       });
     });
   }

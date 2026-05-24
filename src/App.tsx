@@ -20,6 +20,14 @@ const App: React.FC = () => {
   const [initialSettings, setInitialSettings] = useState({ userName: 'User', theme: 'light' });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    if (view === 'snippets') {
+      setActiveTab('snippets');
+    }
+  }, []);
+
+  useEffect(() => {
     // Load Name from chrome storage
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(['userName'], (result) => {
@@ -129,6 +137,9 @@ const App: React.FC = () => {
             <Table size={20} />
             <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'tables' ? 'text-primary-content' : 'text-base-content'}`}>Tables</span>
           </button>
+
+          <div className="border-t border-base-300 my-2 opacity-50"></div>
+
           <button
             onClick={() => setActiveTab('snippets')}
             className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${

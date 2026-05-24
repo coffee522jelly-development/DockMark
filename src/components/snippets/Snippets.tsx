@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trash2, Download, FileText, Search, ExternalLink } from 'lucide-react';
+import { Trash2, Download, FileText, Search, ExternalLink, Copy, Check, Edit2, Save, X } from 'lucide-react';
 
 interface Snippet {
   id: string;
@@ -13,6 +13,9 @@ const Snippets: React.FC = () => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
 
   useEffect(() => {
     const loadSnippets = () => {
@@ -45,6 +48,27 @@ const Snippets: React.FC = () => {
     const newSnippets = snippets.filter(s => s.id !== id);
     setSnippets(newSnippets);
     saveToStorage(newSnippets);
+  };
+
+  const copyToClipboard = (snippet: Snippet) => {
+    navigator.clipboard.writeText(snippet.text).then(() => {
+      setCopiedId(snippet.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
+  const startEditing = (snippet: Snippet) => {
+    setEditingId(snippet.id);
+    setEditTitle(snippet.title);
+  };
+
+  const saveTitle = (id: string) => {
+    const newSnippets = snippets.map(s =>
+      s.id === id ? { ...s, title: editTitle } : s
+    );
+    setSnippets(newSnippets);
+    saveToStorage(newSnippets);
+    setEditingId(null);
   };
 
   const exportAsMarkdown = (snippet: Snippet) => {
@@ -141,15 +165,53 @@ ${snippet.text}
             <div key={snippet.id} className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-md transition-shadow group">
               <div className="card-body p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm truncate text-base-content" title={snippet.title}>
-                      {snippet.title}
-                    </h3>
+                  <div className="flex-1 min-w-0 pr-2">
+                    {editingId === snippet.id ? (
+                      <div className="flex gap-1 items-center">
+                        <input
+                          type="text"
+                          className="input input-bordered input-xs flex-1"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveTitle(snippet.id);
+                            if (e.key === 'Escape') setEditingId(null);
+                          }}
+                        />
+                        <button onClick={() => saveTitle(snippet.id)} className="btn btn-ghost btn-xs btn-square text-success">
+                          <Save className="w-3 h-3" />
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="btn btn-ghost btn-xs btn-square text-error">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 group/title">
+                        <h3 className="font-bold text-sm truncate text-base-content" title={snippet.title}>
+                          {snippet.title}
+                        </h3>
+                        <button
+                          onClick={() => startEditing(snippet)}
+                          className="opacity-0 group-hover/title:opacity-100 transition-opacity btn btn-ghost btn-xs btn-square p-0"
+                          title="Edit title"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                     <p className="text-[10px] opacity-50">
                       {new Date(snippet.timestamp).toLocaleString()}
                     </p>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <button
+                      onClick={() => copyToClipboard(snippet)}
+                      className={`btn btn-ghost btn-xs btn-square ${copiedId === snippet.id ? 'text-success' : 'text-base-content/50'}`}
+                      title="Copy to clipboard"
+                    >
+                      {copiedId === snippet.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
                     <button
                       onClick={() => exportAsMarkdown(snippet)}
                       className="btn btn-ghost btn-xs btn-square text-info"
