@@ -26,7 +26,7 @@ const RssWidget: React.FC = () => {
 
     let feeds: RssFeed[] = [];
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      const result = await new Promise<{rssFeeds?: RssFeed[]}>(resolve => chrome.storage.local.get(['rssFeeds'], resolve));
+      const result = await new Promise<any>(resolve => chrome.storage.local.get(['rssFeeds'], (res) => resolve(res)));
       feeds = result.rssFeeds || [];
     } else {
       const stored = localStorage.getItem('dockmark_rss_feeds');

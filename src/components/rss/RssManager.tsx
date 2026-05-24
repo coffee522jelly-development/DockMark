@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Rss, Plus, Trash2, ExternalLink, Globe, Save } from 'lucide-react';
+import { Rss, Plus, Trash2, ExternalLink, Globe } from 'lucide-react';
 
 interface RssFeed {
   id: string;
