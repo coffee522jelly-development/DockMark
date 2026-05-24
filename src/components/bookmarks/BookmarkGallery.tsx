@@ -258,61 +258,69 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
         )}
 
         {viewMode === 'tables' && (
-          <div className="overflow-x-auto bg-base-100 rounded-2xl border border-base-300 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <table className="table table-zebra w-full">
-              <thead>
-                <tr>
-                  <th className="w-16 text-center">Icon</th>
-                  <th>Title</th>
-                  <th>URL</th>
-                  <th className="w-32 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookmarks.map((bookmark) => {
-                  const domain = new URL(bookmark.url).hostname;
-                  const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
-                  return (
-                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
-                      <td className="text-center">
-                        <div className="avatar">
-                          <div className="w-8 h-8 rounded-lg bg-base-300 flex items-center justify-center p-1">
-                            <img src={faviconUrl} alt="favicon" />
+          <div className="bg-base-100 rounded-2xl border border-base-300 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="table table-zebra w-full table-fixed md:table-auto">
+                <thead>
+                  <tr>
+                    <th className="w-16 text-center">Icon</th>
+                    <th className="w-1/3 min-w-[150px]">Title</th>
+                    <th className="hidden md:table-cell">URL</th>
+                    <th className="w-32 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBookmarks.map((bookmark) => {
+                    const domain = new URL(bookmark.url).hostname;
+                    const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
+                    return (
+                      <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
+                        <td className="text-center">
+                          <div className="avatar">
+                            <div className="w-8 h-8 rounded-lg bg-base-300 flex items-center justify-center p-1">
+                              <img src={faviconUrl} alt="favicon" />
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="font-bold">{bookmark.title}</td>
-                      <td className="text-sm text-base-content/50 truncate max-w-xs">{bookmark.url}</td>
-                      <td className="text-center">
-                        <div className="flex justify-center gap-1">
-                          <button
-                            onClick={() => window.open(bookmark.url, '_blank')}
-                            className="btn btn-ghost btn-xs btn-circle text-primary"
-                            title="Open"
-                          >
-                            <ExternalLink size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDownloadMarkdown(bookmark)}
-                            className="btn btn-ghost btn-xs btn-circle"
-                            title="Save as Markdown"
-                          >
-                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(bookmark.id)}
-                            className="btn btn-ghost btn-xs btn-circle text-error"
-                            title="Delete"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="font-bold">
+                          <div className="truncate max-w-full" title={bookmark.title}>
+                            {bookmark.title}
+                          </div>
+                        </td>
+                        <td className="text-sm text-base-content/50 hidden md:table-cell">
+                          <div className="truncate max-w-xs">{bookmark.url}</div>
+                        </td>
+                        <td className="text-center">
+                          <div className="flex justify-center gap-1">
+                            <button
+                              onClick={() => window.open(bookmark.url, '_blank')}
+                              className="btn btn-ghost btn-xs btn-circle text-primary"
+                              title="Open"
+                            >
+                              <ExternalLink size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDownloadMarkdown(bookmark)}
+                              className="btn btn-ghost btn-xs btn-circle"
+                              title="Save as Markdown"
+                            >
+                              {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <FileText size={14} />}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(bookmark.id)}
+                              className="btn btn-ghost btn-xs btn-circle text-error"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
