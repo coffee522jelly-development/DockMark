@@ -1,73 +1,46 @@
-# React + TypeScript + Vite
+# DockMark ⚓
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**DockMark** is a powerful Chrome extension that transforms your "New Tab" page into a high-productivity dashboard and a sophisticated bookmark management hub.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🛠 Productivity Dock
+A customizable dashboard featuring essential widgets to keep you focused and organized:
+- **Clock & Calendar**: Stay on top of your schedule.
+- **Google Search**: Quick access to the web.
+- **Pomodoro Timer**: Boost focus with 25-minute work intervals.
+- **TODO List**: Manage tasks with persistent storage.
+- **Sticky Notes**: Jot down quick thoughts and reminders.
+- **Weather**: Real-time local weather updates via Geolocation.
+- **RSS Feed (Alpha)**: Keep up with your favorite news sources.
 
-## React Compiler
+### 🔖 Advanced Bookmark Management
+DockMark goes beyond simple lists, offering four distinct ways to visualize and interact with your browser bookmarks:
+- **Buttons View**: Alphabetically sorted and color-coded by folder for quick access.
+- **Cards View**: Rich visual cards featuring site thumbnails for easy recognition.
+- **Icons View**: A compact, minimalist grid for a clean look.
+- **Tables View**: A structured, high-density list optimized for managing large collections without horizontal clutter.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✨ Power Tools
+- **Markdown Export**: Fetch the content of any bookmarked page and save it as a clean Markdown file for archival or note-taking.
+- **Sync with Chrome**: Seamlessly integrates with your browser's native bookmarks API.
+- **Theme Support**: Choose from 20+ DaisyUI themes (Light, Dark, Cyberpunk, etc.) to match your style.
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
+- **Framework**: React 19 + TypeScript
+- **Styling**: Tailwind CSS v4 + DaisyUI v5
+- **Icons**: Lucide React
+- **Build Tool**: Vite
+- **Storage**: Chrome Storage API + LocalStorage
+- **Content Parsing**: Turndown
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Installation (Developer Mode)
+1. Clone this repository.
+2. Run `npm install` to install dependencies.
+3. Run `npm run build` to generate the production build in the `dist` directory.
+4. Open Chrome and navigate to `chrome://extensions/`.
+5. Enable **Developer mode** in the top right.
+6. Click **Load unpacked** and select the `dist` folder.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📄 License
+MIT

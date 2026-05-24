@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Bookmark Organizer",
+  "name": "DockMark",
   "version": "1.0.0",
-  "description": "A bookmark organizer with a customizable dashboard (Dock).",
+  "description": "A productivity dashboard and bookmark organizer for your new tab.",
   "permissions": ["bookmarks", "storage", "geolocation", "favicon"],
   "host_permissions": ["<all_urls>"],
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "action": {
-    "default_title": "Bookmark Organizer"
+    "default_title": "DockMark"
   },
   "icons": {
     "128": "favicon.svg"
