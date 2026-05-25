@@ -3,21 +3,43 @@ import { Clock } from 'lucide-react';
 
 const ClockWidget: React.FC = () => {
   const [time, setTime] = useState(new Date());
+  const [font, setFont] = useState('ui-sans-serif, system-ui');
 
   useEffect(() => {
+    const loadFont = () => {
+      const savedFont = localStorage.getItem('clock-font') || 'ui-sans-serif, system-ui';
+      setFont(savedFont);
+    };
+
+    loadFont();
+    // Listen for storage changes to update font in real-time if changed in settings
+    window.addEventListener('storage', loadFont);
+
+    // Also check periodically if changed within the same tab (since localStorage doesn't fire storage event in same tab)
+    const fontChecker = setInterval(loadFont, 1000);
+
     const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('storage', loadFont);
+      clearInterval(fontChecker);
+    };
   }, []);
 
   const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const dateString = time.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300">
-      <div className="card-body items-center text-center">
+    <div className="card bg-base-100 shadow-xl border border-base-300 h-full">
+      <div className="card-body items-center justify-center text-center p-4">
         <Clock className="w-8 h-8 text-primary mb-2" />
-        <h2 className="text-4xl font-bold font-mono text-base-content">{timeString}</h2>
-        <p className="text-base-content/60">{dateString}</p>
+        <h2
+          className="text-4xl font-bold text-base-content break-all"
+          style={{ fontFamily: font }}
+        >
+          {timeString}
+        </h2>
+        <p className="text-sm text-base-content/60 mt-2">{dateString}</p>
       </div>
     </div>
   );

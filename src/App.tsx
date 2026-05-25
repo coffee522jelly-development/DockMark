@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table, FileText } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table, FileText, Clock } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkGallery from './components/bookmarks/BookmarkGallery';
@@ -13,12 +13,33 @@ const themes = [
   "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"
 ];
 
+const clockFonts = [
+  { name: 'Standard (Sans)', value: 'ui-sans-serif, system-ui' },
+  { name: 'Roboto', value: 'Roboto, sans-serif' },
+  { name: 'Montserrat', value: 'Montserrat, sans-serif' },
+  { name: 'Playfair Display', value: 'Playfair Display, serif' },
+  { name: 'Cormorant Garamond', value: 'Cormorant Garamond, serif' },
+  { name: 'JetBrains Mono', value: 'JetBrains Mono, monospace' },
+  { name: 'Orbitron', value: 'Orbitron, sans-serif' },
+  { name: 'Bebas Neue', value: 'Bebas Neue, sans-serif' },
+  { name: 'Righteous', value: 'Righteous, sans-serif' },
+  { name: 'Unbounded', value: 'Unbounded, sans-serif' },
+  { name: 'Press Start 2P', value: '"Press Start 2P", system-ui' },
+  { name: 'Bangers', value: 'Bangers, system-ui' },
+  { name: 'Lobster', value: 'Lobster, system-ui' },
+  { name: 'Pacifico', value: 'Pacifico, system-ui' },
+  { name: 'Caveat', value: 'Caveat, cursive' },
+  { name: 'Dancing Script', value: 'Dancing Script, cursive' },
+  { name: 'Special Elite', value: 'Special Elite, system-ui' }
+];
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
-  const [initialSettings, setInitialSettings] = useState({ userName: 'User', theme: 'light' });
+  const [clockFont, setClockFont] = useState('ui-sans-serif, system-ui');
+  const [initialSettings, setInitialSettings] = useState({ userName: 'User', theme: 'light', clockFont: 'ui-sans-serif, system-ui' });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -40,6 +61,10 @@ const App: React.FC = () => {
     const savedTheme = localStorage.getItem('app-theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Load Clock Font
+    const savedFont = localStorage.getItem('clock-font') || 'ui-sans-serif, system-ui';
+    setClockFont(savedFont);
   }, []);
 
   const saveSettings = () => {
@@ -52,6 +77,9 @@ const App: React.FC = () => {
     localStorage.setItem('app-theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
 
+    // Save Clock Font
+    localStorage.setItem('clock-font', clockFont);
+
     setShowSettings(false);
   };
 
@@ -61,13 +89,14 @@ const App: React.FC = () => {
   };
 
   const openSettings = () => {
-    setInitialSettings({ userName, theme });
+    setInitialSettings({ userName, theme, clockFont });
     setShowSettings(true);
   };
 
   const cancelSettings = () => {
     setUserName(initialSettings.userName);
     setTheme(initialSettings.theme);
+    setClockFont(initialSettings.clockFont);
     document.documentElement.setAttribute('data-theme', initialSettings.theme);
     setShowSettings(false);
   };
@@ -237,15 +266,19 @@ const App: React.FC = () => {
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-bold flex items-center gap-2"><Rss size={16} /> RSS Feed URL</span>
+                  <span className="label-text font-bold flex items-center gap-2"><Clock size={16} /> Clock Font</span>
                 </label>
-                <input
-                  type="url"
-                  className="input input-bordered w-full"
-                  placeholder="https://example.com/rss"
-                  disabled
-                />
-                <span className="label-text-alt mt-1 text-base-content/40">Coming soon...</span>
+                <select
+                  className="select select-bordered w-full"
+                  value={clockFont}
+                  onChange={(e) => setClockFont(e.target.value)}
+                  style={{ fontFamily: clockFont }}
+                >
+                  {clockFonts.map(f => (
+                    <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.name}</option>
+                  ))}
+                </select>
+                <span className="label-text-alt mt-1 text-base-content/40">Choose a font for the clock widget.</span>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-base-200 rounded-xl">
