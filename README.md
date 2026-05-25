@@ -1,46 +1,54 @@
 # DockMark ⚓
 
-**DockMark** is a powerful Chrome extension that transforms your "New Tab" page into a high-productivity dashboard and a sophisticated bookmark management hub.
+**DockMark** は、ブラウザの「新しいタブ」を生産性の高いダッシュボードと高度なブックマーク管理ハブに変える強力な Chrome 拡張機能です。
 
-## 🚀 Features
+## 🚀 主な機能
 
-### 🛠 Productivity Dock
-A customizable dashboard featuring essential widgets to keep you focused and organized:
-- **Clock & Calendar**: Stay on top of your schedule.
-- **Google Search**: Quick access to the web.
-- **Pomodoro Timer**: Boost focus with 25-minute work intervals.
-- **TODO List**: Manage tasks with persistent storage.
-- **Sticky Notes**: Jot down quick thoughts and reminders.
-- **Weather**: Real-time local weather updates via Geolocation.
-- **RSS Feed (Alpha)**: Keep up with your favorite news sources.
+### 🛠 プロダクティビティ・ドック (Dock)
+集中力と整理整頓を維持するための、カスタマイズ可能なダッシュボードです：
+- **時計 & カレンダー**: スケジュールを常に把握。
+- **Google 検索**: ウェブへ素早くアクセス。
+- **ポモドーロタイマー**: 25 分の作業インターバルで集中力を向上。
+- **TODO リスト**: タスクを管理（永続ストレージ対応）。
+- **付箋 (Notes)**: 短いメモやリマインダーを素早く記録。
+- **天気予報**: 位置情報を使用したリアルタイムな現地の天気更新。
+- **RSS フィード**: お気に入りのニュースソースをチェック。
+- **ウィジェットの並び替え**: ドラッグ＆ドロップで自由に配置を変更可能。
 
-### 🔖 Advanced Bookmark Management
-DockMark goes beyond simple lists, offering four distinct ways to visualize and interact with your browser bookmarks:
-- **Buttons View**: Alphabetically sorted and color-coded by folder for quick access.
-- **Cards View**: Rich visual cards featuring site thumbnails for easy recognition.
-- **Icons View**: A compact, minimalist grid for a clean look.
-- **Tables View**: A structured, high-density list optimized for managing large collections without horizontal clutter.
+### 🔖 高度なブックマーク管理
+DockMark は単なるリスト表示を超え、4 つの異なるスタイルでブックマークを可視化・操作できます：
+- **ボタン表示**: アルファベット順にソートされ、フォルダごとに色分けされたクイックアクセス表示。
+- **カード表示**: サイトのサムネイルを表示する視覚的なカード形式。
+- **アイコン表示**: 最小限のグリッドで構成されたクリーンな表示。
+- **テーブル表示**: 大量のコレクションを管理するために最適化された、高密度なリスト形式。
 
-### ✨ Power Tools
-- **Markdown Export**: Fetch the content of any bookmarked page and save it as a clean Markdown file for archival or note-taking.
-- **Sync with Chrome**: Seamlessly integrates with your browser's native bookmarks API.
-- **Theme Support**: Choose from 20+ DaisyUI themes (Light, Dark, Cyberpunk, etc.) to match your style.
+### ✂️ コードスニペット保存
+ウェブ閲覧中に気になったテキストを素早く保存できます：
+- **右クリックメニュー**: 選択したテキストを右クリックから直接「DockMark」に保存。
+- **フォーマット維持**: 改行やインデントを正しく保持して保存。
+- **Markdown エクスポート**: 保存したスニペットを Markdown 形式で出力。
 
-## 🛠 Tech Stack
-- **Framework**: React 19 + TypeScript
-- **Styling**: Tailwind CSS v4 + DaisyUI v5
-- **Icons**: Lucide React
-- **Build Tool**: Vite
-- **Storage**: Chrome Storage API + LocalStorage
-- **Content Parsing**: Turndown
+### ✨ その他の機能
+- **Markdown 変換**: ブックマークしたページのコンテンツを取得し、アーカイブやノート用にクリーンな Markdown ファイルとして保存。
+- **Chrome 同期**: ブラウザのネイティブなブックマーク API とシームレスに連携。
+- **テーマ設定**: 20 種類以上の DaisyUI テーマ（Light, Dark, Cyberpunk など）から自分のスタイルに合わせて選択。
+- **ドラッグ＆ドロップ移動**: ブックマーク管理画面で、アイテムをドラッグしてフォルダ移動が可能。
 
-## 📦 Installation (Developer Mode)
-1. Clone this repository.
-2. Run `npm install` to install dependencies.
-3. Run `npm run build` to generate the production build in the `dist` directory.
-4. Open Chrome and navigate to `chrome://extensions/`.
-5. Enable **Developer mode** in the top right.
-6. Click **Load unpacked** and select the `dist` folder.
+## 🛠 使用技術
+- **フレームワーク**: React + TypeScript
+- **スタイリング**: Tailwind CSS v4 + DaisyUI v5
+- **アイコン**: Lucide React
+- **ビルドツール**: Vite
+- **ストレージ**: Chrome Storage API + LocalStorage
+- **コンテンツ解析**: Turndown
 
-## 📄 License
+## 📦 インストール方法 (開発者モード)
+1. このリポジトリをクローンします。
+2. `npm install` を実行して依存関係をインストールします。
+3. `npm run build` を実行して、`dist` ディレクトリにビルドファイルを生成します。
+4. Chrome を開き、`chrome://extensions/` にアクセスします。
+5. 右上の **デベロッパー モード** をオンにします。
+6. **パッケージ化されていない拡張機能を読み込む** をクリックし、`dist` フォルダを選択します。
+
+## 📄 ライセンス
 MIT
