@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trash2, Download, FileText, Search, ExternalLink, Copy, Check, Edit2, Save, X } from 'lucide-react';
+import { Trash2, Download, FileText, Search, ExternalLink, Copy, Check, Edit2, Save, X, Plus } from 'lucide-react';
 
 interface Snippet {
   id: string;
@@ -16,6 +16,11 @@ const Snippets: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+
+  // New snippet modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newSnippetTitle, setNewSnippetTitle] = useState('');
+  const [newSnippetText, setNewSnippetText] = useState('');
 
   useEffect(() => {
     const loadSnippets = () => {
@@ -42,6 +47,27 @@ const Snippets: React.FC = () => {
     } else {
       localStorage.setItem('dockmark_snippets', JSON.stringify(newSnippets));
     }
+  };
+
+  const addSnippet = () => {
+    if (!newSnippetText.trim()) return;
+
+    const newSnippet: Snippet = {
+      id: Date.now().toString(),
+      text: newSnippetText,
+      url: '',
+      title: newSnippetTitle.trim() || 'Manual Snippet',
+      timestamp: new Date().toISOString()
+    };
+
+    const updated = [newSnippet, ...snippets];
+    setSnippets(updated);
+    saveToStorage(updated);
+
+    // Clear and close
+    setNewSnippetTitle('');
+    setNewSnippetText('');
+    setIsModalOpen(false);
   };
 
   const deleteSnippet = (id: string) => {
@@ -95,7 +121,7 @@ ${snippet.text}
     let content = "# All Snippets\n\n";
     snippets.forEach(snippet => {
       content += `## ${snippet.title}\n\n`;
-      content += `- URL: ${snippet.url}\n`;
+      content += `- URL: ${snippet.url || 'Manual Input'}\n`;
       content += `- Date: ${snippet.timestamp}\n\n`;
       content += "```\n";
       content += snippet.text + "\n";
@@ -127,10 +153,19 @@ ${snippet.text}
   return (
     <div className="p-6 max-w-6xl mx-auto h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2 text-base-content">
-          <FileText className="w-6 h-6 text-primary" />
-          Code Snippets
-        </h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-base-content">
+            <FileText className="w-6 h-6 text-primary" />
+            Code Snippets
+          </h1>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="btn btn-primary btn-sm gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Snippet
+          </button>
+        </div>
         <div className="flex gap-2">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
@@ -144,7 +179,7 @@ ${snippet.text}
           </div>
           <button
             onClick={exportAllAsMarkdown}
-            className="btn btn-primary btn-sm gap-2"
+            className="btn btn-outline btn-sm gap-2"
             disabled={snippets.length === 0}
           >
             <Download className="w-4 h-4" />
@@ -157,7 +192,7 @@ ${snippet.text}
         <div className="flex-1 flex flex-col items-center justify-center opacity-50">
           <FileText className="w-16 h-16 mb-4" />
           <p className="text-xl font-medium">No snippets found</p>
-          <p className="text-sm">Select text on any webpage and use the right-click menu to save snippets.</p>
+          <p className="text-sm">Create a new snippet or save text from any webpage via right-click.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2 pb-6">
@@ -235,20 +270,78 @@ ${snippet.text}
                   </pre>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                  <a
-                    href={snippet.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] text-primary hover:underline truncate"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    {new URL(snippet.url).hostname}
-                  </a>
+                <div className="mt-4 flex items-center justify-between min-h-[1rem]">
+                  {snippet.url ? (
+                    <a
+                      href={snippet.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[10px] text-primary hover:underline truncate"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      {new URL(snippet.url).hostname}
+                    </a>
+                  ) : (
+                    <span className="text-[10px] opacity-30 italic">Manual entry</span>
+                  )}
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* New Snippet Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-base-100 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-base-300">
+            <div className="p-6 border-b border-base-300 flex justify-between items-center bg-base-200/50">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Plus size={20} className="text-primary" /> Create New Snippet
+              </h3>
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost btn-sm btn-circle">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-bold">Title</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  placeholder="e.g. Useful Regex, SQL Query, etc."
+                  value={newSnippetTitle}
+                  onChange={(e) => setNewSnippetTitle(e.target.value)}
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-bold">Snippet Content</span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered h-64 font-mono text-sm"
+                  placeholder="Paste or type your code here..."
+                  value={newSnippetText}
+                  onChange={(e) => setNewSnippetText(e.target.value)}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="p-6 bg-base-200/50 border-t border-base-300 flex justify-end gap-3">
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost">Cancel</button>
+              <button
+                onClick={addSnippet}
+                className="btn btn-primary"
+                disabled={!newSnippetText.trim()}
+              >
+                Create Snippet
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
