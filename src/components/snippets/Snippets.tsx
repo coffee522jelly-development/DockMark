@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Trash2, Download, FileText, Search, ExternalLink, Copy, Check, Edit2, Save, X, Plus } from 'lucide-react';
+import {
+  Trash2, Download, FileText, Search, ExternalLink,
+  Copy, Check, Edit2, Save, X, Plus,
+  LayoutList, Columns, LayoutGrid
+} from 'lucide-react';
 
 interface Snippet {
   id: string;
@@ -16,6 +20,7 @@ const Snippets: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [columns, setColumns] = useState<1 | 2 | 4>(2);
 
   // New snippet modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -166,7 +171,30 @@ ${snippet.text}
             New Snippet
           </button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-4 items-center">
+          <div className="join bg-base-200 p-0.5">
+            <button
+              onClick={() => setColumns(1)}
+              className={`join-item btn btn-xs ${columns === 1 ? 'btn-primary' : 'btn-ghost'}`}
+              title="1 Column"
+            >
+              <LayoutList className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setColumns(2)}
+              className={`join-item btn btn-xs ${columns === 2 ? 'btn-primary' : 'btn-ghost'}`}
+              title="2 Columns"
+            >
+              <Columns className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setColumns(4)}
+              className={`join-item btn btn-xs ${columns === 4 ? 'btn-primary' : 'btn-ghost'}`}
+              title="4 Columns"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
             <input
@@ -195,7 +223,11 @@ ${snippet.text}
           <p className="text-sm">Create a new snippet or save text from any webpage via right-click.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2 pb-6">
+        <div className={`grid gap-4 overflow-y-auto pr-2 pb-6 ${
+          columns === 1 ? 'grid-cols-1' :
+          columns === 2 ? 'grid-cols-1 md:grid-cols-2' :
+          'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'
+        }`}>
           {filteredSnippets.map((snippet) => (
             <div key={snippet.id} className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-md transition-shadow group">
               <div className="card-body p-4">
@@ -304,11 +336,9 @@ ${snippet.text}
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-bold">Title</span>
-                </label>
+            <div className="p-6 flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold opacity-70 px-1">Title</label>
                 <input
                   type="text"
                   className="input input-bordered w-full"
@@ -318,12 +348,12 @@ ${snippet.text}
                 />
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-bold">Snippet Content</span>
-                </label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold opacity-70 px-1">Snippet Content</label>
                 <textarea
-                  className="textarea textarea-bordered h-64 font-mono text-sm"
+                  className={`textarea textarea-bordered font-mono text-sm transition-all duration-200 ${
+                    newSnippetText ? 'h-80' : 'h-40'
+                  }`}
                   placeholder="Paste or type your code here..."
                   value={newSnippetText}
                   onChange={(e) => setNewSnippetText(e.target.value)}
