@@ -102,10 +102,20 @@ const App: React.FC = () => {
     setShowSettings(false);
   };
 
+  const backgroundImage = "https://picsum.photos/1920/1080?random=1";
+
   return (
-    <div className="flex h-screen bg-base-200">
+    <div className="flex h-screen relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div
+        className="fixed inset-0 z-[-2] bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      />
+      {/* Dark Overlay */}
+      <div className="fixed inset-0 z-[-1] bg-black/50 backdrop-blur-[2px]" />
+
       {/* Sidebar */}
-      <div className="w-20 lg:w-64 bg-base-100 border-r border-base-300 flex flex-col">
+      <div className="w-20 lg:w-64 bg-base-100/80 backdrop-blur-md border-r border-base-300 flex flex-col">
         <div className="p-4 flex items-center justify-center lg:justify-start gap-3">
           <div className="bg-primary p-2 rounded-lg text-primary-content">
             <Bookmark size={24} />
@@ -213,12 +223,12 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-4 lg:p-8">
+      <main className="flex-1 overflow-auto p-4 lg:p-8 bg-transparent">
         <div className="max-w-7xl mx-auto">
           <header className="mb-8 flex justify-between items-center">
-            <div>
+            <div className="bg-base-100/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
               <h2 className="text-3xl font-bold text-base-content">Welcome back, {userName}!</h2>
-              <p className="text-base-content/60">Here's what's happening today.</p>
+              <p className="text-base-content/70">Here's what's happening today.</p>
             </div>
           </header>
 
