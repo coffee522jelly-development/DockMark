@@ -34,8 +34,11 @@ const clockFonts = [
   { name: 'Special Elite', value: 'Special Elite, system-ui' }
 ];
 
+type TabType = 'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss' | 'history';
+const tabOrder: TabType[] = ['dock', 'bookmark', 'buttons', 'cards', 'icons', 'tables', 'snippets', 'rss', 'history'];
+
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss' | 'history'>('dock');
+  const [activeTab, setActiveTab] = useState<TabType>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -66,6 +69,34 @@ const App: React.FC = () => {
     // Load Clock Font
     const savedFont = localStorage.getItem('clock-font') || 'ui-sans-serif, system-ui';
     setClockFont(savedFont);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't navigate if user is typing in an input or textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveTab(prev => {
+          const currentIndex = tabOrder.indexOf(prev);
+          const nextIndex = (currentIndex + 1) % tabOrder.length;
+          return tabOrder[nextIndex];
+        });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveTab(prev => {
+          const currentIndex = tabOrder.indexOf(prev);
+          const prevIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
+          return tabOrder[prevIndex];
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const saveSettings = () => {
