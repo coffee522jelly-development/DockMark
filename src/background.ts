@@ -1,5 +1,17 @@
 /// <reference types="chrome" />
 
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get(["tabHistory", "autoRestoreEnabled"], (result) => {
+    // Default to true if not set, or check user preference
+    if (result.autoRestoreEnabled !== false && result.tabHistory && result.tabHistory.length > 0) {
+      const latest = result.tabHistory[0];
+      latest.tabs.forEach((t: { url: string }) => {
+        chrome.tabs.create({ url: t.url });
+      });
+    }
+  });
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "saveSnippet",
@@ -18,10 +30,37 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "同一ドメインをタブグループにする (DockMark)",
     contexts: ["all"]
   });
+
+  chrome.contextMenus.create({
+    id: "saveTabState",
+    title: "現在のタブの状態を保存する (DockMark)",
+    contexts: ["all"]
+  });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "groupTabsByDomain") {
+  if (info.menuItemId === "saveTabState") {
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    const tabData = tabs.map(t => ({
+      title: t.title || "Untitled",
+      url: t.url || ""
+    })).filter(t => t.url);
+
+    const historyEntry = {
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      tabs: tabData
+    };
+
+    chrome.storage.local.get(["tabHistory"], (result) => {
+      const history = result.tabHistory || [];
+      history.unshift(historyEntry);
+      // Keep only 10 items
+      const trimmedHistory = history.slice(0, 10);
+      chrome.storage.local.set({ tabHistory: trimmedHistory });
+    });
+
+  } else if (info.menuItemId === "groupTabsByDomain") {
     const tabs = await chrome.tabs.query({ currentWindow: true });
 
     // Group tabs by domain

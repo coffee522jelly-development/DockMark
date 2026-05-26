@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table, FileText, Clock } from 'lucide-react';
+import { LayoutGrid, Bookmark, Settings, X, User, Rss, Bell, Layout, Palette, Grid, Image as ImageIcon, Table, FileText, Clock, History } from 'lucide-react';
 import Dock from './components/Dock';
 import BookmarkManager from './components/bookmarks/BookmarkManager';
 import BookmarkGallery from './components/bookmarks/BookmarkGallery';
 import Snippets from './components/snippets/Snippets';
 import RssManager from './components/rss/RssManager';
+import TabHistory from './components/history/TabHistory';
 
 const themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -34,7 +35,7 @@ const clockFonts = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss'>('dock');
+  const [activeTab, setActiveTab] = useState<'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss' | 'history'>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -188,6 +189,16 @@ const App: React.FC = () => {
             <Rss size={20} />
             <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'rss' ? 'text-primary-content' : 'text-base-content'}`}>RSS Feeds</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'history' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
+            }`}
+          >
+            <History size={20} />
+            <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'history' ? 'text-primary-content' : 'text-base-content'}`}>Tab History</span>
+          </button>
         </nav>
 
         <div className="p-4 border-t border-base-300">
@@ -219,6 +230,7 @@ const App: React.FC = () => {
           {activeTab === 'tables' && <BookmarkGallery viewMode="tables" />}
           {activeTab === 'snippets' && <Snippets />}
           {activeTab === 'rss' && <RssManager />}
+          {activeTab === 'history' && <TabHistory />}
         </div>
       </main>
 
