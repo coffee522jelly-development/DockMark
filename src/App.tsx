@@ -151,7 +151,10 @@ const App: React.FC = () => {
           <div className="bg-primary p-2 rounded-lg text-primary-content">
             <Bookmark size={24} />
           </div>
-          <h1 className="font-bold text-xl hidden lg:block text-base-content">DockMark</h1>
+          <div>
+            <h1 className="font-bold text-xl hidden lg:block text-base-content">MarkBrew</h1>
+            <span className="text-[10px] opacity-30 hidden lg:block -mt-1 font-medium">v1.0.0</span>
+          </div>
         </div>
 
         <nav className="flex-1 px-2 py-4 space-y-2">

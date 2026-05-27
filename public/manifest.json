@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "DockMark",
+  "name": "MarkBrew",
   "version": "1.0.0",
   "description": "A productivity dashboard and bookmark organizer for your new tab.",
   "permissions": ["bookmarks", "storage", "geolocation", "favicon", "contextMenus", "scripting", "tabGroups", "tabs", "sessions"],
@@ -13,7 +13,7 @@
     "newtab": "index.html"
   },
   "action": {
-    "default_title": "DockMark"
+    "default_title": "MarkBrew"
   },
   "icons": {
     "128": "favicon.svg"

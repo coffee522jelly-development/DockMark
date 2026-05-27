@@ -15,25 +15,25 @@ chrome.runtime.onStartup.addListener(() => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "saveSnippet",
-    title: "スニペットを保存 (DockMark)",
+    title: "スニペットを保存 (MarkBrew)",
     contexts: ["selection"]
   });
 
   chrome.contextMenus.create({
     id: "openSnippets",
-    title: "スニペット一覧を開く (DockMark)",
+    title: "スニペット一覧を開く (MarkBrew)",
     contexts: ["all"]
   });
 
   chrome.contextMenus.create({
     id: "groupTabsByDomain",
-    title: "同一ドメインをタブグループにする (DockMark)",
+    title: "同一ドメインをタブグループにする (MarkBrew)",
     contexts: ["all"]
   });
 
   chrome.contextMenus.create({
     id: "saveTabState",
-    title: "現在のタブの状態を保存する (DockMark)",
+    title: "現在のタブの状態を保存する (MarkBrew)",
     contexts: ["all"]
   });
 });
