@@ -14,7 +14,9 @@ const TimerWidget: React.FC = () => {
       }, 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
-      // Optional: alert('Timer finished!');
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'Timer finished! Time to take a break.', type: 'success' }
+      }));
     }
 
     return () => clearInterval(interval);

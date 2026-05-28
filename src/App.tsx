@@ -37,8 +37,15 @@ const clockFonts = [
 type TabType = 'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'snippets' | 'rss' | 'history';
 const tabOrder: TabType[] = ['dock', 'bookmark', 'buttons', 'cards', 'icons', 'tables', 'snippets', 'rss', 'history'];
 
+interface ToastMessage {
+  id: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+}
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dock');
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
@@ -97,6 +104,20 @@ const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const handleShowToast = (e: any) => {
+      const { message, type = 'info' } = e.detail;
+      const id = Date.now().toString();
+      setToasts(prev => [...prev, { id, message, type }]);
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, 5000);
+    };
+
+    window.addEventListener('show-toast', handleShowToast);
+    return () => window.removeEventListener('show-toast', handleShowToast);
   }, []);
 
   const saveSettings = () => {
@@ -277,6 +298,15 @@ const App: React.FC = () => {
           {activeTab === 'history' && <TabHistory />}
         </div>
       </main>
+
+      {/* Toast Notification Container */}
+      <div className="toast toast-end toast-bottom z-[100]">
+        {toasts.map(toast => (
+          <div key={toast.id} className={`alert alert-${toast.type} shadow-lg animate-in slide-in-from-right duration-300`}>
+            <span>{toast.message}</span>
+          </div>
+        ))}
+      </div>
 
       {/* Settings Modal */}
       {showSettings && (
