@@ -156,7 +156,7 @@ ${snippet.text}
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto h-full flex flex-col">
+    <div className="p-6 max-w-6xl mx-auto h-full flex flex-col bg-base-100/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold flex items-center gap-2 text-base-content">

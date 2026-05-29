@@ -50,7 +50,17 @@ const App: React.FC = () => {
   const [userName, setUserName] = useState('User');
   const [theme, setTheme] = useState('light');
   const [clockFont, setClockFont] = useState('ui-sans-serif, system-ui');
-  const [initialSettings, setInitialSettings] = useState({ userName: 'User', theme: 'light', clockFont: 'ui-sans-serif, system-ui' });
+  const [iconShape, setIconShape] = useState<'round' | 'square'>('square');
+  const [iconSize, setIconSize] = useState(64);
+  const [borderRadius, setBorderRadius] = useState(16);
+  const [initialSettings, setInitialSettings] = useState({
+    userName: 'User',
+    theme: 'light',
+    clockFont: 'ui-sans-serif, system-ui',
+    iconShape: 'square' as 'round' | 'square',
+    iconSize: 64,
+    borderRadius: 16
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -76,6 +86,14 @@ const App: React.FC = () => {
     // Load Clock Font
     const savedFont = localStorage.getItem('clock-font') || 'ui-sans-serif, system-ui';
     setClockFont(savedFont);
+
+    // Load Design Settings
+    const savedIconShape = localStorage.getItem('icon-shape') as 'round' | 'square' || 'square';
+    setIconShape(savedIconShape);
+    const savedIconSize = Number(localStorage.getItem('icon-size')) || 64;
+    setIconSize(savedIconSize);
+    const savedBorderRadius = Number(localStorage.getItem('border-radius')) || 16;
+    setBorderRadius(savedBorderRadius);
   }, []);
 
   useEffect(() => {
@@ -133,6 +151,11 @@ const App: React.FC = () => {
     // Save Clock Font
     localStorage.setItem('clock-font', clockFont);
 
+    // Save Design Settings
+    localStorage.setItem('icon-shape', iconShape);
+    localStorage.setItem('icon-size', iconSize.toString());
+    localStorage.setItem('border-radius', borderRadius.toString());
+
     setShowSettings(false);
   };
 
@@ -142,7 +165,7 @@ const App: React.FC = () => {
   };
 
   const openSettings = () => {
-    setInitialSettings({ userName, theme, clockFont });
+    setInitialSettings({ userName, theme, clockFont, iconShape, iconSize, borderRadius });
     setShowSettings(true);
   };
 
@@ -150,6 +173,9 @@ const App: React.FC = () => {
     setUserName(initialSettings.userName);
     setTheme(initialSettings.theme);
     setClockFont(initialSettings.clockFont);
+    setIconShape(initialSettings.iconShape);
+    setIconSize(initialSettings.iconSize);
+    setBorderRadius(initialSettings.borderRadius);
     document.documentElement.setAttribute('data-theme', initialSettings.theme);
     setShowSettings(false);
   };
@@ -158,6 +184,18 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen relative overflow-hidden">
+      <style>
+        {`
+          :root {
+            --rounded-box: ${borderRadius}px;
+            --rounded-btn: ${borderRadius / 2}px;
+            --rounded-badge: ${borderRadius / 4}px;
+          }
+          .card, .btn, .input, .select, .textarea, .alert {
+            border-radius: ${borderRadius}px !important;
+          }
+        `}
+      </style>
       {/* Dynamic Background */}
       <div
         className="fixed inset-0 z-[-2] bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
@@ -289,10 +327,10 @@ const App: React.FC = () => {
 
           {activeTab === 'dock' && <Dock />}
           {activeTab === 'bookmark' && <BookmarkManager />}
-          {activeTab === 'buttons' && <BookmarkGallery viewMode="buttons" />}
-          {activeTab === 'cards' && <BookmarkGallery viewMode="cards" />}
-          {activeTab === 'icons' && <BookmarkGallery viewMode="icons" />}
-          {activeTab === 'tables' && <BookmarkGallery viewMode="tables" />}
+          {activeTab === 'buttons' && <BookmarkGallery viewMode="buttons" iconShape={iconShape} iconSize={iconSize} />}
+          {activeTab === 'cards' && <BookmarkGallery viewMode="cards" iconShape={iconShape} iconSize={iconSize} />}
+          {activeTab === 'icons' && <BookmarkGallery viewMode="icons" iconShape={iconShape} iconSize={iconSize} />}
+          {activeTab === 'tables' && <BookmarkGallery viewMode="tables" iconShape={iconShape} iconSize={iconSize} />}
           {activeTab === 'snippets' && <Snippets />}
           {activeTab === 'rss' && <RssManager />}
           {activeTab === 'history' && <TabHistory />}
@@ -365,6 +403,61 @@ const App: React.FC = () => {
                   ))}
                 </select>
                 <span className="label-text-alt mt-1 text-base-content/40">Choose a font for the clock widget.</span>
+              </div>
+
+              <div className="border-t border-base-300 pt-6">
+                <h4 className="text-sm font-bold mb-4 flex items-center gap-2">
+                  <Palette size={16} className="text-primary" /> Design Customization
+                </h4>
+
+                <div className="space-y-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium">Icon Shape</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setIconShape('square')}
+                        className={`btn btn-sm flex-1 ${iconShape === 'square' ? 'btn-primary' : 'btn-outline'}`}
+                      >
+                        Rounded Square
+                      </button>
+                      <button
+                        onClick={() => setIconShape('round')}
+                        className={`btn btn-sm flex-1 ${iconShape === 'round' ? 'btn-primary' : 'btn-outline'}`}
+                      >
+                        Circle
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium">Icon Size ({iconSize}px)</span>
+                    </label>
+                    <input
+                      type="range" min="48" max="96" step="8"
+                      className="range range-primary range-xs"
+                      value={iconSize}
+                      onChange={(e) => setIconSize(Number(e.target.value))}
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium">Border Radius ({borderRadius}px)</span>
+                    </label>
+                    <input
+                      type="range" min="0" max="32" step="4"
+                      className="range range-primary range-xs"
+                      value={borderRadius}
+                      onChange={(e) => setBorderRadius(Number(e.target.value))}
+                    />
+                    <div className="label">
+                      <span className="label-text-alt text-base-content/40 italic">Applies to all cards and UI elements.</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-base-200 rounded-xl">

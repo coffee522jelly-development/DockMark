@@ -13,9 +13,11 @@ export type BookmarkViewMode = 'buttons' | 'cards' | 'icons' | 'tables';
 
 interface BookmarkGalleryProps {
   viewMode: BookmarkViewMode;
+  iconShape?: 'round' | 'square';
+  iconSize?: number;
 }
 
-const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
+const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape = 'square', iconSize = 64 }) => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
@@ -407,7 +409,14 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
                     className="tooltip tooltip-bottom"
                     data-tip={bookmark.title}
                   >
-                    <button className="btn btn-ghost btn-circle p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move">
+                    <button
+                      className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm`}
+                      style={{
+                        width: `${iconSize}px`,
+                        height: `${iconSize}px`,
+                        borderRadius: iconShape === 'round' ? '9999px' : undefined
+                      }}
+                    >
                       <img
                         src={faviconUrl}
                         alt={bookmark.title}
