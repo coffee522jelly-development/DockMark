@@ -19,6 +19,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
 
   const fetchBookmarks = () => {
     const flattenBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[]): BookmarkItem[] => {
@@ -42,8 +43,26 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
     if (typeof chrome !== 'undefined' && chrome.bookmarks) {
       chrome.bookmarks.getTree((tree) => {
         const flatList = flattenBookmarks(tree);
-        flatList.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
-        setBookmarks(flatList);
+
+        // Load custom order if it exists
+        chrome.storage.local.get(['bookmarkIconOrder'], (result) => {
+          if (result.bookmarkIconOrder && Array.isArray(result.bookmarkIconOrder)) {
+            const order: string[] = result.bookmarkIconOrder;
+            const sortedList = [...flatList].sort((a, b) => {
+              const idxA = order.indexOf(a.id);
+              const idxB = order.indexOf(b.id);
+
+              if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+              if (idxA !== -1) return -1;
+              if (idxB !== -1) return 1;
+              return a.title.localeCompare(b.title, 'ja');
+            });
+            setBookmarks(sortedList);
+          } else {
+            flatList.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+            setBookmarks(flatList);
+          }
+        });
       });
     } else {
       // Mock data
@@ -118,6 +137,37 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
     b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     b.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (viewMode !== 'icons' || !draggedId || draggedId === targetId) return;
+
+    const newBookmarks = [...bookmarks];
+    const draggedIndex = newBookmarks.findIndex(b => b.id === draggedId);
+    const targetIndex = newBookmarks.findIndex(b => b.id === targetId);
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      const [draggedItem] = newBookmarks.splice(draggedIndex, 1);
+      newBookmarks.splice(targetIndex, 0, draggedItem);
+      setBookmarks(newBookmarks);
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (viewMode === 'icons') {
+      const order = bookmarks.map(b => b.id);
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ bookmarkIconOrder: order });
+      } else {
+        localStorage.setItem('bookmarkIconOrder', JSON.stringify(order));
+      }
+    }
+    setDraggedId(null);
+  };
 
   const getFolderColor = (parentId?: string) => {
     if (!parentId) return 'btn-primary';
@@ -344,17 +394,24 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode }) => {
               const faviconUrl = `chrome-extension://${chromeExtensionId}/_favicon/?pageUrl=${encodeURIComponent(bookmark.url)}&size=64`;
 
               return (
-                <div key={bookmark.id} className="group relative">
+                <div
+                  key={bookmark.id}
+                  className={`group relative transition-all duration-200 ${draggedId === bookmark.id ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`}
+                  draggable
+                  onDragStart={() => handleDragStart(bookmark.id)}
+                  onDragOver={(e) => handleDragOver(e, bookmark.id)}
+                  onDragEnd={handleDragEnd}
+                >
                   <div
                     onClick={() => window.open(bookmark.url, '_blank')}
                     className="tooltip tooltip-bottom"
                     data-tip={bookmark.title}
                   >
-                    <button className="btn btn-ghost btn-circle p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300">
+                    <button className="btn btn-ghost btn-circle p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move">
                       <img
                         src={faviconUrl}
                         alt={bookmark.title}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain pointer-events-none"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
                         }}
