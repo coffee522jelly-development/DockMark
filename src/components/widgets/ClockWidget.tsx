@@ -30,7 +30,7 @@ const ClockWidget: React.FC = () => {
   const dateString = time.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300 h-full">
+    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
       <div className="card-body items-center justify-center text-center p-4">
         <Clock className="w-8 h-8 text-primary mb-2" />
         <h2

@@ -21,8 +21,8 @@ const CalendarWidget: React.FC = () => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300">
-      <div className="card-body p-4">
+    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
+      <div className="card-body p-4 overflow-hidden">
         <div className="flex items-center gap-2 mb-4">
           <CalendarIcon className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-base-content">{monthName} {year}</h3>

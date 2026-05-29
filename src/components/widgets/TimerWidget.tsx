@@ -38,8 +38,8 @@ const TimerWidget: React.FC = () => {
   const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300">
-      <div className="card-body items-center text-center">
+    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
+      <div className="card-body items-center text-center p-4 justify-center">
         <h3 className="card-title text-base-content flex items-center gap-2 mb-2">
           <Timer className="w-5 h-5 text-primary" />
           25 min Timer

@@ -13,8 +13,8 @@ const SearchWidget: React.FC = () => {
   };
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300">
-      <div className="card-body">
+    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
+      <div className="card-body justify-center">
         <h3 className="card-title text-base-content flex items-center gap-2 mb-2">
           <Search className="w-5 h-5 text-primary" />
           Quick Search

@@ -46,15 +46,15 @@ const BookmarksWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="card bg-base-100 shadow-xl h-full border border-base-300 flex items-center justify-center">
+      <div className="card bg-base-100 shadow-xl h-80 border border-base-300 flex items-center justify-center">
         <span className="loading loading-spinner loading-md text-primary"></span>
       </div>
     );
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl h-full border border-base-300">
-      <div className="card-body p-4">
+    <div className="card bg-base-100 shadow-xl h-80 border border-base-300">
+      <div className="card-body p-4 overflow-hidden">
         <div className="flex items-center justify-between mb-3">
           <h2 className="card-title text-sm flex items-center gap-2">
             <Bookmark size={16} className="text-primary" />

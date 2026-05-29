@@ -52,7 +52,7 @@ const WeatherWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="card bg-blue-500 text-white shadow-xl h-48 flex items-center justify-center">
+      <div className="card bg-blue-500 text-white shadow-xl h-80 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin opacity-50" />
       </div>
     );
@@ -60,7 +60,7 @@ const WeatherWidget: React.FC = () => {
 
   if (error || !weather) {
     return (
-      <div className="card bg-blue-500 text-white shadow-xl p-5">
+      <div className="card bg-blue-500 text-white shadow-xl p-5 h-80 flex items-center justify-center">
         <p>Weather data unavailable</p>
       </div>
     );
@@ -70,7 +70,7 @@ const WeatherWidget: React.FC = () => {
   const daily = weather.daily;
 
   return (
-    <div className="card bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-xl">
+    <div className="card bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-xl h-80">
       <div className="card-body p-5">
         <div className="flex justify-between items-start">
           <div>
