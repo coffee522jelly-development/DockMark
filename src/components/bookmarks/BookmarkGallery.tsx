@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { ExternalLink, Search, Trash2, Save, Download } from 'lucide-react';
 import TurndownService from 'turndown';
 
@@ -23,7 +23,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
-  const fetchBookmarks = () => {
+  const fetchBookmarks = useCallback(() => {
     const flattenBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[]): BookmarkItem[] => {
       let flat: BookmarkItem[] = [];
       for (const node of nodes) {
@@ -72,17 +72,17 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         { id: '1', title: 'Apple', url: 'https://apple.com', parentId: 'f1' },
         { id: '2', title: 'Google', url: 'https://google.com', parentId: 'f1' },
         { id: '3', title: 'Yahoo', url: 'https://yahoo.co.jp', parentId: 'f2' },
-        { id: '4', title: 'あいうえお銀行 - とても長い名前の銀行口座で、テストのためにわざと長くしています。どこまで表示されるかな？あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ', url: 'https://example.com/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow', parentId: 'f3' },
+        { id: '4', title: 'あいうえお銀行 - とても長い名前の銀行口座で、テストのためにわざと長くしています。どこまで表示されるかな？あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほ', url: 'https://example.com/very/long/url/path/to/test/truncation/behavior/in/the/table/view/to/ensure/it/does/not/overflow', parentId: 'f3' },
         { id: '5', title: 'SuperLongBookmarkTitleThatShouldDefinitelyBeTruncatedInTheTableViewToPreventAnyHorizontalScrollingIssuesAndKeepTheUICleanWithoutAnySpacesToForceTheIssue', url: 'https://extremely-long-domain-name-that-goes-on-and-on-and-on-without-any-spaces-to-test-word-breaking.example.com/path?query=123&another_long_parameter=abcdefghijklmnopqrstuvwxyz1234567890&extremely_long_parameter_without_spaces_to_test_overflow_behavior_in_browsers_that_struggle_with_this', parentId: 'f3' },
       ];
       mock.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
       setBookmarks(mock);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchBookmarks();
-  }, []);
+  }, [fetchBookmarks]);
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this bookmark?')) {
@@ -135,10 +135,12 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
     }
   };
 
-  const filteredBookmarks = bookmarks.filter(b =>
-    b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.url.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBookmarks = useMemo(() => {
+    return bookmarks.filter(b =>
+      b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.url.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [bookmarks, searchQuery]);
 
   const handleDragStart = (id: string) => {
     setDraggedId(id);
@@ -217,8 +219,8 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
 
       <div className="w-full">
         {viewMode === 'buttons' && (
-          <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {filteredBookmarks.map((bookmark) => (
+          <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300 bg-base-100/40 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+            {filteredBookmarks.map((bookmark: BookmarkItem) => (
               <div key={bookmark.id} className="group relative">
                 <button
                   onClick={() => window.open(bookmark.url, '_blank')}
@@ -249,7 +251,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
 
         {viewMode === 'cards' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {filteredBookmarks.map((bookmark) => {
+            {filteredBookmarks.map((bookmark: BookmarkItem) => {
               const domain = new URL(bookmark.url).hostname;
               return (
                 <div
@@ -321,7 +323,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                 </tr>
               </thead>
               <tbody>
-                {filteredBookmarks.map((bookmark) => {
+                {filteredBookmarks.map((bookmark: BookmarkItem) => {
                   const domain = new URL(bookmark.url).hostname;
                   const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
                   return (
@@ -390,7 +392,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
 
         {viewMode === 'icons' && (
           <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {filteredBookmarks.map((bookmark) => {
+            {filteredBookmarks.map((bookmark: BookmarkItem) => {
               const url = new URL(bookmark.url);
               const chromeExtensionId = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : '';
               const faviconUrl = `chrome-extension://${chromeExtensionId}/_favicon/?pageUrl=${encodeURIComponent(bookmark.url)}&size=64`;

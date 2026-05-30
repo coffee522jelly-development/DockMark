@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
+import { useStorage } from '../../hooks/useStorage';
 
 const ClockWidget: React.FC = () => {
   const [time, setTime] = useState(new Date());
-  const [font, setFont] = useState('ui-sans-serif, system-ui');
+  const [font] = useStorage('clock-font', 'ui-sans-serif, system-ui', 'localStorage');
 
   useEffect(() => {
-    const loadFont = () => {
-      const savedFont = localStorage.getItem('clock-font') || 'ui-sans-serif, system-ui';
-      setFont(savedFont);
-    };
-
-    loadFont();
-    // Listen for storage changes to update font in real-time if changed in settings
-    window.addEventListener('storage', loadFont);
-
-    // Also check periodically if changed within the same tab (since localStorage doesn't fire storage event in same tab)
-    const fontChecker = setInterval(loadFont, 1000);
-
     const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener('storage', loadFont);
-      clearInterval(fontChecker);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
