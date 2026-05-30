@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StickyNote } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const NotesWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [note, setNote] = useState('');
 
   useEffect(() => {
@@ -35,11 +37,11 @@ const NotesWidget: React.FC = () => {
       <div className="p-4 flex flex-col h-full">
         <h3 className="card-title flex items-center gap-2 mb-3">
           <StickyNote className="w-5 h-5" />
-          Sticky Note
+          {t.widgets.notes.title}
         </h3>
         <textarea
           className="flex-1 bg-white/30 rounded-xl p-3 border-none focus:outline-none focus:bg-white/50 transition-all resize-none text-sm placeholder-yellow-800/40 leading-relaxed"
-          placeholder="Type your notes here..."
+          placeholder={t.widgets.notes.placeholder}
           value={note}
           onChange={handleChange}
         />

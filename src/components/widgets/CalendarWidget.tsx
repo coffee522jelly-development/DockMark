@@ -1,8 +1,10 @@
 import React from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const CalendarWidget: React.FC = () => {
+  const { t } = useTranslation();
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -18,8 +20,10 @@ const CalendarWidget: React.FC = () => {
     days.push(i);
   }
 
-  const monthName = now.toLocaleDateString([], { month: 'long' });
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthName = now.toLocaleDateString(t.widgets.calendar.locale, { month: 'long' });
+  const dayNames = t.language === 'ja'
+    ? ['日', '月', '火', '水', '木', '金', '土']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <GlassCard className="h-80" noPadding>

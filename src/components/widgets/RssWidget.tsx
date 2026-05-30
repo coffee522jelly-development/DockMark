@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Rss, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useStorage } from '../../hooks/useStorage';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface RssFeed {
   id: string;
@@ -10,6 +11,7 @@ interface RssFeed {
 }
 
 const RssWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [feeds] = useStorage<RssFeed[]>('rssFeeds', [], 'local');
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -83,7 +85,7 @@ const RssWidget: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="card-title text-base-content flex items-center gap-2">
             <Rss className="w-5 h-5 text-orange-500" />
-            RSS Reader
+            {t.widgets.rss.title}
           </h3>
           <button
             onClick={fetchFeeds}
@@ -132,8 +134,8 @@ const RssWidget: React.FC = () => {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-base-content/40 text-center p-4">
               <Rss className="w-8 h-8 mb-2 opacity-20" />
-              <p className="text-xs">No feeds registered or found.</p>
-              <p className="text-[10px] mt-1 opacity-60">Go to RSS Feeds to add some.</p>
+              <p className="text-xs">{t.widgets.rss.empty}</p>
+              <p className="text-[10px] mt-1 opacity-60">{t.widgets.rss.help}</p>
             </div>
           )}
         </div>

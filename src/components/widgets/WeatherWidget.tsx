@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Cloud, CloudRain, Sun, Wind, MapPin, Loader2 } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const WeatherWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [weather, setWeather] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ const WeatherWidget: React.FC = () => {
   if (error || !weather) {
     return (
       <GlassCard className="h-80 flex items-center justify-center">
-        <p className="text-error opacity-70">Weather unavailable</p>
+        <p className="text-error opacity-70">{t.widgets.weather.unavailable}</p>
       </GlassCard>
     );
   }
@@ -76,7 +78,7 @@ const WeatherWidget: React.FC = () => {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-bold flex items-center gap-2 text-base-content">
-              <MapPin className="w-4 h-4 text-primary" /> Current
+              <MapPin className="w-4 h-4 text-primary" /> {t.widgets.weather.title}
             </h3>
             <p className="text-xs opacity-50 mt-1">
               {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -106,12 +108,12 @@ const WeatherWidget: React.FC = () => {
           <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
             <CloudRain className="w-3 h-3 opacity-50" />
             <span className="font-bold">{getWeatherCondition(current.weather_code) === 'Rainy' ? 'High' : 'Low'}</span>
-            <span className="opacity-50 scale-90">Precip</span>
+            <span className="opacity-50 scale-90">{t.widgets.weather.precip}</span>
           </div>
           <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
             <Cloud className="w-3 h-3 opacity-50" />
             <span className="font-bold">{current.relative_humidity_2m}%</span>
-            <span className="opacity-50 scale-90">Humid</span>
+            <span className="opacity-50 scale-90">{t.widgets.weather.humidity}</span>
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const SearchWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
@@ -20,13 +22,13 @@ const SearchWidget: React.FC = () => {
           <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
             <Search size={20} />
           </div>
-          <h3 className="font-bold text-lg text-base-content">Quick Search</h3>
+          <h3 className="font-bold text-lg text-base-content">{t.widgets.search.title}</h3>
         </div>
         <form onSubmit={handleSearch} className="form-control">
           <div className="relative group">
             <input
               type="text"
-              placeholder="Search Google..."
+              placeholder={t.widgets.search.placeholder}
               className="input input-bordered w-full pr-12 bg-base-100/50 border-white/10 focus:border-primary/50 transition-all"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -39,7 +41,7 @@ const SearchWidget: React.FC = () => {
             </button>
           </div>
         </form>
-        <p className="text-[10px] text-base-content/40 mt-4 text-center">Press Enter to search on Google</p>
+        <p className="text-[10px] text-base-content/40 mt-4 text-center">{t.widgets.search.help}</p>
       </div>
     </GlassCard>
   );

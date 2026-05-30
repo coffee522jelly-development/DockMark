@@ -9,13 +9,16 @@ import Sidebar from './components/layout/Sidebar';
 import SettingsModal from './components/modals/SettingsModal';
 import { useStorage } from './hooks/useStorage';
 import { TabType, tabOrder } from './config';
+import { useTranslation } from './contexts/LanguageContext';
 
 const App: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: string }[]>([]);
 
   // User Settings
+  const { language, setLanguage } = useTranslation();
   const [userName, setUserName] = useStorage('userName', 'User', 'local');
   const [theme, setTheme] = useStorage('app-theme', 'light', 'localStorage');
   const [clockFont, setClockFont] = useStorage('clock-font', 'ui-sans-serif, system-ui', 'localStorage');
@@ -108,8 +111,8 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <header className="mb-8 flex justify-between items-center">
             <div className="bg-base-100/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-              <h2 className="text-3xl font-bold text-base-content">Welcome back, {userName}!</h2>
-              <p className="text-base-content/70">Here's what's happening today.</p>
+              <h2 className="text-3xl font-bold text-base-content">{t.header.welcome}, {userName}!</h2>
+              <p className="text-base-content/70">{t.header.happening}</p>
             </div>
           </header>
 
@@ -155,6 +158,8 @@ const App: React.FC = () => {
         setIconSize={(val) => setTempSettings({...tempSettings, iconSize: val})}
         borderRadius={tempSettings.borderRadius}
         setBorderRadius={(val) => setTempSettings({...tempSettings, borderRadius: val})}
+        language={language}
+        setLanguage={setLanguage}
       />
     </div>
   );

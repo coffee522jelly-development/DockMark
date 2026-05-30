@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import BookmarkList from './BookmarkList';
-import { FolderPlus } from 'lucide-react';
+import { FolderPlus, Bookmark } from 'lucide-react';
+import { useTranslation } from '../../contexts/LanguageContext';
+import PageHeader from '../common/PageHeader';
 
 const BookmarkManager: React.FC = () => {
+  const { t } = useTranslation();
   const [newFolderName, setNewFolderName] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -26,41 +29,43 @@ const BookmarkManager: React.FC = () => {
   };
 
   return (
-    <div className="bg-base-100 rounded-2xl shadow-xl border border-base-300 overflow-hidden">
-      <div className="p-6 border-b border-base-300 flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-base-content">Browser Bookmarks</h2>
-          <p className="text-base-content/60">Organize and manage your browser bookmarks.</p>
-        </div>
-        <button
-          className="btn btn-primary btn-sm gap-2"
-          onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).showModal()}
-        >
-          <FolderPlus size={18} />
-          New Folder
-        </button>
-      </div>
-      <div className="p-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <PageHeader
+        title={t.sidebar.bookmarks}
+        description={t.rss.description}
+        icon={Bookmark}
+        action={
+          <button
+            className="btn btn-primary btn-sm gap-2"
+            onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).showModal()}
+          >
+            <FolderPlus size={18} />
+            {t.rss.addNew}
+          </button>
+        }
+      />
+
+      <div className="p-0">
         <BookmarkList key={refreshTrigger} />
       </div>
 
       {/* New Folder Modal */}
       <dialog id="new_folder_modal" className="modal">
-        <div className="modal-box bg-base-100">
-          <h3 className="font-bold text-lg mb-4">Create New Folder</h3>
+        <div className="modal-box bg-base-100 border border-white/10 shadow-2xl">
+          <h3 className="font-bold text-lg mb-4">{t.rss.addNew}</h3>
           <div className="form-control">
-            <label className="label"><span className="label-text">Folder Name</span></label>
+            <label className="label"><span className="label-text">{t.rss.feedTitle}</span></label>
             <input
               type="text"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full bg-base-100/50"
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="My New Collection"
+              placeholder="..."
             />
           </div>
           <div className="modal-action">
-            <button className="btn" onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).close()}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleCreateFolder}>Create</button>
+            <button className="btn btn-ghost" onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).close()}>{t.settings.cancel}</button>
+            <button className="btn btn-primary" onClick={handleCreateFolder}>{t.rss.add}</button>
           </div>
         </div>
       </dialog>

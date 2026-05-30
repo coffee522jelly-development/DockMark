@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { History, ExternalLink, Trash2, Clock, Globe, ToggleLeft, ToggleRight } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface TabEntry {
   title: string;
@@ -80,6 +81,8 @@ const TabHistory: React.FC = () => {
     }
   };
 
+  const { t } = useTranslation();
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleString();
@@ -88,12 +91,12 @@ const TabHistory: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
-        title="Tab History"
-        description="Manage your saved tab sessions (Max 10)."
+        title={t.history.title}
+        description={t.history.description}
         icon={History}
         action={
           <div className="flex items-center gap-4 px-4 py-2 bg-base-100/30 border border-white/10 shadow-sm backdrop-blur-sm">
-            <span className="text-sm font-medium">Auto-restore latest</span>
+            <span className="text-sm font-medium">{t.history.autoRestore}</span>
             <button
               onClick={toggleAutoRestore}
               className={`transition-colors ${autoRestore ? 'text-primary' : 'text-base-content/30'}`}
@@ -116,7 +119,7 @@ const TabHistory: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{formatDate(entry.timestamp)}</h3>
-                      <p className="text-sm text-base-content/60">{entry.tabs.length} tabs saved</p>
+                      <p className="text-sm text-base-content/60">{entry.tabs.length} {t.history.tabsSaved}</p>
                     </div>
                   </div>
 
@@ -125,7 +128,7 @@ const TabHistory: React.FC = () => {
                       onClick={() => restoreTabs(entry.tabs)}
                       className="btn btn-primary btn-sm gap-2"
                     >
-                      <ExternalLink size={16} /> Restore All
+                      <ExternalLink size={16} /> {t.history.restoreAll}
                     </button>
                     <button
                       onClick={() => deleteEntry(entry.id)}
@@ -148,10 +151,10 @@ const TabHistory: React.FC = () => {
             </GlassCard>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-base-100 border border-dashed border-base-300 opacity-50">
+          <div className="flex flex-col items-center justify-center py-20 bg-base-100/20 border border-dashed border-white/10 opacity-30">
             <History size={64} className="mb-4" />
-            <p className="text-xl font-medium">No history saved yet.</p>
-            <p className="text-sm">Right-click on any page and select "Save current tab state" to start.</p>
+            <p className="text-xl font-medium">{t.history.empty}</p>
+            <p className="text-sm">{t.history.emptySub}</p>
           </div>
         )}
       </div>

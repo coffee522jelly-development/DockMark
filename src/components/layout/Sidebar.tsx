@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayoutGrid, Bookmark, Layout, Grid, Image as ImageIcon, Table, FileText, Rss, History, Settings } from 'lucide-react';
 import { TabType } from '../../config';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface SidebarProps {
   activeTab: TabType;
@@ -9,16 +10,18 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings }) => {
+  const { t } = useTranslation();
+
   const menuItems = [
-    { id: 'dock', icon: LayoutGrid, label: 'Dock' },
-    { id: 'bookmark', icon: Bookmark, label: 'Bookmarks' },
-    { id: 'buttons', icon: Layout, label: 'Buttons' },
-    { id: 'cards', icon: Grid, label: 'Cards' },
-    { id: 'icons', icon: ImageIcon, label: 'Icons' },
-    { id: 'tables', icon: Table, label: 'Tables' },
-    { id: 'snippets', icon: FileText, label: 'Snippets', divider: true },
-    { id: 'rss', icon: Rss, label: 'RSS Feeds' },
-    { id: 'history', icon: History, label: 'Tab History' },
+    { id: 'dock', icon: LayoutGrid, label: t.sidebar.dock },
+    { id: 'bookmark', icon: Bookmark, label: t.sidebar.bookmarks },
+    { id: 'buttons', icon: Layout, label: t.sidebar.buttons },
+    { id: 'cards', icon: Grid, label: t.sidebar.cards },
+    { id: 'icons', icon: ImageIcon, label: t.sidebar.icons },
+    { id: 'tables', icon: Table, label: t.sidebar.tables },
+    { id: 'snippets', icon: FileText, label: t.sidebar.snippets, divider: true },
+    { id: 'rss', icon: Rss, label: t.sidebar.rss },
+    { id: 'history', icon: History, label: t.sidebar.history },
   ];
 
   return (
@@ -58,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
           className="w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
         >
           <Settings size={20} />
-          <span className="font-medium hidden lg:block text-base-content text-left flex-1">Settings</span>
+          <span className="font-medium hidden lg:block text-base-content text-left flex-1">{t.sidebar.settings}</span>
         </button>
       </div>
     </div>

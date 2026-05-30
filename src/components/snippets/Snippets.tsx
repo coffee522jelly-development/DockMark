@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface Snippet {
   id: string;
@@ -157,11 +158,13 @@ ${snippet.text}
     );
   }
 
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 bg-transparent">
       <PageHeader
-        title="Code Snippets"
-        description="Manage and reuse your saved code snippets."
+        title={t.snippets.title}
+        description={t.snippets.description}
         icon={FileText}
         action={
           <div className="flex flex-wrap items-center gap-4">
@@ -189,7 +192,7 @@ ${snippet.text}
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder={t.snippets.search}
                 className="input input-bordered input-sm pl-9 bg-base-100/50 border-white/10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -197,10 +200,10 @@ ${snippet.text}
             </div>
             <div className="flex gap-2">
               <button onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">
-                <Plus size={16} /> New
+                <Plus size={16} /> {t.snippets.new}
               </button>
               <button onClick={exportAllAsMarkdown} className="btn btn-outline btn-sm" disabled={snippets.length === 0}>
-                <Download size={16} /> Export
+                <Download size={16} /> {t.snippets.export}
               </button>
             </div>
           </div>
@@ -208,10 +211,10 @@ ${snippet.text}
       />
 
       {filteredSnippets.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center opacity-50">
-          <FileText className="w-16 h-16 mb-4" />
-          <p className="text-xl font-medium">No snippets found</p>
-          <p className="text-sm">Create a new snippet or save text from any webpage via right-click.</p>
+        <div className="flex-1 flex flex-col items-center justify-center opacity-30">
+          <FileText size={64} className="mb-4" />
+          <p className="text-xl font-medium">{t.snippets.empty}</p>
+          <p className="text-sm">{t.snippets.emptySub}</p>
         </div>
       ) : (
         <div className={`grid gap-4 overflow-y-auto pr-2 pb-6 ${
@@ -305,7 +308,7 @@ ${snippet.text}
                       {new URL(snippet.url).hostname}
                     </a>
                   ) : (
-                    <span className="text-[10px] opacity-30 italic">Manual entry</span>
+                    <span className="text-[10px] opacity-30 italic">{t.snippets.manualEntry}</span>
                   )}
                 </div>
               </div>
@@ -316,11 +319,11 @@ ${snippet.text}
 
       {/* New Snippet Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-base-100 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-base-300">
             <div className="p-6 border-b border-base-300 flex justify-between items-center bg-base-200/50">
               <h3 className="text-xl font-bold flex items-center gap-2">
-                <Plus size={20} className="text-primary" /> Create New Snippet
+                <Plus size={20} className="text-primary" /> {t.snippets.modalTitle}
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost btn-sm btn-circle">
                 <X size={20} />
@@ -329,23 +332,23 @@ ${snippet.text}
 
             <div className="p-6 flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold opacity-70 px-1">Title</label>
+                <label className="text-sm font-bold opacity-70 px-1">{t.snippets.labelTitle}</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
-                  placeholder="e.g. Useful Regex, SQL Query, etc."
+                  className="input input-bordered w-full bg-base-100/50"
+                  placeholder={t.snippets.placeholderTitle}
                   value={newSnippetTitle}
                   onChange={(e) => setNewSnippetTitle(e.target.value)}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-bold opacity-70 px-1">Snippet Content</label>
+                <label className="text-sm font-bold opacity-70 px-1">{t.snippets.labelContent}</label>
                 <textarea
-                  className={`textarea textarea-bordered font-mono text-sm transition-all duration-200 ${
+                  className={`textarea textarea-bordered font-mono text-sm transition-all duration-200 bg-base-100/50 ${
                     newSnippetText ? 'h-80' : 'h-40'
                   }`}
-                  placeholder="Paste or type your code here..."
+                  placeholder={t.snippets.placeholderContent}
                   value={newSnippetText}
                   onChange={(e) => setNewSnippetText(e.target.value)}
                 ></textarea>
@@ -353,13 +356,13 @@ ${snippet.text}
             </div>
 
             <div className="p-6 bg-base-200/50 border-t border-base-300 flex justify-end gap-3">
-              <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost">Cancel</button>
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-ghost">{t.settings.cancel}</button>
               <button
                 onClick={addSnippet}
                 className="btn btn-primary"
                 disabled={!newSnippetText.trim()}
               >
-                Create Snippet
+                {t.snippets.new}
               </button>
             </div>
           </div>

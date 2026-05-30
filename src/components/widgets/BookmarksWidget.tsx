@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Bookmark, RefreshCw } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const BookmarksWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [bookmarks, setBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +61,7 @@ const BookmarksWidget: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="card-title text-sm flex items-center gap-2 text-base-content">
             <Bookmark size={16} className="text-primary" />
-            Bookmarks
+            {t.widgets.bookmarks.title}
           </h2>
           <button
             onClick={fetchBookmarks}
@@ -100,7 +102,7 @@ const BookmarksWidget: React.FC = () => {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center opacity-30">
             <Bookmark size={32} className="mb-2" />
-            <p className="text-xs">No bookmarks in Bookmark Bar.</p>
+            <p className="text-xs">{t.widgets.bookmarks.empty}</p>
           </div>
         )}
       </div>

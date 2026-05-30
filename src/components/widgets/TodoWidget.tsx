@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckSquare, Plus, Trash2 } from 'lucide-react';
 import { useStorage } from '../../hooks/useStorage';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface Todo {
   id: number;
@@ -10,6 +11,7 @@ interface Todo {
 }
 
 const TodoWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [todos, setTodos] = useStorage<Todo[]>('todos', [], 'local');
   const [inputValue, setInputValue] = useState('');
 
@@ -36,14 +38,14 @@ const TodoWidget: React.FC = () => {
       <div className="p-4 flex flex-col h-full">
         <h3 className="card-title text-base-content flex items-center gap-2 mb-4">
           <CheckSquare className="w-5 h-5 text-primary" />
-          TODO List
+          {t.widgets.todo.title}
         </h3>
 
         <form onSubmit={addTodo} className="flex gap-2 mb-4">
           <input
             type="text"
             className="input input-bordered input-sm flex-1 bg-base-100/50 border-white/10"
-            placeholder="Add task..."
+            placeholder={t.widgets.todo.placeholder}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />
@@ -75,7 +77,7 @@ const TodoWidget: React.FC = () => {
           {todos.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full opacity-30">
               <CheckSquare size={32} className="mb-2" />
-              <p className="text-xs">No tasks yet.</p>
+              <p className="text-xs">{t.widgets.todo.empty}</p>
             </div>
           )}
         </div>

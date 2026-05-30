@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Timer, Play, Pause, RotateCcw } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const TimerWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
 
@@ -16,7 +18,7 @@ const TimerWidget: React.FC = () => {
     } else if (timeLeft === 0) {
       setIsActive(false);
       window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { message: 'Timer finished! Time to take a break.', type: 'success' }
+        detail: { message: t.widgets.timer.finished, type: 'success' }
       }));
     }
 
@@ -43,7 +45,7 @@ const TimerWidget: React.FC = () => {
       <div className="flex flex-col h-full items-center justify-center text-center">
         <h3 className="card-title text-base-content flex items-center gap-2 mb-6">
           <Timer className="w-5 h-5 text-primary" />
-          25 min Timer
+          {t.widgets.timer.title}
         </h3>
 
         <div className="relative flex items-center justify-center mb-8">

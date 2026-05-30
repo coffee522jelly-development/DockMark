@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Rss, Plus, Trash2, ExternalLink, Globe } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface RssFeed {
   id: string;
@@ -10,6 +11,7 @@ interface RssFeed {
 }
 
 const RssManager: React.FC = () => {
+  const { t } = useTranslation();
   const [feeds, setFeeds] = useState<RssFeed[]>([]);
   const [newUrl, setNewUrl] = useState('');
   const [newTitle, setNewTitle] = useState('');
@@ -75,18 +77,18 @@ const RssManager: React.FC = () => {
   return (
     <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
-        title="RSS Feeds"
-        description="Add and manage your favorite RSS feeds."
+        title={t.rss.title}
+        description={t.rss.description}
         icon={Rss}
       />
 
       <GlassCard className="mb-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Plus size={18} className="text-primary" /> Add New Feed
+          <Plus size={18} className="text-primary" /> {t.rss.addNew}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control">
-            <label className="label"><span className="label-text font-medium">Feed Title</span></label>
+            <label className="label"><span className="label-text font-medium">{t.rss.feedTitle}</span></label>
             <input
               type="text"
               placeholder="e.g. BBC News"
@@ -96,7 +98,7 @@ const RssManager: React.FC = () => {
             />
           </div>
           <div className="form-control">
-            <label className="label"><span className="label-text font-medium">Feed URL</span></label>
+            <label className="label"><span className="label-text font-medium">{t.rss.feedUrl}</span></label>
             <div className="flex gap-2">
               <input
                 type="url"
@@ -106,7 +108,7 @@ const RssManager: React.FC = () => {
                 onChange={(e) => setNewUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addFeed()}
               />
-              <button onClick={addFeed} className="btn btn-primary">Add</button>
+              <button onClick={addFeed} className="btn btn-primary">{t.rss.add}</button>
             </div>
           </div>
         </div>
@@ -114,14 +116,14 @@ const RssManager: React.FC = () => {
 
       <div className="flex-1 overflow-auto pr-2 custom-scrollbar">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-base-content">
-          Your Feeds <span className="badge badge-primary">{feeds.length}</span>
+          {t.rss.yourFeeds} <span className="badge badge-primary">{feeds.length}</span>
         </h3>
 
         {feeds.length === 0 ? (
-          <div className="card bg-base-200 border-2 border-dashed border-base-300 py-12 text-center flex flex-col items-center justify-center opacity-50">
+          <div className="card bg-base-100/20 border-2 border-dashed border-white/10 py-12 text-center flex flex-col items-center justify-center opacity-30">
             <Globe className="w-12 h-12 mb-4" />
-            <p className="text-lg font-medium">No RSS feeds registered</p>
-            <p className="text-sm">Add your first feed above to see the latest news in your Dock.</p>
+            <p className="text-lg font-medium">{t.rss.empty}</p>
+            <p className="text-sm">{t.rss.emptySub}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

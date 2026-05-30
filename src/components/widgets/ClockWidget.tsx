@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { useStorage } from '../../hooks/useStorage';
 import GlassCard from '../common/GlassCard';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 const ClockWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [time, setTime] = useState(new Date());
   const [font] = useStorage('clock-font', 'ui-sans-serif, system-ui', 'localStorage');
 
@@ -13,7 +15,7 @@ const ClockWidget: React.FC = () => {
   }, []);
 
   const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const dateString = time.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const dateString = time.toLocaleDateString(t.widgets.clock.dateLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <GlassCard className="h-80">
