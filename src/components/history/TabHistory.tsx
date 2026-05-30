@@ -92,7 +92,7 @@ const TabHistory: React.FC = () => {
         description="Manage your saved tab sessions (Max 10)."
         icon={History}
         action={
-          <div className="flex items-center gap-4 px-4 py-2 bg-base-100/30 rounded-2xl border border-white/10 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-4 px-4 py-2 bg-base-100/30 border border-white/10 shadow-sm backdrop-blur-sm">
             <span className="text-sm font-medium">Auto-restore latest</span>
             <button
               onClick={toggleAutoRestore}
@@ -148,7 +148,7 @@ const TabHistory: React.FC = () => {
             </GlassCard>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-base-100 rounded-3xl border border-dashed border-base-300 opacity-50">
+          <div className="flex flex-col items-center justify-center py-20 bg-base-100 border border-dashed border-base-300 opacity-50">
             <History size={64} className="mb-4" />
             <p className="text-xl font-medium">No history saved yet.</p>
             <p className="text-sm">Right-click on any page and select "Save current tab state" to start.</p>

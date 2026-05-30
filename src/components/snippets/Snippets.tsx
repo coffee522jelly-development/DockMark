@@ -158,7 +158,7 @@ ${snippet.text}
   }
 
   return (
-    <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 bg-transparent">
       <PageHeader
         title="Code Snippets"
         description="Manage and reuse your saved code snippets."

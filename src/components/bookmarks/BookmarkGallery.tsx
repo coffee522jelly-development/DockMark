@@ -222,7 +222,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
 
       <div className="w-full">
         {viewMode === 'buttons' && (
-          <GlassCard className="flex flex-wrap gap-3 rounded-3xl p-6">
+          <GlassCard className="flex flex-wrap gap-3 p-6">
             {filteredBookmarks.map((bookmark: BookmarkItem) => (
               <div key={bookmark.id} className="group relative">
                 <button
@@ -315,7 +315,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'tables' && (
-          <GlassCard className="rounded-3xl" noPadding>
+          <GlassCard noPadding>
             <table className="table table-zebra w-full table-fixed bg-transparent">
               <thead>
                 <tr>
@@ -394,7 +394,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'icons' && (
-          <GlassCard className="flex flex-wrap gap-4 rounded-3xl p-6">
+          <GlassCard className="flex flex-wrap gap-4 p-6">
             {filteredBookmarks.map((bookmark: BookmarkItem) => {
               const url = new URL(bookmark.url);
               const chromeExtensionId = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : '';
