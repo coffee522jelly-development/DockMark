@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cloud, CloudRain, Sun, Wind, MapPin, Loader2 } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
 
 const WeatherWidget: React.FC = () => {
   const [weather, setWeather] = useState<any>(null);
@@ -52,17 +53,17 @@ const WeatherWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="card bg-blue-500 text-white shadow-xl h-80 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin opacity-50" />
-      </div>
+      <GlassCard className="h-80 flex items-center justify-center border-blue-500/30">
+        <Loader2 className="w-8 h-8 animate-spin text-primary opacity-50" />
+      </GlassCard>
     );
   }
 
   if (error || !weather) {
     return (
-      <div className="card bg-blue-500 text-white shadow-xl p-5 h-80 flex items-center justify-center">
-        <p>Weather data unavailable</p>
-      </div>
+      <GlassCard className="h-80 flex items-center justify-center">
+        <p className="text-error opacity-70">Weather unavailable</p>
+      </GlassCard>
     );
   }
 
@@ -70,46 +71,51 @@ const WeatherWidget: React.FC = () => {
   const daily = weather.daily;
 
   return (
-    <div className="card bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-xl h-80">
-      <div className="card-body p-5">
+    <GlassCard className="h-80 bg-blue-500/20" noPadding>
+      <div className="p-6 flex flex-col h-full">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-bold flex items-center gap-1">
-              <MapPin className="w-4 h-4" /> Current Location
+            <h3 className="text-lg font-bold flex items-center gap-2 text-base-content">
+              <MapPin className="w-4 h-4 text-primary" /> Current
             </h3>
-            <p className="text-xs opacity-80">
+            <p className="text-xs opacity-50 mt-1">
               {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
-          {getWeatherIcon(current.weather_code)}
+          <div className="p-2 rounded-2xl bg-base-100/50">
+            {getWeatherIcon(current.weather_code)}
+          </div>
         </div>
 
-        <div className="flex items-center gap-4 my-2">
-          <span className="text-5xl font-bold">{Math.round(current.temperature_2m)}°</span>
+        <div className="flex items-center gap-6 my-6">
+          <span className="text-6xl font-bold text-base-content">{Math.round(current.temperature_2m)}°</span>
           <div className="text-sm">
-            <p className="font-bold">{getWeatherCondition(current.weather_code)}</p>
-            <p className="opacity-80">
+            <p className="font-bold text-base-content text-lg">{getWeatherCondition(current.weather_code)}</p>
+            <p className="opacity-60 font-medium">
               H:{Math.round(daily.temperature_2m_max[0])}° L:{Math.round(daily.temperature_2m_min[0])}°
             </p>
           </div>
         </div>
 
-        <div className="flex justify-between mt-2 pt-4 border-t border-white/20 text-xs">
-          <div className="flex items-center gap-1">
-            <Wind className="w-3 h-3" />
-            <span>{current.wind_speed_10m} km/h</span>
+        <div className="grid grid-cols-3 gap-2 mt-auto pt-4 border-t border-white/10 text-[10px]">
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+            <Wind className="w-3 h-3 opacity-50" />
+            <span className="font-bold">{current.wind_speed_10m}</span>
+            <span className="opacity-50 scale-90">km/h</span>
           </div>
-          <div className="flex items-center gap-1">
-            <CloudRain className="w-3 h-3" />
-            <span>{getWeatherCondition(current.weather_code) === 'Rainy' ? 'High' : 'Low'}</span>
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+            <CloudRain className="w-3 h-3 opacity-50" />
+            <span className="font-bold">{getWeatherCondition(current.weather_code) === 'Rainy' ? 'High' : 'Low'}</span>
+            <span className="opacity-50 scale-90">Precip</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Cloud className="w-3 h-3" />
-            <span>{current.relative_humidity_2m}%</span>
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+            <Cloud className="w-3 h-3 opacity-50" />
+            <span className="font-bold">{current.relative_humidity_2m}%</span>
+            <span className="opacity-50 scale-90">Humid</span>
           </div>
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

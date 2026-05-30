@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckSquare, Plus, Trash2 } from 'lucide-react';
 import { useStorage } from '../../hooks/useStorage';
+import GlassCard from '../common/GlassCard';
 
 interface Todo {
   id: number;
@@ -31,9 +32,9 @@ const TodoWidget: React.FC = () => {
   };
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
-      <div className="card-body p-4 flex flex-col h-full">
-        <h3 className="card-title text-base-content flex items-center gap-2 mb-2">
+    <GlassCard className="h-80" noPadding>
+      <div className="p-4 flex flex-col h-full">
+        <h3 className="card-title text-base-content flex items-center gap-2 mb-4">
           <CheckSquare className="w-5 h-5 text-primary" />
           TODO List
         </h3>
@@ -41,7 +42,7 @@ const TodoWidget: React.FC = () => {
         <form onSubmit={addTodo} className="flex gap-2 mb-4">
           <input
             type="text"
-            className="input input-bordered input-sm flex-1 bg-base-200 border-base-300"
+            className="input input-bordered input-sm flex-1 bg-base-100/50 border-white/10"
             placeholder="Add task..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -51,7 +52,7 @@ const TodoWidget: React.FC = () => {
           </button>
         </form>
 
-        <div className="flex-1 overflow-auto space-y-2 pr-1">
+        <div className="flex-1 overflow-auto space-y-2 pr-1 custom-scrollbar">
           {todos.map(todo => (
             <div key={todo.id} className="flex items-center gap-2 group">
               <input
@@ -72,11 +73,14 @@ const TodoWidget: React.FC = () => {
             </div>
           ))}
           {todos.length === 0 && (
-            <p className="text-center text-base-content/40 text-xs mt-4">No tasks yet.</p>
+            <div className="flex flex-col items-center justify-center h-full opacity-30">
+              <CheckSquare size={32} className="mb-2" />
+              <p className="text-xs">No tasks yet.</p>
+            </div>
           )}
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

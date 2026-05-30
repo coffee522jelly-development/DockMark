@@ -90,7 +90,7 @@ const App: React.FC = () => {
             --rounded-btn: ${borderRadius / 2}px;
             --rounded-badge: ${borderRadius / 4}px;
           }
-          .card, .btn, .input, .select, .textarea, .alert {
+          div, button, input, select, textarea, img, svg, span:not(.lucide), .card, .alert {
             border-radius: ${borderRadius}px !important;
           }
         `}

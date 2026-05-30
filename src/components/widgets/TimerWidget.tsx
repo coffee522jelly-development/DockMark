@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Timer, Play, Pause, RotateCcw } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
 
 const TimerWidget: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
@@ -38,33 +39,38 @@ const TimerWidget: React.FC = () => {
   const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
-      <div className="card-body items-center text-center p-4 justify-center">
-        <h3 className="card-title text-base-content flex items-center gap-2 mb-2">
+    <GlassCard className="h-80">
+      <div className="flex flex-col h-full items-center justify-center text-center">
+        <h3 className="card-title text-base-content flex items-center gap-2 mb-6">
           <Timer className="w-5 h-5 text-primary" />
           25 min Timer
         </h3>
 
-        <div className="relative flex items-center justify-center my-4">
+        <div className="relative flex items-center justify-center mb-8">
           <div
-            className="radial-progress text-primary"
-            style={{ "--value": progress, "--size": "8rem", "--thickness": "8px" } as React.CSSProperties}
+            className="radial-progress text-primary bg-base-100/30"
+            style={{ "--value": progress, "--size": "9rem", "--thickness": "6px" } as React.CSSProperties}
             role="progressbar"
           >
-            <span className="text-2xl font-bold font-mono text-base-content">{formatTime(timeLeft)}</span>
+            <span className="text-3xl font-bold font-mono text-base-content tracking-tighter">
+              {formatTime(timeLeft)}
+            </span>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <button onClick={toggleTimer} className={`btn btn-circle ${isActive ? 'btn-outline' : 'btn-primary'}`}>
+        <div className="flex gap-3">
+          <button
+            onClick={toggleTimer}
+            className={`btn btn-circle btn-md ${isActive ? 'btn-outline' : 'btn-primary shadow-lg shadow-primary/20'}`}
+          >
             {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-1" />}
           </button>
-          <button onClick={resetTimer} className="btn btn-circle btn-ghost border-base-300">
+          <button onClick={resetTimer} className="btn btn-circle btn-md btn-ghost border-white/10 hover:bg-base-100/50">
             <RotateCcw className="w-5 h-5" />
           </button>
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

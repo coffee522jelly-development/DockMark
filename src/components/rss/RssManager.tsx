@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Rss, Plus, Trash2, ExternalLink, Globe } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
+import PageHeader from '../common/PageHeader';
 
 interface RssFeed {
   id: string;
@@ -71,52 +73,46 @@ const RssManager: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto h-full flex flex-col">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2 text-base-content">
-            <Rss className="w-8 h-8 text-orange-500" />
-            RSS Feed Management
-          </h1>
-          <p className="text-base-content/60 mt-1">Add and manage your favorite RSS feeds to display in the Dock.</p>
-        </div>
-      </div>
+    <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <PageHeader
+        title="RSS Feeds"
+        description="Add and manage your favorite RSS feeds."
+        icon={Rss}
+      />
 
-      <div className="card bg-base-100 shadow-xl border border-base-300 mb-8">
-        <div className="card-body p-6">
-          <h3 className="card-title text-lg mb-4 flex items-center gap-2">
-            <Plus className="w-5 h-5 text-primary" /> Add New Feed
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label"><span className="label-text font-medium">Feed Title (Optional)</span></label>
+      <GlassCard className="mb-6">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Plus size={18} className="text-primary" /> Add New Feed
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="form-control">
+            <label className="label"><span className="label-text font-medium">Feed Title</span></label>
+            <input
+              type="text"
+              placeholder="e.g. BBC News"
+              className="input input-bordered w-full bg-base-100/50 border-white/10"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+          </div>
+          <div className="form-control">
+            <label className="label"><span className="label-text font-medium">Feed URL</span></label>
+            <div className="flex gap-2">
               <input
-                type="text"
-                placeholder="e.g. BBC News"
-                className="input input-bordered w-full"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                type="url"
+                placeholder="https://..."
+                className="input input-bordered w-full flex-1 bg-base-100/50 border-white/10"
+                value={newUrl}
+                onChange={(e) => setNewUrl(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addFeed()}
               />
-            </div>
-            <div className="form-control">
-              <label className="label"><span className="label-text font-medium">Feed URL</span></label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  placeholder="https://example.com/rss.xml"
-                  className="input input-bordered w-full flex-1"
-                  value={newUrl}
-                  onChange={(e) => setNewUrl(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addFeed()}
-                />
-                <button onClick={addFeed} className="btn btn-primary">Add</button>
-              </div>
+              <button onClick={addFeed} className="btn btn-primary">Add</button>
             </div>
           </div>
         </div>
-      </div>
+      </GlassCard>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto pr-2 custom-scrollbar">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-base-content">
           Your Feeds <span className="badge badge-primary">{feeds.length}</span>
         </h3>
@@ -130,9 +126,9 @@ const RssManager: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {feeds.map((feed) => (
-              <div key={feed.id} className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow group">
-                <div className="card-body p-4 flex-row items-center gap-4">
-                  <div className="bg-orange-100 p-3 rounded-xl">
+              <GlassCard key={feed.id} className="hover:border-primary/30 group" noPadding>
+                <div className="p-4 flex items-center gap-4">
+                  <div className="bg-orange-100/20 p-3 rounded-2xl">
                     <Rss className="w-6 h-6 text-orange-500" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -145,10 +141,10 @@ const RssManager: React.FC = () => {
                     onClick={() => deleteFeed(feed.id)}
                     className="btn btn-ghost btn-circle btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 size={16} />
                   </button>
                 </div>
-              </div>
+              </GlassCard>
             ))}
           </div>
         )}

@@ -127,6 +127,9 @@ const SettingsModal: React.FC<SettingsModalProps> = (props) => {
                   value={props.borderRadius}
                   onChange={(e) => props.setBorderRadius(Number(e.target.value))}
                 />
+                <div className="label">
+                  <span className="label-text-alt text-primary font-bold italic">Extreme Mode: Applies to ALMOST EVERYTHING! 🎨</span>
+                </div>
               </div>
             </div>
           </div>

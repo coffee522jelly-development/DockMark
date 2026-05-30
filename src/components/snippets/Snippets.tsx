@@ -4,6 +4,8 @@ import {
   Copy, Check, Edit2, Save, X, Plus,
   LayoutList, Columns, LayoutGrid
 } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
+import PageHeader from '../common/PageHeader';
 
 interface Snippet {
   id: string;
@@ -156,65 +158,54 @@ ${snippet.text}
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto h-full flex flex-col bg-base-100/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-xl">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold flex items-center gap-2 text-base-content">
-            <FileText className="w-6 h-6 text-primary" />
-            Code Snippets
-          </h1>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="btn btn-primary btn-sm gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            New Snippet
-          </button>
-        </div>
-        <div className="flex gap-4 items-center">
-          <div className="join bg-base-200 p-0.5">
-            <button
-              onClick={() => setColumns(1)}
-              className={`join-item btn btn-xs ${columns === 1 ? 'btn-primary' : 'btn-ghost'}`}
-              title="1 Column"
-            >
-              <LayoutList className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setColumns(2)}
-              className={`join-item btn btn-xs ${columns === 2 ? 'btn-primary' : 'btn-ghost'}`}
-              title="2 Columns"
-            >
-              <Columns className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setColumns(4)}
-              className={`join-item btn btn-xs ${columns === 4 ? 'btn-primary' : 'btn-ghost'}`}
-              title="4 Columns"
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-            </button>
+    <div className="space-y-6 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <PageHeader
+        title="Code Snippets"
+        description="Manage and reuse your saved code snippets."
+        icon={FileText}
+        action={
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="join bg-base-100/30 p-0.5 border border-white/10 rounded-xl">
+              <button
+                onClick={() => setColumns(1)}
+                className={`join-item btn btn-xs ${columns === 1 ? 'btn-primary' : 'btn-ghost'}`}
+              >
+                <LayoutList size={14} />
+              </button>
+              <button
+                onClick={() => setColumns(2)}
+                className={`join-item btn btn-xs ${columns === 2 ? 'btn-primary' : 'btn-ghost'}`}
+              >
+                <Columns size={14} />
+              </button>
+              <button
+                onClick={() => setColumns(4)}
+                className={`join-item btn btn-xs ${columns === 4 ? 'btn-primary' : 'btn-ghost'}`}
+              >
+                <LayoutGrid size={14} />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="input input-bordered input-sm pl-9 bg-base-100/50 border-white/10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">
+                <Plus size={16} /> New
+              </button>
+              <button onClick={exportAllAsMarkdown} className="btn btn-outline btn-sm" disabled={snippets.length === 0}>
+                <Download size={16} /> Export
+              </button>
+            </div>
           </div>
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
-            <input
-              type="text"
-              placeholder="Search snippets..."
-              className="input input-bordered input-sm pl-9 w-64"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <button
-            onClick={exportAllAsMarkdown}
-            className="btn btn-outline btn-sm gap-2"
-            disabled={snippets.length === 0}
-          >
-            <Download className="w-4 h-4" />
-            Export All (MD)
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {filteredSnippets.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center opacity-50">
@@ -229,8 +220,8 @@ ${snippet.text}
           'grid-cols-1 md:grid-cols-2 xl:grid-cols-4'
         }`}>
           {filteredSnippets.map((snippet) => (
-            <div key={snippet.id} className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-md transition-shadow group">
-              <div className="card-body p-4">
+            <GlassCard key={snippet.id} className="group hover:border-primary/30" noPadding>
+              <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1 min-w-0 pr-2">
                     {editingId === snippet.id ? (
@@ -297,7 +288,7 @@ ${snippet.text}
                 </div>
 
                 <div className="relative">
-                  <pre className="bg-base-200 p-3 rounded-lg text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap text-base-content/80">
+                  <pre className="bg-base-100/50 p-3 rounded-xl text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap text-base-content/80 border border-white/5">
                     {snippet.text}
                   </pre>
                 </div>
@@ -318,7 +309,7 @@ ${snippet.text}
                   )}
                 </div>
               </div>
-            </div>
+            </GlassCard>
           ))}
         </div>
       )}

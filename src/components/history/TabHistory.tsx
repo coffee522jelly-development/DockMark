@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { History, ExternalLink, Trash2, Clock, Globe, ToggleLeft, ToggleRight } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
+import PageHeader from '../common/PageHeader';
 
 interface TabEntry {
   title: string;
@@ -85,30 +87,28 @@ const TabHistory: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl shadow-sm border border-base-300">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-3">
-            <History className="text-primary" /> Tab History
-          </h2>
-          <p className="text-base-content/60">Manage your saved tab sessions (Max 10).</p>
-        </div>
-
-        <div className="flex items-center gap-4 px-4 py-2 bg-base-200 rounded-xl border border-base-300">
-          <span className="text-sm font-medium">Auto-restore latest on startup</span>
-          <button
-            onClick={toggleAutoRestore}
-            className={`transition-colors ${autoRestore ? 'text-primary' : 'text-base-content/30'}`}
-          >
-            {autoRestore ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Tab History"
+        description="Manage your saved tab sessions (Max 10)."
+        icon={History}
+        action={
+          <div className="flex items-center gap-4 px-4 py-2 bg-base-100/30 rounded-2xl border border-white/10 shadow-sm backdrop-blur-sm">
+            <span className="text-sm font-medium">Auto-restore latest</span>
+            <button
+              onClick={toggleAutoRestore}
+              className={`transition-colors ${autoRestore ? 'text-primary' : 'text-base-content/30'}`}
+            >
+              {autoRestore ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
+            </button>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4">
         {history.length > 0 ? (
           history.map((entry) => (
-            <div key={entry.id} className="card bg-base-100 shadow-sm border border-base-300 hover:border-primary/30 transition-all group">
-              <div className="card-body p-5">
+            <GlassCard key={entry.id} className="hover:border-primary/30 group" noPadding>
+              <div className="p-5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -138,14 +138,14 @@ const TabHistory: React.FC = () => {
 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 overflow-hidden max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                   {entry.tabs.map((tab, idx) => (
-                    <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-base-200 border border-base-300 text-xs truncate" title={tab.title}>
+                    <div key={idx} className="flex items-center gap-2 p-2 rounded-xl bg-base-100/50 border border-white/5 text-xs truncate" title={tab.title}>
                       <Globe size={12} className="shrink-0 opacity-50" />
-                      <span className="truncate flex-1">{tab.title}</span>
+                      <span className="truncate flex-1 font-medium">{tab.title}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
+            </GlassCard>
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-20 bg-base-100 rounded-3xl border border-dashed border-base-300 opacity-50">

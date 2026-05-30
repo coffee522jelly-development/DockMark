@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Bookmark, RefreshCw } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
 
 const BookmarksWidget: React.FC = () => {
   const [bookmarks, setBookmarks] = useState<chrome.bookmarks.BookmarkTreeNode[]>([]);
@@ -46,23 +47,23 @@ const BookmarksWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="card bg-base-100 shadow-xl h-80 border border-base-300 flex items-center justify-center">
+      <GlassCard className="h-80 flex items-center justify-center">
         <span className="loading loading-spinner loading-md text-primary"></span>
-      </div>
+      </GlassCard>
     );
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl h-80 border border-base-300">
-      <div className="card-body p-4 overflow-hidden">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="card-title text-sm flex items-center gap-2">
+    <GlassCard className="h-80" noPadding>
+      <div className="p-4 flex flex-col h-full">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="card-title text-sm flex items-center gap-2 text-base-content">
             <Bookmark size={16} className="text-primary" />
             Bookmarks
           </h2>
           <button
             onClick={fetchBookmarks}
-            className="btn btn-ghost btn-xs btn-circle"
+            className="btn btn-ghost btn-xs btn-circle hover:bg-base-100/50"
             title="Refresh"
           >
             <RefreshCw size={14} />
@@ -70,7 +71,7 @@ const BookmarksWidget: React.FC = () => {
         </div>
 
         {bookmarks.length > 0 ? (
-          <div className="grid grid-cols-4 gap-3 overflow-y-auto max-h-[180px] pr-1">
+          <div className="grid grid-cols-4 gap-3 overflow-y-auto pr-1 custom-scrollbar">
             {bookmarks.map((bm) => (
               <a
                 key={bm.id}
@@ -97,12 +98,13 @@ const BookmarksWidget: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center py-4">
-            <p className="text-xs opacity-50">No bookmarks in Bookmark Bar.</p>
+          <div className="flex-1 flex flex-col items-center justify-center text-center opacity-30">
+            <Bookmark size={32} className="mb-2" />
+            <p className="text-xs">No bookmarks in Bookmark Bar.</p>
           </div>
         )}
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { ExternalLink, Search, Trash2, Save, Download } from 'lucide-react';
+import { ExternalLink, Search, Trash2, Save, Download, Bookmark } from 'lucide-react';
 import TurndownService from 'turndown';
+import GlassCard from '../common/GlassCard';
+import PageHeader from '../common/PageHeader';
 
 interface BookmarkItem {
   id: string;
@@ -197,29 +199,30 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-base-100 p-4 rounded-2xl shadow-sm border border-base-300">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-base-content whitespace-nowrap capitalize">Bookmark {viewMode}</h2>
-        </div>
-
-        <div className="relative w-full md:w-64">
-          <span className="absolute inset-y-0 left-3 flex items-center text-base-content/40">
-            <Search size={18} />
-          </span>
-          <input
-            type="text"
-            placeholder={`Search ${viewMode}...`}
-            className="input input-bordered w-full pl-10 h-10 text-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <PageHeader
+        title={`Bookmark ${viewMode.charAt(0).toUpperCase() + viewMode.slice(1)}`}
+        description={`Browse and manage your bookmarks in ${viewMode} view.`}
+        icon={Bookmark}
+        action={
+          <div className="relative w-full md:w-64">
+            <span className="absolute inset-y-0 left-3 flex items-center text-base-content/40">
+              <Search size={18} />
+            </span>
+            <input
+              type="text"
+              placeholder={`Search ${viewMode}...`}
+              className="input input-bordered w-full pl-10 bg-base-100/50 border-white/10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        }
+      />
 
       <div className="w-full">
         {viewMode === 'buttons' && (
-          <div className="flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300 bg-base-100/40 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+          <GlassCard className="flex flex-wrap gap-3 rounded-3xl p-6">
             {filteredBookmarks.map((bookmark: BookmarkItem) => (
               <div key={bookmark.id} className="group relative">
                 <button
@@ -246,7 +249,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                 </div>
               </div>
             ))}
-          </div>
+          </GlassCard>
         )}
 
         {viewMode === 'cards' && (
@@ -312,8 +315,8 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'tables' && (
-          <div className="bg-base-100 rounded-2xl border border-base-300 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
-            <table className="table table-zebra w-full table-fixed">
+          <GlassCard className="rounded-3xl" noPadding>
+            <table className="table table-zebra w-full table-fixed bg-transparent">
               <thead>
                 <tr>
                   <th className="w-12 text-center"></th>
@@ -327,10 +330,10 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                   const domain = new URL(bookmark.url).hostname;
                   const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
                   return (
-                    <tr key={bookmark.id} className="hover:bg-base-200 transition-colors group">
+                    <tr key={bookmark.id} className="hover:bg-base-100/50 transition-colors group">
                       <td className="text-center px-2">
                         <div className="avatar">
-                          <div className="w-6 h-6 rounded bg-base-300 flex items-center justify-center p-0.5">
+                          <div className="w-6 h-6 rounded bg-base-300/50 flex items-center justify-center p-0.5">
                             <img src={faviconUrl} alt="favicon" />
                           </div>
                         </div>
@@ -340,7 +343,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                           href={bookmark.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="truncate w-full block hover:underline hover:text-primary transition-all"
+                          className="truncate w-full block hover:underline hover:text-primary transition-all font-medium"
                           title={bookmark.title}
                         >
                           {bookmark.title}
@@ -351,7 +354,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                           href={bookmark.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="truncate w-full block hover:underline hover:text-primary transition-all"
+                          className="truncate w-full block hover:underline hover:text-primary transition-all font-normal"
                           title={bookmark.url}
                         >
                           {bookmark.url}
@@ -387,11 +390,11 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                 })}
               </tbody>
             </table>
-          </div>
+          </GlassCard>
         )}
 
         {viewMode === 'icons' && (
-          <div className="flex flex-wrap gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <GlassCard className="flex flex-wrap gap-4 rounded-3xl p-6">
             {filteredBookmarks.map((bookmark: BookmarkItem) => {
               const url = new URL(bookmark.url);
               const chromeExtensionId = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : '';
@@ -448,7 +451,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                 </div>
               );
             })}
-          </div>
+          </GlassCard>
         )}
 
         {filteredBookmarks.length === 0 && (

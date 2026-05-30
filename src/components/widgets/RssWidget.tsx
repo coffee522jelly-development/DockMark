@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Rss, RefreshCw, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useStorage } from '../../hooks/useStorage';
+import GlassCard from '../common/GlassCard';
+
+interface RssFeed {
+  id: string;
+  url: string;
+  title: string;
+}
 
 const RssWidget: React.FC = () => {
-  const [feeds] = useStorage<string[]>('rss-feeds', [], 'local');
+  const [feeds] = useStorage<RssFeed[]>('rssFeeds', [], 'local');
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,9 +26,9 @@ const RssWidget: React.FC = () => {
     let allItems: any[] = [];
 
     try {
-      for (const url of feeds) {
+      for (const feed of feeds) {
         try {
-          const response = await fetch(url);
+          const response = await fetch(feed.url);
           const text = await response.text();
           const parser = new DOMParser();
           const xml = parser.parseFromString(text, 'text/xml');
@@ -33,7 +40,7 @@ const RssWidget: React.FC = () => {
               allItems.push({
                 title: item.querySelector('title')?.textContent || 'Untitled',
                 link: item.querySelector('link')?.textContent || '#',
-                source: url,
+                source: feed.url,
                 id: Math.random().toString(36)
               });
             }
@@ -47,14 +54,14 @@ const RssWidget: React.FC = () => {
                 allItems.push({
                   title: entry.querySelector('title')?.textContent || 'Untitled',
                   link: entry.querySelector('link')?.getAttribute('href') || '#',
-                  source: url,
+                source: feed.url,
                   id: Math.random().toString(36)
                 });
               }
             });
           }
         } catch (e) {
-          console.error(`Failed to fetch feed: ${url}`, e);
+          console.error(`Failed to fetch feed: ${feed.url}`, e);
         }
       }
 
@@ -71,9 +78,9 @@ const RssWidget: React.FC = () => {
   }, [feeds]);
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
-      <div className="card-body p-4 flex flex-col h-full">
-        <div className="flex items-center justify-between mb-2">
+    <GlassCard className="h-80" noPadding>
+      <div className="p-4 flex flex-col h-full">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="card-title text-base-content flex items-center gap-2">
             <Rss className="w-5 h-5 text-orange-500" />
             RSS Reader
@@ -87,7 +94,7 @@ const RssWidget: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto space-y-3 pr-1 custom-scrollbar">
+        <div className="flex-1 overflow-auto space-y-2 pr-1 custom-scrollbar">
           {loading && items.length === 0 ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (
@@ -109,7 +116,7 @@ const RssWidget: React.FC = () => {
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block group hover:bg-base-200 p-2 rounded-lg transition-colors border border-transparent hover:border-base-300"
+                className="block group hover:bg-base-100/50 p-2 rounded-lg transition-colors border border-transparent hover:border-white/10"
               >
                 <div className="flex justify-between items-start gap-2">
                   <h4 className="text-xs font-bold text-base-content line-clamp-2 leading-relaxed">
@@ -131,7 +138,7 @@ const RssWidget: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
 
 const CalendarWidget: React.FC = () => {
   const now = new Date();
@@ -21,24 +22,24 @@ const CalendarWidget: React.FC = () => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="card bg-base-100 shadow-xl border border-base-300 h-80">
-      <div className="card-body p-4 overflow-hidden">
+    <GlassCard className="h-80" noPadding>
+      <div className="p-4 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-4">
           <CalendarIcon className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-base-content">{monthName} {year}</h3>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-center text-xs">
+        <div className="grid grid-cols-7 gap-1 text-center text-xs flex-1">
           {dayNames.map(d => (
-            <div key={d} className="font-bold text-base-content/40">{d}</div>
+            <div key={d} className="font-bold text-base-content/40 py-1">{d}</div>
           ))}
           {days.map((day, idx) => (
             <div
               key={idx}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg flex items-center justify-center transition-colors ${
                 day === now.getDate()
-                  ? 'bg-primary text-primary-content font-bold'
+                  ? 'bg-primary text-primary-content font-bold shadow-md'
                   : day
-                    ? 'text-base-content hover:bg-base-200 cursor-default'
+                    ? 'text-base-content hover:bg-base-100/50 cursor-default'
                     : ''
               }`}
             >
@@ -47,7 +48,7 @@ const CalendarWidget: React.FC = () => {
           ))}
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 
