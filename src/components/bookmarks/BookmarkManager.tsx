@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BookmarkList from './BookmarkList';
 import { FolderPlus, Bookmark } from 'lucide-react';
+import GlassCard from '../common/GlassCard';
 import { useTranslation } from '../../contexts/LanguageContext';
 import PageHeader from '../common/PageHeader';
 
@@ -45,9 +46,9 @@ const BookmarkManager: React.FC = () => {
         }
       />
 
-      <div className="p-0">
+      <GlassCard className="p-4" noPadding>
         <BookmarkList key={refreshTrigger} />
-      </div>
+      </GlassCard>
 
       {/* New Folder Modal */}
       <dialog id="new_folder_modal" className="modal">

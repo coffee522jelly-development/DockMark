@@ -251,9 +251,10 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
             {isGrouped ? (
               Object.entries(groupedBookmarks).map(([groupTitle, items]) => (
                 <div key={groupTitle} className="space-y-3">
-                  <h3 className="text-sm font-bold opacity-50 px-2 flex items-center gap-2">
-                    <Bookmark size={14} /> {groupTitle}
-                  </h3>
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-base-100/60 backdrop-blur-md border border-white/10 shadow-sm ml-2">
+                    <Bookmark size={14} className="text-primary" />
+                    <h3 className="text-sm font-bold text-base-content/80">{groupTitle}</h3>
+                  </div>
                   <GlassCard className="flex flex-wrap gap-3 p-6">
                     {items.map((bookmark) => (
                       <div key={bookmark.id} className="group relative">
@@ -302,11 +303,13 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                     .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
                     .map(([month, items]) => (
                       <div key={`${year}-${month}`} className="space-y-4">
-                        <div className="flex items-center gap-3 px-2">
-                          <div className="w-2 h-2 rounded-full bg-primary/50" />
-                          <h4 className="text-sm font-bold opacity-60">
-                            {new Date(Number(year), Number(month) - 1).toLocaleString(t.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'long' })}
-                          </h4>
+                        <div className="flex items-center gap-3 px-1 ml-1">
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-base-100/40 backdrop-blur-md border border-white/10 shadow-sm">
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                            <h4 className="text-xs font-bold text-base-content/70">
+                              {new Date(Number(year), Number(month) - 1).toLocaleString(t.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'long' })}
+                            </h4>
+                          </div>
                         </div>
 
                         <div className="space-y-4 border-l-2 border-primary/10 ml-3 pl-8">

@@ -291,7 +291,7 @@ ${snippet.text}
                 </div>
 
                 <div className="relative">
-                  <pre className="bg-base-100/50 p-3 rounded-xl text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap text-base-content/80 border border-white/5">
+                  <pre className="bg-base-100/80 backdrop-blur-sm p-3 rounded-xl text-xs font-mono max-h-48 overflow-y-auto whitespace-pre-wrap text-base-content border border-white/10 shadow-inner">
                     {snippet.text}
                   </pre>
                 </div>
