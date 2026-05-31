@@ -161,6 +161,23 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
     return groups;
   }, [filteredBookmarks]);
 
+  const timelineGroups = useMemo(() => {
+    if (viewMode !== 'timeline') return {};
+    const groups: Record<string, Record<string, BookmarkItem[]>> = {};
+
+    filteredBookmarks.forEach(bm => {
+      const date = new Date(bm.dateAdded || 0);
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+      if (!groups[year]) groups[year] = {};
+      if (!groups[year][month]) groups[year][month] = [];
+      groups[year][month].push(bm);
+    });
+
+    return groups;
+  }, [filteredBookmarks, viewMode]);
+
   const handleDragStart = (id: string) => {
     setDraggedId(id);
   };
@@ -271,34 +288,52 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'timeline' && (
-          <div className="space-y-4">
-            {filteredBookmarks.map((bookmark, idx) => {
-              const date = bookmark.dateAdded ? new Date(bookmark.dateAdded).toLocaleDateString() : 'Unknown';
-              return (
-                <div key={bookmark.id} className="flex gap-4 group">
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-white/10 shrink-0">
-                      <Bookmark size={18} />
-                    </div>
-                    {idx !== filteredBookmarks.length - 1 && (
-                      <div className="w-0.5 h-full bg-base-content/10 group-hover:bg-primary/30 transition-colors" />
-                    )}
+          <div className="space-y-12">
+            {Object.entries(timelineGroups)
+              .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+              .map(([year, months]) => (
+                <div key={year} className="space-y-8">
+                  <div className="flex items-center gap-4">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/30" />
+                    <h3 className="text-2xl font-black text-primary/40 tracking-tighter italic">{year}</h3>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/30" />
                   </div>
-                  <div className="flex-1 pb-8">
-                    <GlassCard className="hover:border-primary/30 group/card transition-all cursor-pointer" noPadding onClick={() => window.open(bookmark.url, '_blank')}>
-                      <div className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{date}</span>
-                          <span className="badge badge-outline badge-xs opacity-50">{bookmark.parentTitle}</span>
+
+                  {Object.entries(months)
+                    .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
+                    .map(([month, items]) => (
+                      <div key={`${year}-${month}`} className="space-y-4">
+                        <div className="flex items-center gap-3 px-2">
+                          <div className="w-2 h-2 rounded-full bg-primary/50" />
+                          <h4 className="text-sm font-bold opacity-60">
+                            {new Date(Number(year), Number(month) - 1).toLocaleString(t.language === 'ja' ? 'ja-JP' : 'en-US', { month: 'long' })}
+                          </h4>
                         </div>
-                        <h3 className="font-bold text-base-content group-hover/card:text-primary transition-colors">{bookmark.title}</h3>
-                        <p className="text-xs opacity-50 truncate mt-1">{bookmark.url}</p>
+
+                        <div className="space-y-4 border-l-2 border-primary/10 ml-3 pl-8">
+                          {items.map((bookmark) => {
+                            const date = bookmark.dateAdded ? new Date(bookmark.dateAdded).toLocaleDateString() : 'Unknown';
+                            return (
+                              <div key={bookmark.id} className="relative group">
+                                <div className="absolute -left-[41px] top-4 w-4 h-4 rounded-full bg-base-100 border-2 border-primary/30 group-hover:border-primary transition-colors z-10" />
+                                <GlassCard className="hover:border-primary/30 group/card transition-all cursor-pointer" noPadding onClick={() => window.open(bookmark.url, '_blank')}>
+                                  <div className="p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{date}</span>
+                                      <span className="badge badge-outline badge-xs opacity-50">{bookmark.parentTitle}</span>
+                                    </div>
+                                    <h3 className="font-bold text-base-content group-hover/card:text-primary transition-colors">{bookmark.title}</h3>
+                                    <p className="text-xs opacity-50 truncate mt-1">{bookmark.url}</p>
+                                  </div>
+                                </GlassCard>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </GlassCard>
-                  </div>
+                    ))}
                 </div>
-              );
-            })}
+              ))}
           </div>
         )}
 
