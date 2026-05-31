@@ -12,6 +12,7 @@ export const translations = {
       snippets: 'Snippets',
       rss: 'RSS Feeds',
       history: 'Tab History',
+      timeline: 'Timeline',
       settings: 'Settings'
     },
     header: {
@@ -35,6 +36,13 @@ export const translations = {
       timerAlerts: 'Show timer alerts',
       cancel: 'Cancel',
       save: 'Save Changes'
+    },
+    bookmarks: {
+      viewMode: 'View Mode',
+      groupView: 'Grouped',
+      cloudView: 'Cloud',
+      timelineTitle: 'Bookmark Timeline',
+      timelineDesc: 'View your bookmarks in chronological order.'
     },
     widgets: {
       clock: { dateLocale: 'en-US' },
@@ -94,6 +102,7 @@ export const translations = {
       snippets: 'スニペット',
       rss: 'RSSフィード',
       history: 'タブ履歴',
+      timeline: 'タイムライン',
       settings: '設定'
     },
     header: {
@@ -117,6 +126,13 @@ export const translations = {
       timerAlerts: 'タイマー通知を表示する',
       cancel: 'キャンセル',
       save: '変更を保存'
+    },
+    bookmarks: {
+      viewMode: '表示モード',
+      groupView: 'グループ化',
+      cloudView: 'クラウド',
+      timelineTitle: 'ブックマーク・タイムライン',
+      timelineDesc: 'ブックマークを登録日時の順に表示します。'
     },
     widgets: {
       clock: { dateLocale: 'ja-JP' },

@@ -19,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
     { id: 'cards', icon: Grid, label: t.sidebar.cards },
     { id: 'icons', icon: ImageIcon, label: t.sidebar.icons },
     { id: 'tables', icon: Table, label: t.sidebar.tables },
+    { id: 'timeline', icon: History, label: t.sidebar.timeline },
     { id: 'snippets', icon: FileText, label: t.sidebar.snippets, divider: true },
     { id: 'rss', icon: Rss, label: t.sidebar.rss },
     { id: 'history', icon: History, label: t.sidebar.history },
