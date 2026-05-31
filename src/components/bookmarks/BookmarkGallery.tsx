@@ -293,10 +293,9 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
               .map(([year, months]) => (
                 <div key={year} className="space-y-8">
-                  <div className="flex items-center gap-4">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/30" />
-                    <h3 className="text-2xl font-black text-primary/40 tracking-tighter italic">{year}</h3>
-                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/30" />
+                  <div className="flex items-center gap-4 px-2">
+                    <h3 className="text-3xl font-black text-primary/40 tracking-tighter italic">{year}</h3>
+                    <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
                   </div>
 
                   {Object.entries(months)
