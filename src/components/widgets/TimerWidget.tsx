@@ -74,12 +74,26 @@ const TimerWidget: React.FC = () => {
             {t.widgets.timer.title}
           </h3>
 
-          <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost btn-xs gap-1 opacity-60 hover:opacity-100" onClick={() => setShowPresets(!showPresets)}>
+          <div
+            className={`dropdown dropdown-end ${showPresets ? 'dropdown-open' : ''}`}
+            onMouseDown={(e) => e.stopPropagation()} // Prevent drag start when interacting with dropdown
+          >
+            <label
+              tabIndex={0}
+              className="btn btn-ghost btn-xs gap-1 opacity-60 hover:opacity-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowPresets(!showPresets);
+              }}
+            >
               {duration}{t.widgets.timer.custom} <ChevronDown size={12} />
             </label>
-            <ul tabIndex={0} className={`dropdown-content z-[20] menu p-2 shadow-2xl bg-base-100 rounded-xl border border-white/10 w-48 max-h-60 overflow-y-auto ${showPresets ? '' : 'hidden'}`}>
-              <div className="px-2 py-1 flex gap-1">
+            <div
+              tabIndex={0}
+              className="dropdown-content z-[50] menu p-2 shadow-2xl bg-base-100 rounded-xl border border-white/10 w-48 max-h-60 overflow-y-auto block"
+            >
+              <div className="px-2 py-1 flex gap-1" onClick={(e) => e.stopPropagation()}>
                 <input
                   type="number"
                   className="input input-bordered input-xs w-full bg-base-200"
@@ -91,14 +105,22 @@ const TimerWidget: React.FC = () => {
                 <button onClick={addCustomPreset} className="btn btn-primary btn-xs btn-square"><Plus size={12} /></button>
               </div>
               <div className="divider my-1 opacity-20"></div>
-              {presets.map(p => (
-                <li key={p}>
-                  <button onClick={() => selectPreset(p)} className={duration === p ? 'active' : ''}>
-                    {p}{t.widgets.timer.custom}
-                  </button>
-                </li>
-              ))}
-            </ul>
+              <ul className="menu menu-sm p-0">
+                {presets.map(p => (
+                  <li key={p}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectPreset(p);
+                      }}
+                      className={duration === p ? 'active' : ''}
+                    >
+                      {p}{t.widgets.timer.custom}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
