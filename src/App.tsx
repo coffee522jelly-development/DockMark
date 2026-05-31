@@ -92,9 +92,13 @@ const App: React.FC = () => {
             --rounded-box: ${borderRadius}px;
             --rounded-btn: ${borderRadius / 2}px;
             --rounded-badge: ${borderRadius / 4}px;
+            --number-font: ${clockFont};
           }
           div, button, input, select, textarea, img, svg, span:not(.lucide), header, nav, section, main, .card, .alert {
             border-radius: ${borderRadius}px !important;
+          }
+          .font-number {
+            font-family: var(--number-font) !important;
           }
         `}
       </style>

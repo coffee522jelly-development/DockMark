@@ -54,7 +54,7 @@ const TimerWidget: React.FC = () => {
             style={{ "--value": progress, "--size": "9rem", "--thickness": "6px" } as React.CSSProperties}
             role="progressbar"
           >
-            <span className="text-3xl font-bold font-mono text-base-content tracking-tighter">
+            <span className="text-3xl font-bold text-base-content tracking-tighter font-number">
               {formatTime(timeLeft)}
             </span>
           </div>

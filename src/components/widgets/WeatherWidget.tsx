@@ -90,7 +90,7 @@ const WeatherWidget: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-6 my-6">
-          <span className="text-6xl font-bold text-base-content">{Math.round(current.temperature_2m)}°</span>
+          <span className="text-6xl font-bold text-base-content font-number">{Math.round(current.temperature_2m)}°</span>
           <div className="text-sm">
             <p className="font-bold text-base-content text-lg">{getWeatherCondition(current.weather_code)}</p>
             <p className="opacity-60 font-medium">
