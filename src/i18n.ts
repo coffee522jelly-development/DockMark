@@ -50,7 +50,7 @@ export const translations = {
       calendar: { locale: 'en-US' },
       search: { title: 'Quick Search', placeholder: 'Search Google...', help: 'Press Enter to search on Google' },
       weather: { title: 'Current', unavailable: 'Weather unavailable', humidity: 'Humid', precip: 'Precip' },
-      timer: { title: '25 min Timer', finished: 'Timer finished! Time to take a break.' },
+      timer: { title: 'Timer', finished: 'Timer finished! Time to take a break.', add: 'Add', custom: 'min' },
       notes: { title: 'Sticky Note', placeholder: 'Type your notes here...' },
       rss: { title: 'RSS Reader', empty: 'No feeds registered or found.', help: 'Go to RSS Feeds to add some.' },
       bookmarks: { title: 'Bookmarks', empty: 'No bookmarks in Bookmark Bar.' }
@@ -140,7 +140,7 @@ export const translations = {
       calendar: { locale: 'ja-JP' },
       search: { title: 'クイック検索', placeholder: 'Googleで検索...', help: 'EnterキーでGoogle検索' },
       weather: { title: '現在地', unavailable: '天気情報を取得できません', humidity: '湿度', precip: '降水' },
-      timer: { title: '25分タイマー', finished: 'タイマー終了！休憩しましょう。' },
+      timer: { title: 'タイマー', finished: 'タイマー終了！休憩しましょう。', add: '追加', custom: '分' },
       notes: { title: '付箋', placeholder: 'メモを入力...' },
       rss: { title: 'RSSリーダー', empty: 'フィードが登録されていないか見つかりません。', help: 'RSSフィードから追加してください。' },
       bookmarks: { title: 'ブックマーク', empty: 'ブックマークバーに項目がありません。' }

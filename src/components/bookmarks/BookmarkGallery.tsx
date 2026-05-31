@@ -294,7 +294,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               .map(([year, months]) => (
                 <div key={year} className="space-y-8">
                   <div className="flex items-center gap-4 px-2">
-                    <h3 className="text-3xl font-black text-primary/40 tracking-tighter italic font-number">{year}</h3>
+                    <h3 className="text-3xl font-black text-primary/40 tracking-tighter font-number">{year}</h3>
                     <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
                   </div>
 
