@@ -88,24 +88,24 @@ const TimerWidget: React.FC = () => {
           <div
             ref={dropdownRef}
             className={`dropdown dropdown-end ${showPresets ? 'dropdown-open' : ''}`}
-            onMouseDown={(e) => e.stopPropagation()} // Prevent drag start when interacting with dropdown
           >
-            <label
-              tabIndex={0}
+            <button
+              type="button"
               className="btn btn-ghost btn-xs gap-1 opacity-60 hover:opacity-100"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 setShowPresets(!showPresets);
               }}
             >
               {duration}{t.widgets.timer.custom} <ChevronDown size={12} />
-            </label>
+            </button>
             {showPresets && (
               <div
                 tabIndex={0}
                 className="dropdown-content z-[50] menu p-2 shadow-2xl bg-base-100 rounded-xl border border-white/10 w-48 max-h-60 overflow-y-auto"
                 style={{ display: 'block' }}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 <div className="px-2 py-1 flex gap-1" onClick={(e) => e.stopPropagation()}>
                   <input
