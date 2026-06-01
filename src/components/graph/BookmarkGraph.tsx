@@ -1,7 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import Graph from 'graphology';
-import Sigma from 'sigma';
-import forceAtlas2 from 'graphology-layout-forceatlas2';
+import React, { useEffect, useRef, useState } from 'react';
+import { Cosmograph } from '@cosmograph/cosmograph';
 import { Share2, Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
@@ -10,19 +8,42 @@ import { useTranslation } from '../../contexts/LanguageContext';
 const BookmarkGraph: React.FC = () => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const sigmaRef = useRef<Sigma | null>(null);
+  const cosmoRef = useRef<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const graph = new Graph();
-
     const loadBookmarks = async () => {
+      const points: any[] = [];
+      const links: any[] = [];
+
+      const processNode = (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
+        const isFolder = !node.url;
+        const nodeId = node.id;
+
+        points.push({
+          id: nodeId,
+          label: node.title || (isFolder ? 'Folder' : 'Bookmark'),
+          isFolder,
+          url: node.url,
+          color: isFolder ? '#3b82f6' : '#10b981',
+        });
+
+        if (parentId) {
+          links.push({ source: parentId, target: nodeId });
+        }
+
+        if (node.children) {
+          node.children.forEach(child => processNode(child, nodeId));
+        }
+      };
+
       if (typeof chrome !== 'undefined' && chrome.bookmarks) {
         const tree = await chrome.bookmarks.getTree();
-        processNode(tree[0], graph);
+        processNode(tree[0]);
       } else {
-        // Mock data for development
+        // Mock data
         const mockData = {
           id: '0',
           title: 'Root',
@@ -45,78 +66,63 @@ const BookmarkGraph: React.FC = () => {
             }
           ]
         };
-        processNode(mockData as any, graph);
+        processNode(mockData as any);
       }
 
-      // Layout
-      forceAtlas2.assign(graph, { iterations: 100, settings: { gravity: 1 } });
-
-      // Create Sigma instance
       if (containerRef.current) {
-        sigmaRef.current = new Sigma(graph, containerRef.current, {
-          renderEdgeLabels: true,
-          labelFont: 'inherit',
-          defaultNodeType: 'circle',
-        });
-
-        // Click events
-        sigmaRef.current.on('clickNode', ({ node }) => {
-          const url = graph.getNodeAttribute(node, 'url');
-          if (url) {
-            window.open(url, '_blank');
-          }
-        });
+        cosmoRef.current = new Cosmograph(containerRef.current, {
+          points,
+          pointIdBy: 'id',
+          links,
+          linkSourceBy: 'source',
+          linkTargetBy: 'target',
+          pointColorByFn: (n: any) => n.color,
+          pointLabelBy: 'label',
+          pointSizeByFn: (n: any) => (n.isFolder ? 4 : 2),
+          linkWidth: 1,
+          linkColor: '#94a3b833',
+          backgroundColor: 'transparent',
+          simulationGravity: 0.1,
+          simulationRepulsion: 1,
+          simulationLinkDistance: 10,
+          onClick: (n: any) => {
+            if (n?.url) window.open(n.url, '_blank');
+          },
+        } as any);
       }
-    };
-
-    const processNode = (node: chrome.bookmarks.BookmarkTreeNode, g: Graph, parentId?: string) => {
-      const isFolder = !node.url;
-      const nodeId = node.id;
-
-      if (!g.hasNode(nodeId)) {
-        g.addNode(nodeId, {
-          label: node.title || (isFolder ? 'Folder' : 'Bookmark'),
-          size: isFolder ? 15 : 8,
-          color: isFolder ? '#3b82f6' : '#10b981',
-          x: Math.random(),
-          y: Math.random(),
-          url: node.url,
-        });
-      }
-
-      if (parentId) {
-        g.addEdge(parentId, nodeId, { size: 1, color: '#94a3b8' });
-      }
-
-      if (node.children) {
-        node.children.forEach(child => processNode(child, g, nodeId));
-      }
+      setLoading(false);
     };
 
     loadBookmarks();
 
     return () => {
-      if (sigmaRef.current) {
-        sigmaRef.current.kill();
-        sigmaRef.current = null;
+      if (cosmoRef.current) {
+        cosmoRef.current.destroy();
+        cosmoRef.current = null;
       }
     };
   }, []);
 
-  const zoomIn = () => sigmaRef.current?.getCamera().animatedZoom({ duration: 300 });
-  const zoomOut = () => sigmaRef.current?.getCamera().animatedUnzoom({ duration: 300 });
-  const resetCamera = () => sigmaRef.current?.getCamera().animatedReset({ duration: 300 });
+  const zoomIn = () => cosmoRef.current?.zoomIn();
+  const zoomOut = () => cosmoRef.current?.zoomOut();
+  const resetCamera = () => cosmoRef.current?.fitView();
 
   return (
     <div className="flex flex-col h-[calc(100vh-12rem)]">
       <PageHeader
         title={t.sidebar.graph}
-        description="Visualize your bookmarks as a network of folders and pages."
+        description="Visualize your bookmarks with a high-performance interactive graph."
         icon={Share2}
       />
 
       <GlassCard className="flex-1 relative overflow-hidden p-0">
-        <div ref={containerRef} className="w-full h-full bg-base-100/10" />
+        <div ref={containerRef} className="w-full h-full" />
+
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-base-100/20 backdrop-blur-sm">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+          </div>
+        )}
 
         <div className="absolute bottom-4 right-4 flex flex-col gap-2">
           <button onClick={zoomIn} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
