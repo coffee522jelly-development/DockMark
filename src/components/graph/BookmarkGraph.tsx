@@ -4,6 +4,7 @@ import { Share2, Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useStorage } from '../../hooks/useStorage';
 
 interface CosmoNode {
   id: string;
@@ -12,6 +13,7 @@ interface CosmoNode {
   url?: string;
   color: string;
   val: number;
+  icon?: HTMLImageElement;
 }
 
 interface CosmoLink {
@@ -21,6 +23,7 @@ interface CosmoLink {
 
 const BookmarkGraph: React.FC = () => {
   const { t } = useTranslation();
+  const [theme] = useStorage('app-theme', 'light', 'localStorage');
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
@@ -32,17 +35,61 @@ const BookmarkGraph: React.FC = () => {
       const nodes: CosmoNode[] = [];
       const links: CosmoLink[] = [];
 
-      const processNode = (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
+      // Helper to get resolved theme colors (works with oklch, hsl, etc.)
+      const getThemeColor = (variable: string) => {
+        const temp = document.createElement('div');
+        temp.style.color = `var(${variable})`;
+        document.body.appendChild(temp);
+        const resolvedColor = getComputedStyle(temp).color;
+        document.body.removeChild(temp);
+        return resolvedColor;
+      };
+
+      const themeColors = {
+        primary: getThemeColor('--p'),
+        secondary: getThemeColor('--s'),
+        text: getThemeColor('--bc'),
+      };
+
+      const getFavicon = (url: string): Promise<HTMLImageElement | undefined> => {
+        return new Promise((resolve) => {
+          try {
+            const domain = new URL(url).hostname;
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+            const timeout = setTimeout(() => resolve(undefined), 2000);
+            img.onload = () => {
+              clearTimeout(timeout);
+              resolve(img);
+            };
+            img.onerror = () => {
+              clearTimeout(timeout);
+              resolve(undefined);
+            };
+          } catch {
+            resolve(undefined);
+          }
+        });
+      };
+
+      const processNode = async (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
         const isFolder = !node.url;
         const nodeId = node.id;
+
+        let icon: HTMLImageElement | undefined;
+        if (!isFolder && node.url) {
+          icon = await getFavicon(node.url);
+        }
 
         nodes.push({
           id: nodeId,
           name: node.title || (isFolder ? 'Folder' : 'Bookmark'),
           isFolder,
           url: node.url,
-          color: isFolder ? '#3b82f6' : '#10b981',
-          val: isFolder ? 4 : 2,
+          color: isFolder ? themeColors.primary : themeColors.secondary,
+          val: isFolder ? 6 : 4,
+          icon
         });
 
         if (parentId) {
@@ -50,13 +97,15 @@ const BookmarkGraph: React.FC = () => {
         }
 
         if (node.children) {
-          node.children.forEach(child => processNode(child, nodeId));
+          for (const child of node.children) {
+            await processNode(child, nodeId);
+          }
         }
       };
 
       if (typeof chrome !== 'undefined' && chrome.bookmarks) {
         const tree = await chrome.bookmarks.getTree();
-        processNode(tree[0]);
+        await processNode(tree[0]);
       } else {
         // Mock data
         const mockData = {
@@ -81,7 +130,7 @@ const BookmarkGraph: React.FC = () => {
             }
           ]
         };
-        processNode(mockData as any);
+        await processNode(mockData as any);
       }
 
       if (containerRef.current) {
@@ -93,6 +142,53 @@ const BookmarkGraph: React.FC = () => {
           .nodeRelSize(4)
           .linkWidth(1)
           .linkColor(() => '#94a3b833')
+          .nodeCanvasObject((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+            const label = node.name;
+            const fontSize = 12 / globalScale;
+            ctx.font = `${fontSize}px Inter, system-ui, Sans-Serif`;
+
+            // Draw Node Circle with shadow
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 4 / globalScale;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
+            ctx.fillStyle = node.color;
+            ctx.fill();
+            ctx.restore();
+
+            // Draw Icon if available (clipped to circle)
+            if (node.icon) {
+              const size = node.val * 1.4;
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, size / 2, 0, Math.PI * 2, true);
+              ctx.clip();
+              ctx.drawImage(node.icon, node.x - size / 2, node.y - size / 2, size, size);
+              ctx.restore();
+            }
+
+            // Draw Label
+            const textWidth = ctx.measureText(label).width;
+            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+
+            // Background for label readability
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(node.x - textWidth / 2 - 2 / globalScale, node.y + node.val + 2 / globalScale, textWidth + 4 / globalScale, fontSize + 2 / globalScale);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#ffffff'; // White text for better contrast on dark bg
+            ctx.fillText(label, node.x, node.y + node.val + 3 / globalScale);
+
+            node.__bckgDimensions = bckgDimensions;
+          })
+          .nodePointerAreaPaint((node: any, color: string, ctx: CanvasRenderingContext2D) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.val + 2, 0, 2 * Math.PI, false);
+            ctx.fill();
+          })
           .onNodeClick((node: any) => {
             if (node.url) window.open(node.url, '_blank');
           })
@@ -113,7 +209,7 @@ const BookmarkGraph: React.FC = () => {
         if (containerRef.current) containerRef.current.innerHTML = '';
       }
     };
-  }, []);
+  }, [theme]);
 
   const zoomIn = () => {
     const current = fgRef.current.zoom();
@@ -160,11 +256,11 @@ const BookmarkGraph: React.FC = () => {
 
         <div className="absolute top-4 left-4 p-3 bg-base-100/50 backdrop-blur-md rounded-xl border border-white/10 text-xs flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+            <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_oklch(var(--p)/0.5)]" />
             <span>Folder</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <div className="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_oklch(var(--s)/0.5)]" />
             <span>Bookmark (Click to open)</span>
           </div>
         </div>
