@@ -1,33 +1,48 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Cosmograph } from '@cosmograph/cosmograph';
+import ForceGraph2D from 'force-graph';
 import { Share2, Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
 import { useTranslation } from '../../contexts/LanguageContext';
 
+interface CosmoNode {
+  id: string;
+  name: string;
+  isFolder: boolean;
+  url?: string;
+  color: string;
+  val: number;
+}
+
+interface CosmoLink {
+  source: string;
+  target: string;
+}
+
 const BookmarkGraph: React.FC = () => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const cosmoRef = useRef<any>(null);
+  const fgRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const loadBookmarks = async () => {
-      const points: any[] = [];
-      const links: any[] = [];
+      const nodes: CosmoNode[] = [];
+      const links: CosmoLink[] = [];
 
       const processNode = (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
         const isFolder = !node.url;
         const nodeId = node.id;
 
-        points.push({
+        nodes.push({
           id: nodeId,
-          label: node.title || (isFolder ? 'Folder' : 'Bookmark'),
+          name: node.title || (isFolder ? 'Folder' : 'Bookmark'),
           isFolder,
           url: node.url,
           color: isFolder ? '#3b82f6' : '#10b981',
+          val: isFolder ? 4 : 2,
         });
 
         if (parentId) {
@@ -70,48 +85,55 @@ const BookmarkGraph: React.FC = () => {
       }
 
       if (containerRef.current) {
-        cosmoRef.current = new Cosmograph(containerRef.current, {
-          points,
-          pointIdBy: 'id',
-          links,
-          linkSourceBy: 'source',
-          linkTargetBy: 'target',
-          pointColorByFn: (n: any) => n.color,
-          pointLabelBy: 'label',
-          pointSizeByFn: (n: any) => (n.isFolder ? 4 : 2),
-          linkWidth: 1,
-          linkColor: '#94a3b833',
-          backgroundColor: 'transparent',
-          simulationGravity: 0.1,
-          simulationRepulsion: 1,
-          simulationLinkDistance: 10,
-          onClick: (n: any) => {
-            if (n?.url) window.open(n.url, '_blank');
-          },
-        } as any);
+        const ForceGraph = (ForceGraph2D as any)();
+        const instance = ForceGraph(containerRef.current)
+          .graphData({ nodes, links })
+          .nodeLabel('name')
+          .nodeColor((node: any) => node.color)
+          .nodeRelSize(4)
+          .linkWidth(1)
+          .linkColor(() => '#94a3b833')
+          .onNodeClick((node: any) => {
+            if (node.url) window.open(node.url, '_blank');
+          })
+          .cooldownTicks(100)
+          .onEngineStop(() => {
+            setLoading(false);
+          });
+
+        fgRef.current = instance;
       }
-      setLoading(false);
     };
 
     loadBookmarks();
 
     return () => {
-      if (cosmoRef.current) {
-        cosmoRef.current.destroy();
-        cosmoRef.current = null;
+      if (fgRef.current) {
+        fgRef.current._destructor?.();
+        if (containerRef.current) containerRef.current.innerHTML = '';
       }
     };
   }, []);
 
-  const zoomIn = () => cosmoRef.current?.zoomIn();
-  const zoomOut = () => cosmoRef.current?.zoomOut();
-  const resetCamera = () => cosmoRef.current?.fitView();
+  const zoomIn = () => {
+    const current = fgRef.current.zoom();
+    fgRef.current.zoom(current * 1.5, 400);
+  };
+
+  const zoomOut = () => {
+    const current = fgRef.current.zoom();
+    fgRef.current.zoom(current * 0.7, 400);
+  };
+
+  const resetCamera = () => {
+    fgRef.current.zoomToFit(400);
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-12rem)]">
       <PageHeader
         title={t.sidebar.graph}
-        description="Visualize your bookmarks with a high-performance interactive graph."
+        description="Visualize your bookmarks as an interactive 2D network."
         icon={Share2}
       />
 
@@ -138,11 +160,11 @@ const BookmarkGraph: React.FC = () => {
 
         <div className="absolute top-4 left-4 p-3 bg-base-100/50 backdrop-blur-md rounded-xl border border-white/10 text-xs flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
             <span>Folder</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             <span>Bookmark (Click to open)</span>
           </div>
         </div>

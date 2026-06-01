@@ -346,7 +346,14 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               return (
                 <div key={bookmark.id} onClick={() => window.open(bookmark.url, '_blank')} className="card bg-base-100 border border-base-300 hover:border-primary hover:shadow-xl transition-all cursor-pointer group overflow-hidden">
                   <figure className="aspect-video bg-base-200 relative">
-                    <img src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(bookmark.url)}?w=400`} alt={bookmark.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=400'; }} />
+                    <img
+                      src={`https://s0.wp.com/mshots/v1/${encodeURIComponent(bookmark.url)}?w=400`}
+                      alt={bookmark.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=400';
+                      }}
+                    />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                   </figure>
                   <div className="card-body p-4 relative">
@@ -355,7 +362,17 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                       <button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-circle btn-xs btn-ghost bg-base-100 shadow-sm text-error" title="Delete"><Trash2 size={12} /></button>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center flex-shrink-0"><img src={`https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`} alt="favicon" className="w-5 h-5" /></div>
+                      <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img
+                          src={`https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`}
+                          alt="favicon"
+                          className="w-5 h-5"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-[10px] font-bold text-base-content/40">${domain.charAt(0).toUpperCase()}</span>`;
+                          }}
+                        />
+                      </div>
                       <div className="overflow-hidden"><h3 className="card-title text-sm font-bold truncate group-hover:text-primary transition-colors">{bookmark.title}</h3><p className="text-xs text-base-content/50 truncate">{domain}</p></div>
                     </div>
                   </div>
@@ -375,7 +392,20 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                   const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
                   return (
                     <tr key={bookmark.id} className="hover:bg-base-100/50 transition-colors group">
-                      <td className="text-center px-2"><div className="avatar"><div className="w-6 h-6 rounded bg-base-300/50 flex items-center justify-center p-0.5"><img src={faviconUrl} alt="favicon" /></div></div></td>
+                      <td className="text-center px-2">
+                        <div className="avatar">
+                          <div className="w-6 h-6 rounded bg-base-300/50 flex items-center justify-center p-0.5 overflow-hidden">
+                            <img
+                              src={faviconUrl}
+                              alt="favicon"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-[8px] font-bold text-base-content/40">${domain.charAt(0).toUpperCase()}</span>`;
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </td>
                       <td className="font-bold py-3 max-w-0"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-medium" title={bookmark.title}>{bookmark.title}</a></td>
                       <td className="text-sm text-base-content/50 py-3 max-w-0"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-normal" title={bookmark.url}>{bookmark.url}</a></td>
                       <td className="text-right pr-4 py-3"><div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => window.open(bookmark.url, '_blank')} className="btn btn-ghost btn-xs btn-circle text-primary" title="Open"><ExternalLink size={14} /></button><button onClick={() => handleDownloadMarkdown(bookmark)} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">{isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}</button><button onClick={() => handleDelete(bookmark.id)} className="btn btn-ghost btn-xs btn-circle text-error" title="Delete"><Trash2 size={14} /></button></div></td>
@@ -395,7 +425,22 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               const faviconUrl = `chrome-extension://${chromeExtensionId}/_favicon/?pageUrl=${encodeURIComponent(bookmark.url)}&size=64`;
               return (
                 <div key={bookmark.id} className={`group relative transition-all duration-200 ${draggedId === bookmark.id ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`} draggable onDragStart={() => handleDragStart(bookmark.id)} onDragOver={(e) => handleDragOver(e, bookmark.id)} onDragEnd={handleDragEnd}>
-                  <div onClick={() => window.open(bookmark.url, '_blank')} className="tooltip tooltip-bottom" data-tip={bookmark.title}><button className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm`} style={{ width: `${iconSize}px`, height: `${iconSize}px`, borderRadius: iconShape === 'round' ? '9999px' : undefined }}><img src={faviconUrl} alt={bookmark.title} className="w-full h-full object-contain pointer-events-none" onError={(e) => { (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`; }} /></button></div>
+                      <div onClick={() => window.open(bookmark.url, '_blank')} className="tooltip tooltip-bottom" data-tip={bookmark.title}>
+                        <button className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm`} style={{ width: `${iconSize}px`, height: `${iconSize}px`, borderRadius: iconShape === 'round' ? '9999px' : undefined }}>
+                          <img
+                            src={faviconUrl}
+                            alt={bookmark.title}
+                            className="w-full h-full object-contain pointer-events-none"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                              (e.target as HTMLImageElement).onerror = (err) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-xs font-bold text-base-content/40">${url.hostname.charAt(0).toUpperCase()}</span>`;
+                              };
+                            }}
+                          />
+                        </button>
+                      </div>
                   <div className="absolute -top-2 -right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"><button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300" title="Markdown">{isProcessing === bookmark.id ? <span className="loading loading-spinner w-3 h-3"></span> : <Download size={10} />}</button><button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300 text-error" title="Delete"><Trash2 size={10} /></button></div>
                 </div>
               );
