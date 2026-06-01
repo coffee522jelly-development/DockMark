@@ -137,9 +137,12 @@ const BookmarkItem: React.FC<{
 
 const BookmarkList: React.FC = () => {
   const [bookmarks, setBookmarks] = useState<BookmarkNode[]>([]);
+  const [allFolders, setAllFolders] = useState<{id: string, title: string}[]>([]);
   const [editingNode, setEditingNode] = useState<BookmarkNode | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editUrl, setEditUrl] = useState('');
+  const [editParentId, setEditParentId] = useState('');
+  const [originalParentId, setOriginalParentId] = useState('');
 
   const fetchBookmarks = () => {
     if (typeof chrome !== 'undefined' && chrome.bookmarks) {
@@ -193,6 +196,32 @@ const BookmarkList: React.FC = () => {
     setEditingNode(node);
     setEditTitle(node.title);
     setEditUrl(node.url || '');
+
+    // Find current parent ID
+    if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+      chrome.bookmarks.get(node.id, (results) => {
+        if (results && results[0] && results[0].parentId) {
+          setEditParentId(results[0].parentId);
+          setOriginalParentId(results[0].parentId);
+        }
+      });
+
+      // Get all folders for selection
+      chrome.bookmarks.getTree((tree) => {
+        const folders: {id: string, title: string}[] = [];
+        const findFolders = (nodes: BookmarkNode[]) => {
+          nodes.forEach(n => {
+            if (n.children) {
+              folders.push({ id: n.id, title: n.title || (n.id === '0' ? 'Root' : 'Untitled') });
+              findFolders(n.children);
+            }
+          });
+        };
+        findFolders(tree);
+        setAllFolders(folders);
+      });
+    }
+
     (document.getElementById('edit_modal') as HTMLDialogElement).showModal();
   };
 
@@ -241,9 +270,17 @@ const BookmarkList: React.FC = () => {
     if (editingNode) {
       if (typeof chrome !== 'undefined' && chrome.bookmarks) {
         chrome.bookmarks.update(editingNode.id, { title: editTitle, url: editUrl || undefined }, () => {
-          fetchBookmarks();
-          setEditingNode(null);
-          (document.getElementById('edit_modal') as HTMLDialogElement).close();
+          if (editParentId !== originalParentId) {
+            chrome.bookmarks.move(editingNode.id, { parentId: editParentId }, () => {
+              fetchBookmarks();
+              setEditingNode(null);
+              (document.getElementById('edit_modal') as HTMLDialogElement).close();
+            });
+          } else {
+            fetchBookmarks();
+            setEditingNode(null);
+            (document.getElementById('edit_modal') as HTMLDialogElement).close();
+          }
         });
       } else {
         // Mock update
@@ -289,6 +326,18 @@ const BookmarkList: React.FC = () => {
                 />
               </div>
             )}
+            <div className="form-control">
+              <label className="label"><span className="label-text">Parent Folder</span></label>
+              <select
+                className="select select-bordered w-full bg-base-100"
+                value={editParentId}
+                onChange={(e) => setEditParentId(e.target.value)}
+              >
+                {allFolders.map(f => (
+                  <option key={f.id} value={f.id}>{f.title || 'Root'}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="modal-action">
             <button className="btn" onClick={() => (document.getElementById('edit_modal') as HTMLDialogElement).close()}>Cancel</button>

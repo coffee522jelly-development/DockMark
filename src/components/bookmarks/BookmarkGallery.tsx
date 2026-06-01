@@ -433,7 +433,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                             className="w-full h-full object-contain pointer-events-none"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
-                              (e.target as HTMLImageElement).onerror = (err) => {
+                              (e.target as HTMLImageElement).onerror = () => {
                                 (e.target as HTMLImageElement).style.display = 'none';
                                 (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-xs font-bold text-base-content/40">${url.hostname.charAt(0).toUpperCase()}</span>`;
                               };
