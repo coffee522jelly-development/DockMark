@@ -1,6 +1,6 @@
-export type TabType = 'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'timeline' | 'snippets' | 'rss' | 'history';
+export type TabType = 'dock' | 'bookmark' | 'buttons' | 'cards' | 'icons' | 'tables' | 'timeline' | 'graph' | 'snippets' | 'rss' | 'history';
 
-export const tabOrder: TabType[] = ['dock', 'bookmark', 'buttons', 'cards', 'icons', 'tables', 'timeline', 'snippets', 'rss', 'history'];
+export const tabOrder: TabType[] = ['dock', 'bookmark', 'buttons', 'cards', 'icons', 'tables', 'timeline', 'graph', 'snippets', 'rss', 'history'];
 
 export const themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
