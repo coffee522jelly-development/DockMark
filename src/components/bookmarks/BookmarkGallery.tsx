@@ -19,7 +19,7 @@ interface FolderItem {
   title: string;
 }
 
-export type BookmarkViewMode = 'buttons' | 'cards' | 'icons' | 'tables' | 'timeline';
+export type BookmarkViewMode = 'buttons' | 'cards' | 'bookshelf' | 'icons' | 'tables' | 'timeline';
 
 interface BookmarkGalleryProps {
   viewMode: BookmarkViewMode;
@@ -281,6 +281,18 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
     return colors[Math.abs(hash) % colors.length];
   };
 
+  const getBookColor = (parentId?: string) => {
+    if (!parentId) return 'bg-primary';
+    const colors = [
+      'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
+      'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-cyan-500',
+      'bg-orange-500', 'bg-teal-500', 'bg-rose-500'
+    ];
+    let hash = 0;
+    for (let i = 0; i < parentId.length; i++) hash = parentId.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
@@ -515,6 +527,66 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               </tbody>
             </table>
           </GlassCard>
+        )}
+
+        {viewMode === 'bookshelf' && (
+          <div className="space-y-8 pb-20">
+            {Object.entries(groupedBookmarks).map(([groupTitle, items]) => (
+              <div key={groupTitle} className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-base-100/60 backdrop-blur-md border border-white/10 shadow-sm ml-2">
+                  <Bookmark size={14} className="text-primary" />
+                  <h3 className="text-sm font-bold text-base-content/80">{groupTitle}</h3>
+                </div>
+
+                <div className="relative">
+                  <div className="flex flex-wrap items-end gap-1 px-4 min-h-[200px]">
+                    {items.map((bookmark) => {
+                      const displayTitle = bookmark.title.length > 30 ? bookmark.title.substring(0, 30) + '...' : bookmark.title;
+                      const bookColor = getBookColor(bookmark.parentId);
+
+                      return (
+                        <div key={bookmark.id} className="group relative perspective-1000">
+                          <div
+                            onClick={() => window.open(bookmark.url, '_blank')}
+                            className={`
+                              w-10 h-48 ${bookColor} rounded-t-sm shadow-lg cursor-pointer
+                              transition-all duration-300 ease-out
+                              group-hover:-translate-y-8 group-hover:scale-105 group-hover:shadow-2xl
+                              relative overflow-hidden border-x border-t border-white/20
+                            `}
+                          >
+                            {/* Spine Text */}
+                            <div className="absolute inset-0 flex items-center justify-center p-2">
+                              <span
+                                className="whitespace-nowrap font-bold text-white/90 text-xs tracking-wider select-none"
+                                style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+                              >
+                                {displayTitle}
+                              </span>
+                            </div>
+
+                            {/* Shine effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-black/10 pointer-events-none" />
+                          </div>
+
+                          {/* Hover Tooltip/Details */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            <GlassCard className="p-3 text-center border-primary/30 shadow-2xl scale-90 group-hover:scale-100 transition-transform">
+                              <p className="text-xs font-bold truncate">{bookmark.title}</p>
+                              <p className="text-[10px] opacity-50 truncate">{new URL(bookmark.url).hostname}</p>
+                            </GlassCard>
+                            <div className="w-3 h-3 bg-base-100 border-r border-b border-primary/30 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Shelf line */}
+                  <div className="h-4 w-full bg-base-100/40 backdrop-blur-sm border-t border-white/10 shadow-inner rounded-full mt-[-2px]" />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
         {viewMode === 'icons' && (

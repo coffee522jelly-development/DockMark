@@ -123,7 +123,7 @@ const App: React.FC = () => {
 
           {activeTab === 'dock' && <Dock />}
           {activeTab === 'bookmark' && <BookmarkManager />}
-          {['buttons', 'cards', 'icons', 'tables', 'timeline'].includes(activeTab) && (
+          {['buttons', 'cards', 'bookshelf', 'icons', 'tables', 'timeline'].includes(activeTab) && (
             <BookmarkGallery
               viewMode={activeTab as any}
               iconShape={iconShape}
