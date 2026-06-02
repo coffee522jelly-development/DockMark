@@ -504,12 +504,14 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                       <td className="text-sm text-base-content/50 py-3 max-w-[300px]"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-normal" title={bookmark.url}>{bookmark.url}</a></td>
                       <td className="py-3">
                         <select
-                          className="select select-ghost select-xs w-full max-w-xs focus:bg-base-100"
+                          className="select select-bordered select-xs w-full max-w-xs bg-base-100 text-base-content border-base-content/10 focus:border-primary"
                           value={bookmark.parentId}
                           onChange={(e) => handleMoveBookmark(bookmark.id, e.target.value)}
                         >
                           {folders.map(folder => (
-                            <option key={folder.id} value={folder.id}>{folder.title}</option>
+                            <option key={folder.id} value={folder.id} className="bg-base-100 text-base-content">
+                              {folder.title}
+                            </option>
                           ))}
                         </select>
                       </td>
