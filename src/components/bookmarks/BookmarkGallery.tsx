@@ -14,6 +14,11 @@ interface BookmarkItem {
   parentTitle?: string;
 }
 
+interface FolderItem {
+  id: string;
+  title: string;
+}
+
 export type BookmarkViewMode = 'buttons' | 'cards' | 'icons' | 'tables' | 'timeline';
 
 interface BookmarkGalleryProps {
@@ -25,10 +30,41 @@ interface BookmarkGalleryProps {
 const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape = 'square', iconSize = 64 }) => {
   const { t } = useTranslation();
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [folders, setFolders] = useState<FolderItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [isGrouped, setIsGrouped] = useState(true);
+  const [sortField, setSortField] = useState<keyof BookmarkItem>('title');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  const fetchFolders = useCallback(() => {
+    const getFoldersRecursively = (nodes: chrome.bookmarks.BookmarkTreeNode[]): FolderItem[] => {
+      let folderList: FolderItem[] = [];
+      for (const node of nodes) {
+        if (!node.url) {
+          folderList.push({ id: node.id, title: node.title || 'Root' });
+          if (node.children) {
+            folderList = [...folderList, ...getFoldersRecursively(node.children)];
+          }
+        }
+      }
+      return folderList;
+    };
+
+    if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+      chrome.bookmarks.getTree((tree) => {
+        setFolders(getFoldersRecursively(tree));
+      });
+    } else {
+      setFolders([
+        { id: '0', title: 'Root' },
+        { id: 'f1', title: 'Tech' },
+        { id: 'f2', title: 'News' },
+        { id: 'f3', title: 'Finance' },
+      ]);
+    }
+  }, []);
 
   const fetchBookmarks = useCallback(() => {
     const flattenBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[], parentTitle: string = ''): BookmarkItem[] => {
@@ -90,7 +126,18 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
 
   useEffect(() => {
     fetchBookmarks();
-  }, [fetchBookmarks]);
+    fetchFolders();
+  }, [fetchBookmarks, fetchFolders]);
+
+  const handleMoveBookmark = (id: string, newParentId: string) => {
+    if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+      chrome.bookmarks.move(id, { parentId: newParentId }, () => {
+        fetchBookmarks();
+      });
+    } else {
+      setBookmarks(prev => prev.map(b => b.id === id ? { ...b, parentId: newParentId, parentTitle: folders.find(f => f.id === newParentId)?.title || 'Unknown' } : b));
+    }
+  };
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this bookmark?')) {
@@ -145,11 +192,28 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
       b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.url.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
     if (viewMode === 'timeline') {
       list.sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0));
+    } else {
+      list.sort((a, b) => {
+        const valA = a[sortField] || '';
+        const valB = b[sortField] || '';
+
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          const comparison = valA.localeCompare(valB, 'ja');
+          return sortOrder === 'asc' ? comparison : -comparison;
+        }
+
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          return sortOrder === 'asc' ? valA - valB : valB - valA;
+        }
+
+        return 0;
+      });
     }
     return list;
-  }, [bookmarks, searchQuery, viewMode]);
+  }, [bookmarks, searchQuery, viewMode, sortField, sortOrder]);
 
   const groupedBookmarks = useMemo(() => {
     const groups: Record<string, BookmarkItem[]> = {};
@@ -383,13 +447,31 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'tables' && (
-          <GlassCard noPadding>
-            <table className="table table-zebra w-full table-fixed bg-transparent">
-              <thead><tr><th className="w-12 text-center"></th><th className="w-[40%]">Title</th><th className="w-[45%]">URL</th><th className="w-28 text-right pr-4"></th></tr></thead>
+          <GlassCard noPadding className="overflow-x-auto">
+            <table className="table table-zebra w-full bg-transparent">
+              <thead>
+                <tr className="border-b border-white/5">
+                  <th className="w-12 text-center"></th>
+                  <th className="cursor-pointer hover:bg-base-content/5 transition-colors" onClick={() => { setSortOrder(sortField === 'title' && sortOrder === 'asc' ? 'desc' : 'asc'); setSortField('title'); }}>
+                    <div className="flex items-center gap-2">Title {sortField === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}</div>
+                  </th>
+                  <th className="cursor-pointer hover:bg-base-content/5 transition-colors" onClick={() => { setSortOrder(sortField === 'url' && sortOrder === 'asc' ? 'desc' : 'asc'); setSortField('url'); }}>
+                    <div className="flex items-center gap-2">URL {sortField === 'url' && (sortOrder === 'asc' ? '↑' : '↓')}</div>
+                  </th>
+                  <th className="w-48 cursor-pointer hover:bg-base-content/5 transition-colors" onClick={() => { setSortOrder(sortField === 'parentTitle' && sortOrder === 'asc' ? 'desc' : 'asc'); setSortField('parentTitle'); }}>
+                    <div className="flex items-center gap-2">Folder {sortField === 'parentTitle' && (sortOrder === 'asc' ? '↑' : '↓')}</div>
+                  </th>
+                  <th className="w-32 cursor-pointer hover:bg-base-content/5 transition-colors" onClick={() => { setSortOrder(sortField === 'dateAdded' && sortOrder === 'asc' ? 'desc' : 'asc'); setSortField('dateAdded'); }}>
+                    <div className="flex items-center gap-2">Date {sortField === 'dateAdded' && (sortOrder === 'asc' ? '↑' : '↓')}</div>
+                  </th>
+                  <th className="w-24 text-right pr-4"></th>
+                </tr>
+              </thead>
               <tbody>
                 {filteredBookmarks.map((bookmark: BookmarkItem) => {
                   const domain = new URL(bookmark.url).hostname;
                   const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
+                  const date = bookmark.dateAdded ? new Date(bookmark.dateAdded).toLocaleDateString() : '-';
                   return (
                     <tr key={bookmark.id} className="hover:bg-base-100/50 transition-colors group">
                       <td className="text-center px-2">
@@ -406,9 +488,27 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                           </div>
                         </div>
                       </td>
-                      <td className="font-bold py-3 max-w-0"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-medium" title={bookmark.title}>{bookmark.title}</a></td>
-                      <td className="text-sm text-base-content/50 py-3 max-w-0"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-normal" title={bookmark.url}>{bookmark.url}</a></td>
-                      <td className="text-right pr-4 py-3"><div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => window.open(bookmark.url, '_blank')} className="btn btn-ghost btn-xs btn-circle text-primary" title="Open"><ExternalLink size={14} /></button><button onClick={() => handleDownloadMarkdown(bookmark)} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">{isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}</button><button onClick={() => handleDelete(bookmark.id)} className="btn btn-ghost btn-xs btn-circle text-error" title="Delete"><Trash2 size={14} /></button></div></td>
+                      <td className="font-bold py-3 max-w-[200px]"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-medium" title={bookmark.title}>{bookmark.title}</a></td>
+                      <td className="text-sm text-base-content/50 py-3 max-w-[300px]"><a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="truncate w-full block hover:underline hover:text-primary transition-all font-normal" title={bookmark.url}>{bookmark.url}</a></td>
+                      <td className="py-3">
+                        <select
+                          className="select select-ghost select-xs w-full max-w-xs focus:bg-base-100"
+                          value={bookmark.parentId}
+                          onChange={(e) => handleMoveBookmark(bookmark.id, e.target.value)}
+                        >
+                          {folders.map(folder => (
+                            <option key={folder.id} value={folder.id}>{folder.title}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="text-xs opacity-50">{date}</td>
+                      <td className="text-right pr-4 py-3">
+                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => window.open(bookmark.url, '_blank')} className="btn btn-ghost btn-xs btn-circle text-primary" title="Open"><ExternalLink size={14} /></button>
+                          <button onClick={() => handleDownloadMarkdown(bookmark)} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">{isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}</button>
+                          <button onClick={() => handleDelete(bookmark.id)} className="btn btn-ghost btn-xs btn-circle text-error" title="Delete"><Trash2 size={14} /></button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}

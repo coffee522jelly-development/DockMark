@@ -33,7 +33,7 @@ const BookmarkManager: React.FC = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
         title={t.sidebar.bookmarks}
-        description={t.rss.description}
+        description={t.bookmarks.managerDesc}
         icon={Bookmark}
         action={
           <button
@@ -41,7 +41,7 @@ const BookmarkManager: React.FC = () => {
             onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).showModal()}
           >
             <FolderPlus size={18} />
-            {t.rss.addNew}
+            {t.bookmarks.addFolder}
           </button>
         }
       />
@@ -53,9 +53,9 @@ const BookmarkManager: React.FC = () => {
       {/* New Folder Modal */}
       <dialog id="new_folder_modal" className="modal">
         <div className="modal-box bg-base-100 border border-white/10 shadow-2xl">
-          <h3 className="font-bold text-lg mb-4">{t.rss.addNew}</h3>
+          <h3 className="font-bold text-lg mb-4">{t.bookmarks.addFolder}</h3>
           <div className="form-control">
-            <label className="label"><span className="label-text">{t.rss.feedTitle}</span></label>
+            <label className="label"><span className="label-text">{t.bookmarks.folderName}</span></label>
             <input
               type="text"
               className="input input-bordered w-full bg-base-100/50"
@@ -66,7 +66,7 @@ const BookmarkManager: React.FC = () => {
           </div>
           <div className="modal-action">
             <button className="btn btn-ghost" onClick={() => (document.getElementById('new_folder_modal') as HTMLDialogElement).close()}>{t.settings.cancel}</button>
-            <button className="btn btn-primary" onClick={handleCreateFolder}>{t.rss.add}</button>
+            <button className="btn btn-primary" onClick={handleCreateFolder}>{t.bookmarks.addFolder}</button>
           </div>
         </div>
       </dialog>

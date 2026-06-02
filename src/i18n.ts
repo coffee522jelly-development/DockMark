@@ -43,7 +43,10 @@ export const translations = {
       groupView: 'Grouped',
       cloudView: 'Cloud',
       timelineTitle: 'Bookmark Timeline',
-      timelineDesc: 'View your bookmarks in chronological order.'
+      timelineDesc: 'View your bookmarks in chronological order.',
+      managerDesc: 'Organize and manage your browser bookmarks.',
+      addFolder: 'New Folder',
+      folderName: 'Folder Name'
     },
     widgets: {
       clock: { dateLocale: 'en-US' },
@@ -134,7 +137,10 @@ export const translations = {
       groupView: 'グループ化',
       cloudView: 'クラウド',
       timelineTitle: 'ブックマーク・タイムライン',
-      timelineDesc: 'ブックマークを登録日時の順に表示します。'
+      timelineDesc: 'ブックマークを登録日時の順に表示します。',
+      managerDesc: 'ブラウザのブックマークを整理・管理します。',
+      addFolder: '新規フォルダ',
+      folderName: 'フォルダ名'
     },
     widgets: {
       clock: { dateLocale: 'ja-JP' },

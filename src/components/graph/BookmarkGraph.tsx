@@ -36,19 +36,44 @@ const BookmarkGraph: React.FC = () => {
       const links: CosmoLink[] = [];
 
       // Helper to get resolved theme colors (works with oklch, hsl, etc.)
-      const getThemeColor = (variable: string) => {
+      const getThemeColor = (variable: string, fallback: string) => {
         const temp = document.createElement('div');
-        temp.style.color = `var(${variable})`;
+        // Map DaisyUI variables to helper classes for better resolution
+        const classMap: Record<string, string> = {
+          '--p': 'text-primary',
+          '--s': 'text-secondary',
+          '--bc': 'text-base-content'
+        };
+
+        if (classMap[variable]) {
+          temp.className = classMap[variable];
+        } else {
+          temp.style.color = `var(${variable})`;
+        }
+
         document.body.appendChild(temp);
-        const resolvedColor = getComputedStyle(temp).color;
+        const style = getComputedStyle(temp);
+        const color = style.color;
         document.body.removeChild(temp);
-        return resolvedColor;
+
+        // Validation: Ensure we don't return black for primary/secondary unless intended
+        const isBlack = color === 'rgb(0, 0, 0)' || color === '#000000';
+        const isInvalid = !color || color === 'rgba(0, 0, 0, 0)' || color === 'transparent';
+
+        if (isInvalid || (isBlack && variable !== '--bc')) {
+          return fallback;
+        }
+
+        return color;
       };
 
+      // Small delay to ensure DaisyUI has applied the theme variables to the DOM
+      await new Promise(resolve => setTimeout(resolve, 50));
+
       const themeColors = {
-        primary: getThemeColor('--p'),
-        secondary: getThemeColor('--s'),
-        text: getThemeColor('--bc'),
+        primary: getThemeColor('--p', '#570df8'),
+        secondary: getThemeColor('--s', '#f000b8'),
+        text: getThemeColor('--bc', '#1f2937'),
       };
 
       const getFavicon = (url: string): Promise<HTMLImageElement | undefined> => {
@@ -147,14 +172,21 @@ const BookmarkGraph: React.FC = () => {
             const fontSize = 12 / globalScale;
             ctx.font = `${fontSize}px Inter, system-ui, Sans-Serif`;
 
-            // Draw Node Circle with shadow
+            // Draw Node Circle with theme-aware glow
             ctx.save();
-            ctx.shadowColor = 'rgba(0,0,0,0.3)';
-            ctx.shadowBlur = 4 / globalScale;
+            ctx.shadowColor = node.color;
+            ctx.shadowBlur = 12 / globalScale;
             ctx.beginPath();
             ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
             ctx.fillStyle = node.color;
             ctx.fill();
+
+            // Inner circle for folders to make them stand out
+            if (node.isFolder) {
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+              ctx.lineWidth = 1 / globalScale;
+              ctx.stroke();
+            }
             ctx.restore();
 
             // Draw Icon if available (clipped to circle)
