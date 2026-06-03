@@ -1,22 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import ForceGraph2D from 'force-graph';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Cosmograph } from '@cosmograph/react';
 import { Share2, Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useStorage } from '../../hooks/useStorage';
 
-interface CosmoNode {
+interface GraphNode extends Record<string, unknown> {
   id: string;
   name: string;
   isFolder: boolean;
   url?: string;
   color: string;
-  val: number;
-  icon?: HTMLImageElement;
 }
 
-interface CosmoLink {
+interface GraphLink extends Record<string, unknown> {
   source: string;
   target: string;
 }
@@ -24,101 +22,65 @@ interface CosmoLink {
 const BookmarkGraph: React.FC = () => {
   const { t } = useTranslation();
   const [theme] = useStorage('app-theme', 'light', 'localStorage');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const fgRef = useRef<any>(null);
+  const [nodes, setNodes] = useState<GraphNode[]>([]);
+  const [links, setLinks] = useState<GraphLink[]>([]);
   const [loading, setLoading] = useState(true);
+  const cosmographRef = React.useRef<any>(null);
+
+  // Helper to get resolved theme colors
+  const getThemeColor = (variable: string, fallback: string) => {
+    const temp = document.createElement('div');
+    const classMap: Record<string, string> = {
+      '--p': 'text-primary',
+      '--s': 'text-secondary',
+      '--bc': 'text-base-content'
+    };
+
+    if (classMap[variable]) {
+      temp.className = classMap[variable];
+    } else {
+      temp.style.color = `var(${variable})`;
+    }
+
+    document.body.appendChild(temp);
+    const style = getComputedStyle(temp);
+    const color = style.color;
+    document.body.removeChild(temp);
+
+    const isBlack = color === 'rgb(0, 0, 0)' || color === '#000000';
+    const isInvalid = !color || color === 'rgba(0, 0, 0, 0)' || color === 'transparent';
+
+    if (isInvalid || (isBlack && variable !== '--bc')) {
+      return fallback;
+    }
+
+    return color;
+  };
 
   useEffect(() => {
-    if (!containerRef.current) return;
-
     const loadBookmarks = async () => {
-      const nodes: CosmoNode[] = [];
-      const links: CosmoLink[] = [];
-
-      // Helper to get resolved theme colors (works with oklch, hsl, etc.)
-      const getThemeColor = (variable: string, fallback: string) => {
-        const temp = document.createElement('div');
-        // Map DaisyUI variables to helper classes for better resolution
-        const classMap: Record<string, string> = {
-          '--p': 'text-primary',
-          '--s': 'text-secondary',
-          '--bc': 'text-base-content'
-        };
-
-        if (classMap[variable]) {
-          temp.className = classMap[variable];
-        } else {
-          temp.style.color = `var(${variable})`;
-        }
-
-        document.body.appendChild(temp);
-        const style = getComputedStyle(temp);
-        const color = style.color;
-        document.body.removeChild(temp);
-
-        // Validation: Ensure we don't return black for primary/secondary unless intended
-        const isBlack = color === 'rgb(0, 0, 0)' || color === '#000000';
-        const isInvalid = !color || color === 'rgba(0, 0, 0, 0)' || color === 'transparent';
-
-        if (isInvalid || (isBlack && variable !== '--bc')) {
-          return fallback;
-        }
-
-        return color;
-      };
-
-      // Small delay to ensure DaisyUI has applied the theme variables to the DOM
-      await new Promise(resolve => setTimeout(resolve, 50));
+      const nodeList: GraphNode[] = [];
+      const linkList: GraphLink[] = [];
 
       const themeColors = {
         primary: getThemeColor('--p', '#570df8'),
         secondary: getThemeColor('--s', '#f000b8'),
-        text: getThemeColor('--bc', '#1f2937'),
-      };
-
-      const getFavicon = (url: string): Promise<HTMLImageElement | undefined> => {
-        return new Promise((resolve) => {
-          try {
-            const domain = new URL(url).hostname;
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-            const timeout = setTimeout(() => resolve(undefined), 2000);
-            img.onload = () => {
-              clearTimeout(timeout);
-              resolve(img);
-            };
-            img.onerror = () => {
-              clearTimeout(timeout);
-              resolve(undefined);
-            };
-          } catch {
-            resolve(undefined);
-          }
-        });
       };
 
       const processNode = async (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
         const isFolder = !node.url;
         const nodeId = node.id;
 
-        let icon: HTMLImageElement | undefined;
-        if (!isFolder && node.url) {
-          icon = await getFavicon(node.url);
-        }
-
-        nodes.push({
+        nodeList.push({
           id: nodeId,
           name: node.title || (isFolder ? 'Folder' : 'Bookmark'),
           isFolder,
           url: node.url,
           color: isFolder ? themeColors.primary : themeColors.secondary,
-          val: isFolder ? 6 : 4,
-          icon
         });
 
         if (parentId) {
-          links.push({ source: parentId, target: nodeId });
+          linkList.push({ source: parentId, target: nodeId });
         }
 
         if (node.children) {
@@ -158,115 +120,51 @@ const BookmarkGraph: React.FC = () => {
         await processNode(mockData as any);
       }
 
-      if (containerRef.current) {
-        const ForceGraph = (ForceGraph2D as any)();
-        const instance = ForceGraph(containerRef.current)
-          .graphData({ nodes, links })
-          .nodeLabel('name')
-          .nodeColor((node: any) => node.color)
-          .nodeRelSize(4)
-          .linkWidth(1)
-          .linkColor(() => '#94a3b833')
-          .nodeCanvasObject((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-            const label = node.name;
-            const fontSize = 12 / globalScale;
-            ctx.font = `${fontSize}px Inter, system-ui, Sans-Serif`;
-
-            // Draw Node Circle with theme-aware glow
-            ctx.save();
-            ctx.shadowColor = node.color;
-            ctx.shadowBlur = 12 / globalScale;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
-            ctx.fillStyle = node.color;
-            ctx.fill();
-
-            // Inner circle for folders to make them stand out
-            if (node.isFolder) {
-              ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-              ctx.lineWidth = 1 / globalScale;
-              ctx.stroke();
-            }
-            ctx.restore();
-
-            // Draw Icon if available (clipped to circle)
-            if (node.icon) {
-              const size = node.val * 1.4;
-              ctx.save();
-              ctx.beginPath();
-              ctx.arc(node.x, node.y, size / 2, 0, Math.PI * 2, true);
-              ctx.clip();
-              ctx.drawImage(node.icon, node.x - size / 2, node.y - size / 2, size, size);
-              ctx.restore();
-            }
-
-            // Draw Label
-            const textWidth = ctx.measureText(label).width;
-            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
-
-            // Background for label readability
-            ctx.fillStyle = 'rgba(0,0,0,0.4)';
-            ctx.fillRect(node.x - textWidth / 2 - 2 / globalScale, node.y + node.val + 2 / globalScale, textWidth + 4 / globalScale, fontSize + 2 / globalScale);
-
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = '#ffffff'; // White text for better contrast on dark bg
-            ctx.fillText(label, node.x, node.y + node.val + 3 / globalScale);
-
-            node.__bckgDimensions = bckgDimensions;
-          })
-          .nodePointerAreaPaint((node: any, color: string, ctx: CanvasRenderingContext2D) => {
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, node.val + 2, 0, 2 * Math.PI, false);
-            ctx.fill();
-          })
-          .onNodeClick((node: any) => {
-            if (node.url) window.open(node.url, '_blank');
-          })
-          .cooldownTicks(100)
-          .onEngineStop(() => {
-            setLoading(false);
-          });
-
-        fgRef.current = instance;
-      }
+      setNodes(nodeList);
+      setLinks(linkList);
+      setLoading(false);
     };
 
     loadBookmarks();
-
-    return () => {
-      if (fgRef.current) {
-        fgRef.current._destructor?.();
-        if (containerRef.current) containerRef.current.innerHTML = '';
-      }
-    };
   }, [theme]);
 
-  const zoomIn = () => {
-    const current = fgRef.current.zoom();
-    fgRef.current.zoom(current * 1.5, 400);
-  };
-
-  const zoomOut = () => {
-    const current = fgRef.current.zoom();
-    fgRef.current.zoom(current * 0.7, 400);
-  };
-
-  const resetCamera = () => {
-    fgRef.current.zoomToFit(400);
-  };
+  const cosmographConfig = useMemo(() => ({
+    points: nodes,
+    links: links,
+    pointIdBy: 'id',
+    linkSourceBy: 'source',
+    linkTargetBy: 'target',
+    pointColorByFn: (n: GraphNode) => n.color,
+    pointSizeByFn: (n: GraphNode) => n.isFolder ? 2 : 1,
+    pointLabelBy: 'name',
+    linkWidth: 0.5,
+    linkColor: '#94a3b833',
+    focusedPointColor: '#ffffff',
+    simulationFriction: 0.5,
+    simulationRepulsion: 0.3,
+    simulationLinkSpring: 0.1,
+    simulationLinkDistance: 10,
+    backgroundColor: 'transparent',
+  }), [nodes, links]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-12rem)]">
       <PageHeader
         title={t.sidebar.graph}
-        description="Visualize your bookmarks as an interactive 2D network."
+        description="High-performance graph visualization powered by Cosmograph."
         icon={Share2}
       />
 
       <GlassCard className="flex-1 relative overflow-hidden p-0">
-        <div ref={containerRef} className="w-full h-full" />
+        {!loading && nodes.length > 0 && (
+          <Cosmograph
+            ref={cosmographRef}
+            {...(cosmographConfig as any)}
+            onClick={(node: any) => {
+              if (node?.url) window.open(node.url, '_blank');
+            }}
+          />
+        )}
 
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-base-100/20 backdrop-blur-sm">
@@ -275,13 +173,13 @@ const BookmarkGraph: React.FC = () => {
         )}
 
         <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-          <button onClick={zoomIn} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
+          <button onClick={() => cosmographRef.current?.zoomIn()} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
             <ZoomIn size={16} />
           </button>
-          <button onClick={zoomOut} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
+          <button onClick={() => cosmographRef.current?.zoomOut()} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
             <ZoomOut size={16} />
           </button>
-          <button onClick={resetCamera} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
+          <button onClick={() => cosmographRef.current?.fitView()} className="btn btn-circle btn-sm bg-base-100/50 backdrop-blur-md border-white/10">
             <Maximize2 size={16} />
           </button>
         </div>
