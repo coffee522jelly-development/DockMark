@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Cosmograph } from '@cosmograph/react';
+import * as duckdb from '@duckdb/duckdb-wasm';
 import { Share2, Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
@@ -25,7 +26,43 @@ const BookmarkGraph: React.FC = () => {
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [links, setLinks] = useState<GraphLink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [duckdbConn, setDuckdbConn] = useState<any>(null);
   const cosmographRef = React.useRef<any>(null);
+
+  // Initialize DuckDB with local assets
+  useEffect(() => {
+    let isMounted = true;
+    const initDuckDB = async () => {
+      try {
+        const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
+          mvp: {
+            mainModule: 'lib/duckdb/duckdb-mvp.wasm',
+            mainWorker: 'lib/duckdb/duckdb-browser-mvp.worker.js',
+          },
+          eh: {
+            mainModule: 'lib/duckdb/duckdb-eh.wasm',
+            mainWorker: 'lib/duckdb/duckdb-browser-eh.worker.js',
+          },
+        };
+
+        const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
+        const worker = new Worker(bundle.mainWorker!);
+        const logger = new duckdb.VoidLogger();
+        const db = new duckdb.AsyncDuckDB(logger, worker);
+        await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+        const conn = await db.connect();
+
+        if (isMounted) {
+          setDuckdbConn({ duckdb: db, connection: conn });
+        }
+      } catch (err) {
+        console.error('Failed to initialize local DuckDB:', err);
+      }
+    };
+
+    initDuckDB();
+    return () => { isMounted = false; };
+  }, []);
 
   // Helper to get resolved theme colors
   const getThemeColor = (variable: string, fallback: string) => {
@@ -156,10 +193,11 @@ const BookmarkGraph: React.FC = () => {
       />
 
       <GlassCard className="flex-1 relative overflow-hidden p-0">
-        {!loading && nodes.length > 0 && (
+        {!loading && nodes.length > 0 && duckdbConn && (
           <Cosmograph
             ref={cosmographRef}
             {...(cosmographConfig as any)}
+            duckDBConnection={duckdbConn}
             onClick={(node: any) => {
               if (node?.url) window.open(node.url, '_blank');
             }}

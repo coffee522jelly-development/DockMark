@@ -5,6 +5,9 @@
   "description": "A productivity dashboard and bookmark organizer for your new tab.",
   "permissions": ["bookmarks", "storage", "geolocation", "favicon", "contextMenus", "scripting", "tabGroups", "tabs", "sessions"],
   "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"
