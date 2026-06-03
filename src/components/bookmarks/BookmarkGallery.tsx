@@ -534,59 +534,129 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
         )}
 
         {viewMode === 'bookshelf' && (
-          <div className="space-y-8 pb-20">
+          <div className="space-y-24 pb-32">
             {Object.entries(groupedBookmarks).map(([groupTitle, items]) => (
-              <div key={groupTitle} className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-base-100/60 backdrop-blur-md border border-white/10 shadow-sm ml-2">
-                  <Bookmark size={14} className="text-primary" />
-                  <h3 className="text-sm font-bold text-base-content/80">{groupTitle}</h3>
+              <div key={groupTitle} className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-base-100/80 backdrop-blur-xl border border-white/20 shadow-xl ml-4">
+                  <Bookmark size={16} className="text-primary" />
+                  <h3 className="text-sm font-black text-base-content uppercase tracking-widest">{groupTitle}</h3>
                 </div>
 
-                <div className="relative">
-                  <div className="flex flex-wrap items-end gap-1 px-4 min-h-[200px]">
-                    {items.map((bookmark) => {
+                <div className="relative group/shelf">
+                  {/* Decorative shelf back with wood-like texture */}
+                  <div className="absolute inset-x-0 bottom-0 top-12 bg-black/20 rounded-lg -z-10 shadow-inner" />
+                  <div className="absolute inset-x-0 bottom-0 top-12 opacity-10 -z-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]" />
+
+                  <div className="flex flex-wrap items-end gap-[2px] px-12 min-h-[220px] relative">
+                    {items.map((bookmark, idx) => {
                       const displayTitle = bookmark.title.length > 30 ? bookmark.title.substring(0, 30) + '...' : bookmark.title;
                       const bookColor = getBookColor(bookmark.parentId);
 
+                      // Deterministic variation based on ID
+                      const hash = bookmark.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                      const heightVar = (hash % 20) - 10; // -10 to +10px
+                      const widthVar = (hash % 8) - 4; // -4 to +4px
+                      const lean = (hash % 6) - 3; // -3 to +3 degrees
+
                       return (
-                        <div key={bookmark.id} className="group relative perspective-1000">
+                        <div
+                          key={bookmark.id}
+                          className="group/book relative perspective-1000 mb-[-2px] transition-transform duration-500 hover:z-50"
+                          style={{ transform: `rotate(${lean}deg)`, transformOrigin: 'bottom center' }}
+                        >
+                          {/* Book Shadow on shelf - dynamic based on hover */}
+                          <div className="absolute bottom-0 left-2 right-2 h-4 bg-black/60 blur-xl rounded-full opacity-40 group-hover/book:opacity-100 transition-opacity" />
+
                           <div
                             onClick={() => window.open(bookmark.url, '_blank')}
                             className={`
-                              w-10 h-48 ${bookColor} rounded-t-sm shadow-lg cursor-pointer
-                              transition-all duration-300 ease-out
-                              group-hover:-translate-y-8 group-hover:scale-105 group-hover:shadow-2xl
+                              ${bookColor} rounded-t-[6px] rounded-b-[2px] shadow-[5px_0_15px_-5px_rgba(0,0,0,0.7),-2px_0_5px_rgba(255,255,255,0.1)_inset] cursor-pointer
+                              transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)
+                              group-hover/book:-translate-y-12 group-hover/book:scale-110 group-hover/book:shadow-[20px_40px_50px_-10px_rgba(0,0,0,0.8)] group-hover/book:rotate-0
                               relative overflow-hidden border-x border-t border-white/20
                             `}
+                            style={{
+                              width: `${40 + widthVar}px`,
+                              height: `${190 + heightVar}px`,
+                            }}
                           >
+                            {/* Gold lines for classic look */}
+                            <div className="absolute top-4 inset-x-0 h-[1px] bg-yellow-400/30 shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
+                            <div className="absolute top-6 inset-x-0 h-[1px] bg-yellow-400/30 shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
+                            <div className="absolute bottom-6 inset-x-0 h-[1px] bg-yellow-400/30 shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
+
+                            {/* Spine curvature effect - more pronounced */}
+                            <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/40 to-transparent" />
+                            <div className="absolute inset-y-0 right-0 w-2 bg-gradient-to-l from-white/10 to-transparent" />
+
                             {/* Spine Text */}
-                            <div className="absolute inset-0 flex items-center justify-center p-2">
+                            <div className="absolute inset-0 flex items-center justify-center p-3">
                               <span
-                                className="whitespace-nowrap font-bold text-white/90 text-xs tracking-wider select-none"
+                                className="whitespace-nowrap font-black text-white/80 text-[11px] tracking-widest select-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] uppercase"
                                 style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
                               >
                                 {displayTitle}
                               </span>
                             </div>
 
-                            {/* Shine effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-black/10 pointer-events-none" />
+                            {/* Shine and Texture effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-black/40 pointer-events-none" />
+                            <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/leather.png')]" />
+
+                            {/* Edge highlights */}
+                            <div className="absolute top-0 inset-x-0 h-1 bg-white/20" />
                           </div>
 
                           {/* Hover Tooltip/Details */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                            <GlassCard className="p-3 text-center border-primary/30 shadow-2xl scale-90 group-hover:scale-100 transition-transform">
-                              <p className="text-xs font-bold truncate">{bookmark.title}</p>
-                              <p className="text-[10px] opacity-50 truncate">{new URL(bookmark.url).hostname}</p>
-                            </GlassCard>
-                            <div className="w-3 h-3 bg-base-100 border-r border-b border-primary/30 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-8 w-64 opacity-0 group-hover/book:opacity-100 transition-all duration-300 pointer-events-none z-[100] translate-y-4 group-hover/book:translate-y-0">
+                            <div className="bg-base-100/90 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative">
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-inner overflow-hidden">
+                                  <img
+                                    src={`https://s2.googleusercontent.com/s2/favicons?domain=${new URL(bookmark.url).hostname}&sz=64`}
+                                    alt="favicon"
+                                    className="w-6 h-6"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = ''; }}
+                                  />
+                                </div>
+                                <div className="overflow-hidden">
+                                  <p className="text-xs font-black truncate text-base-content">{bookmark.title}</p>
+                                  <p className="text-[10px] opacity-60 truncate uppercase tracking-tight text-primary font-bold">{new URL(bookmark.url).hostname}</p>
+                                </div>
+                              </div>
+                              <div className="h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent w-full mb-3" />
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] opacity-40 italic uppercase tracking-tighter">Click to open</span>
+                                <span className="badge badge-primary badge-xs font-bold px-2 py-2">{bookmark.parentTitle}</span>
+                              </div>
+
+                              {/* Triangle pointer */}
+                              <div className="w-3 h-3 bg-base-100/90 border-r border-b border-white/20 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2" />
+                            </div>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                  {/* Shelf line */}
-                  <div className="h-4 w-full bg-base-100/40 backdrop-blur-sm border-t border-white/10 shadow-inner rounded-full mt-[-2px]" />
+
+                  {/* Shelf line with more depth */}
+                  <div className="relative mt-[-4px]">
+                    {/* Shadow cast by books on the shelf (deeper) */}
+                    <div className="absolute -top-8 inset-x-0 h-8 bg-gradient-to-t from-black/50 to-transparent pointer-events-none opacity-80" />
+
+                    {/* The wooden shelf plank */}
+                    <div className="h-8 w-full bg-gradient-to-b from-[#3d2b1f] to-[#2a1d15] border-t-2 border-white/10 shadow-[0_15px_30px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.1)] rounded-sm relative overflow-hidden">
+                       <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]" />
+                    </div>
+
+                    {/* Front edge/depth of the shelf */}
+                    <div className="h-4 w-full bg-[#1e140f] border-t border-white/5 rounded-b-xl shadow-2xl relative">
+                       <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                    </div>
+
+                    {/* Shelf shadow on the "wall" below */}
+                    <div className="absolute top-12 inset-x-4 h-12 bg-black/40 blur-3xl rounded-full -z-20" />
+                  </div>
                 </div>
               </div>
             ))}
