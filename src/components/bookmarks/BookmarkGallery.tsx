@@ -548,7 +548,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                   <div className="absolute inset-x-0 bottom-0 top-12 opacity-10 -z-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]" />
 
                   <div className="flex flex-wrap items-end gap-[2px] px-12 min-h-[220px] relative">
-                    {items.map((bookmark, idx) => {
+                    {items.map((bookmark) => {
                       const displayTitle = bookmark.title.length > 30 ? bookmark.title.substring(0, 30) + '...' : bookmark.title;
                       const bookColor = getBookColor(bookmark.parentId);
 
