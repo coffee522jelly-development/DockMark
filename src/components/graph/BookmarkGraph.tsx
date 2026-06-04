@@ -34,14 +34,21 @@ const BookmarkGraph: React.FC = () => {
     let isMounted = true;
     const initDuckDB = async () => {
       try {
+        const getAssetUrl = (path: string) => {
+          if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+            return chrome.runtime.getURL(path);
+          }
+          return `${window.location.origin}/${path}`;
+        };
+
         const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
           mvp: {
-            mainModule: 'lib/duckdb/duckdb-mvp.wasm',
-            mainWorker: 'lib/duckdb/duckdb-browser-mvp.worker.js',
+            mainModule: getAssetUrl('lib/duckdb/duckdb-mvp.wasm'),
+            mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-mvp.worker.js'),
           },
           eh: {
-            mainModule: 'lib/duckdb/duckdb-eh.wasm',
-            mainWorker: 'lib/duckdb/duckdb-browser-eh.worker.js',
+            mainModule: getAssetUrl('lib/duckdb/duckdb-eh.wasm'),
+            mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-eh.worker.js'),
           },
         };
 
