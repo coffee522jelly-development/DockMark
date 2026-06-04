@@ -440,16 +440,20 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                       <button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-circle btn-xs btn-ghost bg-base-100 shadow-sm text-error" title="Delete"><Trash2 size={12} /></button>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                         <img
-                          src={`https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`}
+                          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
                           alt="favicon"
-                          className="w-5 h-5"
+                          className="w-5 h-5 z-10"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-[10px] font-bold text-base-content/40">${domain.charAt(0).toUpperCase()}</span>`;
+                            const next = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                            if (next) next.style.display = 'flex';
                           }}
                         />
+                        <div className="absolute inset-0 hidden items-center justify-center bg-base-300 text-[10px] font-bold text-base-content/40 uppercase">
+                          {domain.charAt(0)}
+                        </div>
                       </div>
                       <div className="overflow-hidden"><h3 className="card-title text-sm font-bold truncate group-hover:text-primary transition-colors">{bookmark.title}</h3><p className="text-xs text-base-content/50 truncate">{domain}</p></div>
                     </div>
@@ -484,21 +488,26 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               <tbody>
                 {filteredBookmarks.map((bookmark: BookmarkItem) => {
                   const domain = new URL(bookmark.url).hostname;
-                  const faviconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=64`;
+                  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
                   const date = bookmark.dateAdded ? new Date(bookmark.dateAdded).toLocaleDateString() : '-';
                   return (
                     <tr key={bookmark.id} className="hover:bg-base-100/50 transition-colors group">
                       <td className="text-center px-2">
                         <div className="avatar">
-                          <div className="w-6 h-6 rounded bg-base-300/50 flex items-center justify-center p-0.5 overflow-hidden">
+                          <div className="w-6 h-6 rounded bg-base-300/50 flex items-center justify-center p-0.5 overflow-hidden relative">
                             <img
                               src={faviconUrl}
                               alt="favicon"
+                              className="z-10"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
-                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-[8px] font-bold text-base-content/40">${domain.charAt(0).toUpperCase()}</span>`;
+                                const next = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                                if (next) next.style.display = 'flex';
                               }}
                             />
+                            <div className="absolute inset-0 hidden items-center justify-center bg-base-300 text-[8px] font-bold text-base-content/40 uppercase">
+                              {domain.charAt(0)}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -611,13 +620,20 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-8 w-64 opacity-0 group-hover/book:opacity-100 transition-all duration-300 pointer-events-none z-[100] translate-y-4 group-hover/book:translate-y-0">
                             <div className="bg-base-100/90 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative">
                               <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-inner overflow-hidden">
+                                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-inner overflow-hidden relative group/fav">
                                   <img
-                                    src={`https://s2.googleusercontent.com/s2/favicons?domain=${new URL(bookmark.url).hostname}&sz=64`}
+                                    src={`https://www.google.com/s2/favicons?domain=${new URL(bookmark.url).hostname}&sz=64`}
                                     alt="favicon"
-                                    className="w-6 h-6"
-                                    onError={(e) => { (e.target as HTMLImageElement).src = ''; }}
+                                    className="w-6 h-6 z-10"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                      const next = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                                      if (next) next.style.display = 'flex';
+                                    }}
                                   />
+                                  <div className="absolute inset-0 hidden items-center justify-center bg-base-300 text-[10px] font-bold text-base-content/40 uppercase">
+                                    {new URL(bookmark.url).hostname.charAt(0)}
+                                  </div>
                                 </div>
                                 <div className="overflow-hidden">
                                   <p className="text-xs font-black truncate text-base-content">{bookmark.title}</p>
@@ -672,19 +688,23 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               return (
                 <div key={bookmark.id} className={`group relative transition-all duration-200 ${draggedId === bookmark.id ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`} draggable onDragStart={() => handleDragStart(bookmark.id)} onDragOver={(e) => handleDragOver(e, bookmark.id)} onDragEnd={handleDragEnd}>
                       <div onClick={() => window.open(bookmark.url, '_blank')} className="tooltip tooltip-bottom" data-tip={bookmark.title}>
-                        <button className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm`} style={{ width: `${iconSize}px`, height: `${iconSize}px`, borderRadius: iconShape === 'round' ? '9999px' : undefined }}>
+                        <button className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm relative group/fav`} style={{ width: `${iconSize}px`, height: `${iconSize}px`, borderRadius: iconShape === 'round' ? '9999px' : undefined }}>
                           <img
                             src={faviconUrl}
                             alt={bookmark.title}
-                            className="w-full h-full object-contain pointer-events-none"
+                            className="w-full h-full object-contain pointer-events-none z-10"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = `https://s2.googleusercontent.com/s2/favicons?domain=${url.hostname}&sz=64`;
+                              (e.target as HTMLImageElement).src = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
                               (e.target as HTMLImageElement).onerror = () => {
                                 (e.target as HTMLImageElement).style.display = 'none';
-                                (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-xs font-bold text-base-content/40">${url.hostname.charAt(0).toUpperCase()}</span>`;
+                                const next = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                                if (next) next.style.display = 'flex';
                               };
                             }}
                           />
+                          <div className="absolute inset-0 hidden items-center justify-center bg-base-300 text-xs font-bold text-base-content/40 uppercase">
+                            {url.hostname.charAt(0)}
+                          </div>
                         </button>
                       </div>
                   <div className="absolute -top-2 -right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"><button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300" title="Markdown">{isProcessing === bookmark.id ? <span className="loading loading-spinner w-3 h-3"></span> : <Download size={10} />}</button><button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-circle btn-[10px] h-5 w-5 min-h-0 btn-ghost bg-base-100 shadow-md border border-base-300 text-error" title="Delete"><Trash2 size={10} /></button></div>

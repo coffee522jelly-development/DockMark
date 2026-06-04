@@ -26,41 +26,44 @@ const BookmarkGraph: React.FC = () => {
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [links, setLinks] = useState<GraphLink[]>([]);
   const [loading, setLoading] = useState(true);
-  const [duckdbConn, setDuckdbConn] = useState<any>(null);
+  const duckdbConfig = useMemo(() => {
+    const getAssetUrl = (path: string) => {
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+        return chrome.runtime.getURL(path);
+      }
+      return `${window.location.origin}/${path}`;
+    };
+
+    return {
+      mvp: {
+        mainModule: getAssetUrl('lib/duckdb/duckdb-mvp.wasm'),
+        mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-mvp.worker.js'),
+      },
+      eh: {
+        mainModule: getAssetUrl('lib/duckdb/duckdb-eh.wasm'),
+        mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-eh.worker.js'),
+      },
+    };
+  }, []);
+
+  const [duckdbConnection, setDuckdbConnection] = useState<any>(null);
   const cosmographRef = React.useRef<any>(null);
 
   // Initialize DuckDB with local assets
   useEffect(() => {
     let isMounted = true;
+    let db: duckdb.AsyncDuckDB | null = null;
+
     const initDuckDB = async () => {
       try {
-        const getAssetUrl = (path: string) => {
-          if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-            return chrome.runtime.getURL(path);
-          }
-          return `${window.location.origin}/${path}`;
-        };
-
-        const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
-          mvp: {
-            mainModule: getAssetUrl('lib/duckdb/duckdb-mvp.wasm'),
-            mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-mvp.worker.js'),
-          },
-          eh: {
-            mainModule: getAssetUrl('lib/duckdb/duckdb-eh.wasm'),
-            mainWorker: getAssetUrl('lib/duckdb/duckdb-browser-eh.worker.js'),
-          },
-        };
-
-        const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
+        const bundle = await duckdb.selectBundle(duckdbConfig);
         const worker = new Worker(bundle.mainWorker!);
         const logger = new duckdb.VoidLogger();
-        const db = new duckdb.AsyncDuckDB(logger, worker);
+        db = new duckdb.AsyncDuckDB(logger, worker);
         await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-        const conn = await db.connect();
 
         if (isMounted) {
-          setDuckdbConn({ duckdb: db, connection: conn });
+          setDuckdbConnection({ duckdb: db });
         }
       } catch (err) {
         console.error('Failed to initialize local DuckDB:', err);
@@ -68,8 +71,12 @@ const BookmarkGraph: React.FC = () => {
     };
 
     initDuckDB();
-    return () => { isMounted = false; };
-  }, []);
+    return () => {
+      isMounted = false;
+      // We don't terminate here as Cosmograph might still be using it
+      // or it might cause issues during fast refreshes.
+    };
+  }, [duckdbConfig]);
 
   // Helper to get resolved theme colors
   const getThemeColor = (variable: string, fallback: string) => {
@@ -200,11 +207,11 @@ const BookmarkGraph: React.FC = () => {
       />
 
       <GlassCard className="flex-1 relative overflow-hidden p-0">
-        {!loading && nodes.length > 0 && duckdbConn && (
+        {!loading && nodes.length > 0 && duckdbConnection && (
           <Cosmograph
             ref={cosmographRef}
             {...(cosmographConfig as any)}
-            duckDBConnection={duckdbConn}
+            duckDBConnection={duckdbConnection}
             onClick={(node: any) => {
               if (node?.url) window.open(node.url, '_blank');
             }}
