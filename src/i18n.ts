@@ -14,7 +14,6 @@ export const translations = {
       rss: 'RSS Feeds',
       history: 'Tab History',
       timeline: 'Timeline',
-      graph: 'Graph',
       settings: 'Settings'
     },
     header: {
@@ -109,7 +108,6 @@ export const translations = {
       rss: 'RSSフィード',
       history: 'タブ履歴',
       timeline: 'タイムライン',
-      graph: 'グラフ',
       settings: '設定'
     },
     header: {

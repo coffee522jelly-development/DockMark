@@ -5,7 +5,6 @@ import BookmarkGallery from './components/bookmarks/BookmarkGallery';
 import Snippets from './components/snippets/Snippets';
 import RssManager from './components/rss/RssManager';
 import TabHistory from './components/history/TabHistory';
-import BookmarkGraph from './components/graph/BookmarkGraph';
 import Sidebar from './components/layout/Sidebar';
 import SettingsModal from './components/modals/SettingsModal';
 import { useStorage } from './hooks/useStorage';
@@ -133,7 +132,6 @@ const App: React.FC = () => {
           {activeTab === 'snippets' && <Snippets />}
           {activeTab === 'rss' && <RssManager />}
           {activeTab === 'history' && <TabHistory />}
-          {activeTab === 'graph' && <BookmarkGraph />}
         </div>
       </main>
 

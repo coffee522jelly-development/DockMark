@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutGrid, Bookmark, Layout, Grid, Book, Image as ImageIcon, Table, FileText, Rss, History, Settings, Share2 } from 'lucide-react';
+import { LayoutGrid, Bookmark, Layout, Grid, Book, Image as ImageIcon, Table, FileText, Rss, History, Settings } from 'lucide-react';
 import { TabType } from '../../config';
 import { useTranslation } from '../../contexts/LanguageContext';
 
@@ -21,7 +21,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
     { id: 'icons', icon: ImageIcon, label: t.sidebar.icons },
     { id: 'tables', icon: Table, label: t.sidebar.tables },
     { id: 'timeline', icon: History, label: t.sidebar.timeline },
-    { id: 'graph', icon: Share2, label: t.sidebar.graph },
     { id: 'snippets', icon: FileText, label: t.sidebar.snippets, divider: true },
     { id: 'rss', icon: Rss, label: t.sidebar.rss },
     { id: 'history', icon: History, label: t.sidebar.history },
