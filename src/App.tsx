@@ -35,7 +35,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view');
-    if (view === 'snippets') setActiveTab('snippets');
+    if (view && tabOrder.includes(view as TabType)) {
+      setActiveTab(view as TabType);
+    }
   }, []);
 
   useEffect(() => {

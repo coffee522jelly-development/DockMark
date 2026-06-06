@@ -338,7 +338,9 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                           <span className="truncate max-w-[150px] block">{bookmark.title}</span>
                         </button>
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className={`btn btn-ghost btn-xs btn-circle ${isProcessing === bookmark.id ? 'loading loading-spinner' : ''}`} title="Save as Markdown">{!isProcessing && <Save size={14} />}</button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">
+                            {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}
+                          </button>
                           <button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-ghost btn-xs btn-circle text-error" title="Delete"><Trash2 size={14} /></button>
                         </div>
                       </div>
@@ -354,7 +356,9 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                       <span className="truncate max-w-[150px] block">{bookmark.title}</span>
                     </button>
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className={`btn btn-ghost btn-xs btn-circle ${isProcessing === bookmark.id ? 'loading loading-spinner' : ''}`} title="Save as Markdown">{!isProcessing && <Save size={14} />}</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">
+                        {isProcessing === bookmark.id ? <span className="loading loading-spinner loading-xs"></span> : <Save size={14} />}
+                      </button>
                       <button onClick={(e) => { e.stopPropagation(); handleDelete(bookmark.id); }} className="btn btn-ghost btn-xs btn-circle text-error" title="Delete"><Trash2 size={14} /></button>
                     </div>
                   </div>
