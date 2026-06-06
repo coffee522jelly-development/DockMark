@@ -135,7 +135,7 @@ const App: React.FC = () => {
           {activeTab === 'snippets' && <Snippets />}
           {activeTab === 'rss' && <RssManager />}
           {activeTab === 'history' && <TabHistory />}
-          {activeTab === 'graph' && <BookmarkGraph />}
+          {activeTab === 'graph' && <BookmarkGraph theme={showSettings ? tempSettings.theme : theme} />}
         </div>
       </main>
 

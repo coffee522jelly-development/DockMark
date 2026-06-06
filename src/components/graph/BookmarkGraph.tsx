@@ -3,15 +3,21 @@ import Graph from 'graphology';
 import Sigma from 'sigma';
 import { NodeImageProgram } from '@sigma/node-image';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
+import circular from 'graphology-layout/circular';
 import { Share2, Maximize2, ZoomIn, ZoomOut, MousePointer2, Move } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useStorage } from '../../hooks/useStorage';
 
-const BookmarkGraph: React.FC = () => {
+interface BookmarkGraphProps {
+  theme?: string;
+}
+
+const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
   const { t } = useTranslation();
-  const [theme] = useStorage('app-theme', 'light', 'localStorage');
+  const [storageTheme] = useStorage('app-theme', 'light', 'localStorage');
+  const theme = propTheme || storageTheme;
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const graphRef = useRef<Graph>(new Graph());
@@ -51,10 +57,16 @@ const BookmarkGraph: React.FC = () => {
 
   useEffect(() => {
     // Resolve colors whenever theme changes
-    const p = getThemeColor('text-primary', '#8b5cf6');
-    const s = getThemeColor('text-secondary', '#ec4899');
-    const tColor = getThemeColor('text-base-content', '#ffffff');
-    setResolvedColors({ primary: p, secondary: s, text: tColor });
+    const updateColors = () => {
+      const p = getThemeColor('text-primary', '#8b5cf6');
+      const s = getThemeColor('text-secondary', '#ec4899');
+      const tColor = getThemeColor('text-base-content', '#ffffff');
+      setResolvedColors({ primary: p, secondary: s, text: tColor });
+    };
+
+    // Give a small delay to ensure the DOM has applied the new theme styles
+    const timer = setTimeout(updateColors, 100);
+    return () => clearTimeout(timer);
   }, [theme]);
 
   // Update node colors and label colors when theme/colors change
@@ -172,7 +184,7 @@ const BookmarkGraph: React.FC = () => {
       if (!graph.hasNode(nodeId)) {
         const nodeData: any = {
           label: node.title || (isFolder ? 'Folder' : 'Bookmark'),
-          size: isFolder ? 15 : 25,
+          size: isFolder ? 12 : 20,
           color: isFolder ? resolvedColors.primary : resolvedColors.secondary,
           x: Math.random(),
           y: Math.random(),
@@ -195,7 +207,15 @@ const BookmarkGraph: React.FC = () => {
       }
 
       if (node.children) {
-        for (const child of node.children) {
+        // Sort children: Folders first, then by title
+        const sortedChildren = [...node.children].sort((a, b) => {
+          const aIsFolder = !a.url;
+          const bIsFolder = !b.url;
+          if (aIsFolder && !bIsFolder) return -1;
+          if (!aIsFolder && bIsFolder) return 1;
+          return (a.title || '').localeCompare(b.title || '');
+        });
+        for (const child of sortedChildren) {
           processNode(child, nodeId);
         }
       }
@@ -234,7 +254,8 @@ const BookmarkGraph: React.FC = () => {
         processNode(mockData as any);
       }
 
-      // Run ForceAtlas2 layout
+      // Apply circular layout first for order, then forceAtlas2 for spacing
+      circular.assign(graph);
       forceAtlas2.assign(graph, { iterations: 100, settings: { gravity: 1 } });
 
       if (isCancelled) return;
