@@ -15,43 +15,20 @@ const BookmarkGraph: React.FC = () => {
   const sigmaRef = useRef<Sigma | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper to get resolved theme colors
-  const getThemeColor = (variable: string, fallback: string) => {
-    const temp = document.createElement('div');
-    const classMap: Record<string, string> = {
-      '--p': 'text-primary',
-      '--s': 'text-secondary',
-      '--bc': 'text-base-content'
-    };
-
-    if (classMap[variable]) {
-      temp.className = classMap[variable];
-    } else {
-      temp.style.color = `var(${variable})`;
-    }
-
-    document.body.appendChild(temp);
-    const style = getComputedStyle(temp);
-    const color = style.color;
-    document.body.removeChild(temp);
-
-    const isBlack = color === 'rgb(0, 0, 0)' || color === '#000000';
-    const isInvalid = !color || color === 'rgba(0, 0, 0, 0)' || color === 'transparent';
-
-    if (isInvalid || (isBlack && variable !== '--bc')) {
-      return fallback;
-    }
-
-    return color;
-  };
-
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let isCancelled = false;
+    // Clear container to prevent double rendering
+    containerRef.current.innerHTML = '';
+
     const graph = new Graph();
-    const primaryColor = getThemeColor('--p', '#570df8');
-    const secondaryColor = getThemeColor('--s', '#f000b8');
-    const textColor = getThemeColor('--bc', '#ffffff');
+
+    // DaisyUI 5 / Tailwind 4 uses oklch. Sigma might not support it in WebGL.
+    // We'll use more standard colors or try to force hex conversion.
+    const primaryColor = '#8b5cf6'; // Violet 500 (Primary-ish)
+    const secondaryColor = '#ec4899'; // Pink 500 (Secondary-ish)
+    const textColor = theme === 'dark' ? '#ffffff' : '#000000';
 
     const processNode = (node: chrome.bookmarks.BookmarkTreeNode, parentId?: string) => {
       const isFolder = !node.url;
@@ -83,8 +60,10 @@ const BookmarkGraph: React.FC = () => {
     const initGraph = async () => {
       if (typeof chrome !== 'undefined' && chrome.bookmarks) {
         const tree = await chrome.bookmarks.getTree();
+        if (isCancelled) return;
         processNode(tree[0]);
       } else {
+        if (isCancelled) return;
         // Mock data
         const mockData = {
           id: '0',
@@ -114,6 +93,8 @@ const BookmarkGraph: React.FC = () => {
       // Run ForceAtlas2 layout
       forceAtlas2.assign(graph, { iterations: 50, settings: { gravity: 1 } });
 
+      if (isCancelled) return;
+
       const sigma = new Sigma(graph, containerRef.current!, {
         labelColor: { color: textColor },
         labelSize: 12,
@@ -135,9 +116,13 @@ const BookmarkGraph: React.FC = () => {
     initGraph();
 
     return () => {
+      isCancelled = true;
       if (sigmaRef.current) {
         sigmaRef.current.kill();
         sigmaRef.current = null;
+      }
+      if (containerRef.current) {
+        containerRef.current.innerHTML = '';
       }
     };
   }, [theme]);
@@ -194,11 +179,17 @@ const BookmarkGraph: React.FC = () => {
 
         <div className="absolute top-4 left-4 p-3 bg-base-100/50 backdrop-blur-md rounded-xl border border-white/10 text-xs flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_oklch(var(--p)/0.5)]" />
+            <div
+              className="w-3 h-3 rounded-full shadow-lg"
+              style={{ backgroundColor: '#8b5cf6' }}
+            />
             <span>Folder</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_oklch(var(--s)/0.5)]" />
+            <div
+              className="w-3 h-3 rounded-full shadow-lg"
+              style={{ backgroundColor: '#ec4899' }}
+            />
             <span>Bookmark (Click to open)</span>
           </div>
         </div>
