@@ -4,6 +4,7 @@ import Sigma from 'sigma';
 import { NodeImageProgram } from '@sigma/node-image';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import circular from 'graphology-layout/circular';
+import noverlap from 'graphology-layout-noverlap';
 import { Share2, Maximize2, ZoomIn, ZoomOut, MousePointer2, Move } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import PageHeader from '../common/PageHeader';
@@ -245,6 +246,12 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
                   children: [
                     { id: '5', title: 'React', url: 'https://reactjs.org' },
                     { id: '6', title: 'Tailwind', url: 'https://tailwindcss.com' },
+                    { id: '7', title: 'Vite', url: 'https://vitejs.dev' },
+                    { id: '8', title: 'TypeScript', url: 'https://typescriptlang.org' },
+                    { id: '9', title: 'Sigma.js', url: 'https://sigmajs.org' },
+                    { id: '10', title: 'Graphology', url: 'https://graphology.github.io' },
+                    { id: '11', title: 'Playwright', url: 'https://playwright.dev' },
+                    { id: '12', title: 'Lucide Icons', url: 'https://lucide.dev' },
                   ]
                 }
               ]
@@ -254,9 +261,29 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
         processNode(mockData as any);
       }
 
-      // Apply circular layout first for order, then forceAtlas2 for spacing
+      // Apply circular layout first for initial order
       circular.assign(graph);
-      forceAtlas2.assign(graph, { iterations: 100, settings: { gravity: 1 } });
+
+      // Run ForceAtlas2 with settings optimized for preventing overlaps and providing breathing room
+      forceAtlas2.assign(graph, {
+        iterations: 200,
+        settings: {
+          gravity: 0.5,
+          scalingRatio: 10,
+          barnesHutOptimize: true,
+          linLogMode: true,
+          outboundAttractionDistribution: true
+        }
+      });
+
+      // Final pass with noverlap to ensure no node overlaps
+      noverlap.assign(graph, {
+        maxIterations: 50,
+        settings: {
+          margin: 5,
+          ratio: 1.2
+        }
+      });
 
       if (isCancelled) return;
 
