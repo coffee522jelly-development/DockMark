@@ -103,12 +103,34 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
       if (url) window.open(url, '_blank');
     };
 
+    const onEnterNode = ({ node }: { node: string }) => {
+      graph.setNodeAttribute(node, 'highlighted', true);
+      graph.neighbors(node).forEach(neighbor => {
+        graph.setNodeAttribute(neighbor, 'highlighted', true);
+      });
+    };
+
+    const onLeaveNode = ({ node }: { node: string }) => {
+      if (node !== draggedNode) {
+        graph.setNodeAttribute(node, 'highlighted', false);
+      }
+      graph.neighbors(node).forEach(neighbor => {
+        if (neighbor !== draggedNode) {
+          graph.setNodeAttribute(neighbor, 'highlighted', false);
+        }
+      });
+    };
+
     sigma.on('downNode', onDownNode);
     sigma.on('clickNode', onClickNode);
+    sigma.on('enterNode', onEnterNode);
+    sigma.on('leaveNode', onLeaveNode);
 
     return () => {
       sigma.off('downNode', onDownNode);
       sigma.off('clickNode', onClickNode);
+      sigma.off('enterNode', onEnterNode);
+      sigma.off('leaveNode', onLeaveNode);
     };
   }, [isDragMode]);
 
@@ -261,18 +283,79 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
         processNode(mockData as any);
       }
 
-      // Apply circular layout first for initial order
-      circular.assign(graph);
+      // Custom Radial Layout
+      const applyRadialLayout = (g: Graph, rootId: string) => {
+        const positions: Record<string, { x: number; y: number }> = {};
+        const visited = new Set<string>();
+        const radiusStep = 200; // Increased for better spacing
 
-      // Run ForceAtlas2 with settings optimized for preventing overlaps and providing breathing room
+        const compute = (nodeId: string, angleStart: number, angleEnd: number, radius: number) => {
+          visited.add(nodeId);
+          const angleMid = (angleStart + angleEnd) / 2;
+
+          // For the very center (Root), keep it at 0,0.
+          // For its direct children, give them a good starting radius to form a clear inner circle.
+          const currentRadius = radius === 0 ? 0 : radius + 50;
+
+          positions[nodeId] = {
+            x: currentRadius * Math.cos(angleMid),
+            y: currentRadius * Math.sin(angleMid)
+          };
+
+          const children = g.neighbors(nodeId).filter(n => !visited.has(n));
+          if (children.length === 0) return;
+
+          // Sort children: folders in the middle, bookmarks on the sides of the wedge
+          const folders = children.filter(n => g.getNodeAttribute(n, 'isFolder'));
+          const bookmarks = children.filter(n => !g.getNodeAttribute(n, 'isFolder'));
+
+          // Arrange bookmarks -> folders -> bookmarks for a balanced wedge
+          const halfBookmarks = Math.floor(bookmarks.length / 2);
+          const sortedChildren = [
+            ...bookmarks.slice(0, halfBookmarks),
+            ...folders,
+            ...bookmarks.slice(halfBookmarks)
+          ];
+
+          const angleRange = angleEnd - angleStart;
+          // Add some padding between wedges at higher depths
+          const paddedRange = radius > 0 ? angleRange * 0.9 : angleRange;
+          const padding = (angleRange - paddedRange) / 2;
+          const step = paddedRange / sortedChildren.length;
+
+          sortedChildren.forEach((child, i) => {
+            compute(
+              child,
+              angleStart + padding + i * step,
+              angleStart + padding + (i + 1) * step,
+              radius + radiusStep
+            );
+          });
+        };
+
+        // Find the actual root (usually '0' or the only node with no parent in our tree processing)
+        const startNode = g.hasNode('0') ? '0' : g.nodes()[0];
+        if (startNode) {
+          compute(startNode, 0, 2 * Math.PI, 0);
+          Object.entries(positions).forEach(([nodeId, pos]) => {
+            g.setNodeAttribute(nodeId, 'x', pos.x);
+            g.setNodeAttribute(nodeId, 'y', pos.y);
+          });
+        }
+      };
+
+      applyRadialLayout(graph, '0');
+
+      // Run ForceAtlas2 with settings that respect the radial structure but fix overlaps
       forceAtlas2.assign(graph, {
-        iterations: 200,
+        iterations: 150,
         settings: {
-          gravity: 0.5,
-          scalingRatio: 10,
+          gravity: 0.5, // Further reduced gravity to let nodes breathe
+          scalingRatio: 20, // Increased scaling to push nodes further apart
           barnesHutOptimize: true,
-          linLogMode: true,
-          outboundAttractionDistribution: true
+          linLogMode: true, // LinLog helps with highly clustered data
+          strongGravityMode: false,
+          outboundAttractionDistribution: true // Pushes hubs (folders) towards the periphery of the wedge
         }
       });
 
@@ -280,8 +363,8 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
       noverlap.assign(graph, {
         maxIterations: 50,
         settings: {
-          margin: 5,
-          ratio: 1.2
+          margin: 10,
+          ratio: 1.5
         }
       });
 
@@ -292,8 +375,9 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
           image: NodeImageProgram,
         },
         labelColor: { color: resolvedColors.text },
-        labelSize: 14,
+        labelSize: 12,
         labelWeight: 'bold',
+        labelGridCellSize: 60,
         renderEdgeLabels: false,
         enableEdgeEvents: false,
       });
