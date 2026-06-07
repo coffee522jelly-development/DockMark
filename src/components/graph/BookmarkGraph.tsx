@@ -3,7 +3,6 @@ import Graph from 'graphology';
 import Sigma from 'sigma';
 import { NodeImageProgram } from '@sigma/node-image';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
-import circular from 'graphology-layout/circular';
 import noverlap from 'graphology-layout-noverlap';
 import { Share2, Maximize2, ZoomIn, ZoomOut, MousePointer2, Move } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
@@ -284,7 +283,7 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
       }
 
       // Custom Radial Layout
-      const applyRadialLayout = (g: Graph, rootId: string) => {
+      const applyRadialLayout = (g: Graph) => {
         const positions: Record<string, { x: number; y: number }> = {};
         const visited = new Set<string>();
         const radiusStep = 200; // Increased for better spacing
@@ -344,7 +343,7 @@ const BookmarkGraph: React.FC<BookmarkGraphProps> = ({ theme: propTheme }) => {
         }
       };
 
-      applyRadialLayout(graph, '0');
+      applyRadialLayout(graph);
 
       // Run ForceAtlas2 with settings that respect the radial structure but fix overlaps
       forceAtlas2.assign(graph, {
