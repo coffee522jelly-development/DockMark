@@ -36,6 +36,10 @@ export const translations = {
       extremeMode: 'Extreme Mode: Applies to ALMOST EVERYTHING! 🎨',
       notifications: 'Notifications',
       timerAlerts: 'Show timer alerts',
+      readerTitle: 'Dark Mode Reader',
+      readerEnabled: 'Enable Reader',
+      readerBg: 'Background Color',
+      readerText: 'Text Color',
       cancel: 'Cancel',
       save: 'Save Changes'
     },
@@ -131,6 +135,10 @@ export const translations = {
       extremeMode: 'エクストリームモード: ほぼ全ての要素に適用されます！ 🎨',
       notifications: '通知',
       timerAlerts: 'タイマー通知を表示する',
+      readerTitle: 'ダークモード・リーダー',
+      readerEnabled: 'リーダーを有効化',
+      readerBg: '背景色',
+      readerText: 'テキスト色',
       cancel: 'キャンセル',
       save: '変更を保存'
     },

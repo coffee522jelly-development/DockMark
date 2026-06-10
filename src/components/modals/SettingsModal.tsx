@@ -22,6 +22,12 @@ interface SettingsModalProps {
   setBorderRadius: (radius: number) => void;
   language: Language;
   setLanguage: (lang: Language) => void;
+  readerEnabled: boolean;
+  setReaderEnabled: (enabled: boolean) => void;
+  readerBg: string;
+  setReaderBg: (color: string) => void;
+  readerText: string;
+  setReaderText: (color: string) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = (props) => {
@@ -148,6 +154,60 @@ const SettingsModal: React.FC<SettingsModalProps> = (props) => {
                 />
                 <div className="label">
                   <span className="label-text-alt text-primary font-bold italic">{t.settings.extremeMode}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-base-300 pt-6">
+            <h4 className="text-sm font-bold mb-4 flex items-center gap-2">
+              <SettingsIcon size={16} className="text-primary" /> {t.settings.readerTitle}
+            </h4>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-base-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Palette size={20} className="text-primary" />
+                  <div>
+                    <p className="font-bold text-sm">{t.settings.readerEnabled}</p>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={props.readerEnabled}
+                  onChange={(e) => props.setReaderEnabled(e.target.checked)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-xs">{t.settings.readerBg}</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      className="w-full h-10 rounded-lg cursor-pointer bg-transparent border-none"
+                      value={props.readerBg}
+                      onChange={(e) => props.setReaderBg(e.target.value)}
+                    />
+                    <span className="text-[10px] opacity-50 uppercase">{props.readerBg}</span>
+                  </div>
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-xs">{t.settings.readerText}</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      className="w-full h-10 rounded-lg cursor-pointer bg-transparent border-none"
+                      value={props.readerText}
+                      onChange={(e) => props.setReaderText(e.target.value)}
+                    />
+                    <span className="text-[10px] opacity-50 uppercase">{props.readerText}</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -27,9 +27,15 @@ const App: React.FC = () => {
   const [iconSize, setIconSize] = useStorage('icon-size', 64, 'localStorage');
   const [borderRadius, setBorderRadius] = useStorage('border-radius', 16, 'localStorage');
 
+  // Dark Mode Reader (Use chrome storage for sharing with content script)
+  const [readerEnabled, setReaderEnabled] = useStorage('readerEnabled', false, 'local');
+  const [readerBg, setReaderBg] = useStorage('readerBg', '#1a1a1a', 'local');
+  const [readerText, setReaderText] = useStorage('readerText', '#e5e5e5', 'local');
+
   // Temporary state for modal
   const [tempSettings, setTempSettings] = useState({
-    userName, theme, clockFont, iconShape, iconSize, borderRadius
+    userName, theme, clockFont, iconShape, iconSize, borderRadius,
+    readerEnabled, readerBg, readerText
   });
 
   useEffect(() => {
@@ -71,7 +77,10 @@ const App: React.FC = () => {
   }, []);
 
   const openSettings = () => {
-    setTempSettings({ userName, theme, clockFont, iconShape, iconSize, borderRadius });
+    setTempSettings({
+      userName, theme, clockFont, iconShape, iconSize, borderRadius,
+      readerEnabled, readerBg, readerText
+    });
     setShowSettings(true);
   };
 
@@ -82,6 +91,9 @@ const App: React.FC = () => {
     setIconShape(tempSettings.iconShape);
     setIconSize(tempSettings.iconSize);
     setBorderRadius(tempSettings.borderRadius);
+    setReaderEnabled(tempSettings.readerEnabled);
+    setReaderBg(tempSettings.readerBg);
+    setReaderText(tempSettings.readerText);
     setShowSettings(false);
   };
 
@@ -168,6 +180,12 @@ const App: React.FC = () => {
         setBorderRadius={(val) => setTempSettings({...tempSettings, borderRadius: val})}
         language={language}
         setLanguage={setLanguage}
+        readerEnabled={tempSettings.readerEnabled}
+        setReaderEnabled={(val) => setTempSettings({...tempSettings, readerEnabled: val})}
+        readerBg={tempSettings.readerBg}
+        setReaderBg={(val) => setTempSettings({...tempSettings, readerBg: val})}
+        readerText={tempSettings.readerText}
+        setReaderText={(val) => setTempSettings({...tempSettings, readerText: val})}
       />
     </div>
   );
