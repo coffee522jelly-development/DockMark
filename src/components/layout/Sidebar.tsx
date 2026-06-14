@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
         </div>
         <div>
           <h1 className="font-bold text-xl hidden lg:block text-base-content">MarkBrew</h1>
-          <span className="text-[10px] opacity-30 hidden lg:block -mt-1 font-medium">v1.0.0</span>
+          <span className="text-[10px] opacity-30 hidden lg:block -mt-1 font-medium">v1.0.1</span>
         </div>
       </div>
 

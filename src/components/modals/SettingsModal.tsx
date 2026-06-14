@@ -28,6 +28,8 @@ interface SettingsModalProps {
   setReaderBg: (color: string) => void;
   readerText: string;
   setReaderText: (color: string) => void;
+  readerBrightness: number;
+  setReaderBrightness: (val: number) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = (props) => {
@@ -209,6 +211,18 @@ const SettingsModal: React.FC<SettingsModalProps> = (props) => {
                     <span className="text-[10px] opacity-50 uppercase">{props.readerText}</span>
                   </div>
                 </div>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium text-xs">{t.settings.readerBrightness} ({Math.round(props.readerBrightness * 100)}%)</span>
+                </label>
+                <input
+                  type="range" min="0" max="1" step="0.05"
+                  className="range range-primary range-xs"
+                  value={props.readerBrightness}
+                  onChange={(e) => props.setReaderBrightness(Number(e.target.value))}
+                />
               </div>
             </div>
           </div>
