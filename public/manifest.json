@@ -23,7 +23,8 @@
     "newtab": "index.html"
   },
   "action": {
-    "default_title": "MarkBrew"
+    "default_title": "MarkBrew",
+    "default_popup": "popup.html"
   },
   "icons": {
     "128": "favicon.svg"

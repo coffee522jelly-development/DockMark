@@ -25,7 +25,7 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
     html, body {
       background-color: var(--mb-reader-bg) !important;
       color: var(--mb-reader-text) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: var(--mb-reader-bg) !important;
     }
 
     /* Global background and text overrides with exclusion for video players */
@@ -33,9 +33,9 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
     section, article, main, header, footer, nav, aside, table, tr, td, th, ul, ol, li, details, summary {
       background-color: var(--mb-reader-bg) !important;
       color: var(--mb-reader-text) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: var(--mb-reader-bg) !important;
       box-shadow: none !important;
-      outline-color: rgba(255, 255, 255, 0.1) !important;
+      outline-color: var(--mb-reader-bg) !important;
     }
 
     /* Ensure video player components are transparent */
@@ -80,7 +80,7 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
     *:before, *:after {
       background-color: transparent !important;
       color: var(--mb-reader-text) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: var(--mb-reader-bg) !important;
     }
 
     /* Force hide white backgrounds in icon containers, but check it's not a video component */
