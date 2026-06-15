@@ -10,15 +10,17 @@ const Popup = () => {
   const [text, setText] = useState('#e5e5e5');
   const [link, setLink] = useState('#60a5fa');
   const [brightness, setBrightness] = useState(0.7);
+  const [videoOpacity, setVideoOpacity] = useState(0.8);
   const [lang, setLang] = useState<Language>('en');
 
   useEffect(() => {
-    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness', 'language'], (res) => {
+    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness', 'readerVideoOpacity', 'language'], (res) => {
       setEnabled(res.readerEnabled || false);
       setBg(res.readerBg || '#1a1a1a');
       setText(res.readerText || '#e5e5e5');
       setLink(res.readerLink || '#60a5fa');
       setBrightness(res.readerBrightness !== undefined ? res.readerBrightness : 0.7);
+      setVideoOpacity(res.readerVideoOpacity !== undefined ? res.readerVideoOpacity : 0.8);
       setLang(res.language || 'en');
     });
   }, []);
@@ -114,22 +116,42 @@ const Popup = () => {
           </div>
         </div>
 
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text-alt font-medium flex items-center gap-1">
-              <Sun size={14} /> {t.settings.readerBrightness} ({Math.round(brightness * 100)}%)
-            </span>
-          </label>
-          <input
-            type="range" min="0" max="1" step="0.05"
-            className="range range-primary range-xs"
-            value={brightness}
-            onChange={(e) => {
-              const val = Number(e.target.value);
-              setBrightness(val);
-              save('readerBrightness', val);
-            }}
-          />
+        <div className="space-y-4">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text-alt font-medium flex items-center gap-1">
+                <Sun size={14} /> {t.settings.readerBrightness} ({Math.round(brightness * 100)}%)
+              </span>
+            </label>
+            <input
+              type="range" min="0" max="1" step="0.05"
+              className="range range-primary range-xs"
+              value={brightness}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setBrightness(val);
+                save('readerBrightness', val);
+              }}
+            />
+          </div>
+
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text-alt font-medium flex items-center gap-1">
+                <Sun size={14} className="opacity-50" /> {t.settings.readerVideoOpacity} ({Math.round(videoOpacity * 100)}%)
+              </span>
+            </label>
+            <input
+              type="range" min="0" max="1" step="0.05"
+              className="range range-secondary range-xs"
+              value={videoOpacity}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setVideoOpacity(val);
+                save('readerVideoOpacity', val);
+              }}
+            />
+          </div>
         </div>
       </div>
 

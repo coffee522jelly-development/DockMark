@@ -42,6 +42,7 @@ export const translations = {
       readerText: 'Text Color',
       readerLink: 'Link Color',
       readerBrightness: 'Image Brightness',
+      readerVideoOpacity: 'Video Opacity',
       cancel: 'Cancel',
       save: 'Save Changes'
     },
@@ -143,6 +144,7 @@ export const translations = {
       readerText: 'テキスト色',
       readerLink: 'リンクの色',
       readerBrightness: '画像の明るさ',
+      readerVideoOpacity: '動画の不透明度',
       cancel: 'キャンセル',
       save: '変更を保存'
     },

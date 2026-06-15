@@ -1,6 +1,6 @@
 const STYLE_ID = 'markbrew-dark-reader-style';
 
-function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, linkColor: string, brightness: number) {
+function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, linkColor: string, brightness: number, videoOpacity: number) {
   let styleTag = document.getElementById(STYLE_ID) as HTMLStyleElement;
 
   if (!enabled) {
@@ -20,6 +20,7 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       --mb-reader-text: ${textColor} !important;
       --mb-reader-link: ${linkColor} !important;
       --mb-reader-brightness: ${brightness} !important;
+      --mb-reader-video-opacity: ${videoOpacity} !important;
     }
 
     html, body {
@@ -77,13 +78,19 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       border-color: transparent !important;
     }
 
-    /* Videos remain at 100% brightness as per user request */
+    /* Videos use opacity as per user request */
     video {
       filter: none !important;
+      opacity: var(--mb-reader-video-opacity) !important;
+      transition: opacity 0.3s ease !important;
     }
 
     img:hover, svg:hover {
       filter: brightness(1) contrast(1) !important;
+    }
+
+    video:hover {
+      opacity: 1 !important;
     }
 
     /* Handle pseudo-elements */
@@ -114,26 +121,28 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
 }
 
 // Initial application
-chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness'], (result) => {
+chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness', 'readerVideoOpacity'], (result) => {
   applyDarkMode(
     result.readerEnabled || false,
     result.readerBg || '#1a1a1a',
     result.readerText || '#e5e5e5',
     result.readerLink || '#60a5fa',
-    result.readerBrightness !== undefined ? result.readerBrightness : 0.7
+    result.readerBrightness !== undefined ? result.readerBrightness : 0.7,
+    result.readerVideoOpacity !== undefined ? result.readerVideoOpacity : 0.8
   );
 });
 
 // Listen for changes
 chrome.storage.onChanged.addListener((_changes, area) => {
   if (area === 'local') {
-    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness'], (result) => {
+    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness', 'readerVideoOpacity'], (result) => {
       applyDarkMode(
         result.readerEnabled || false,
         result.readerBg || '#1a1a1a',
         result.readerText || '#e5e5e5',
         result.readerLink || '#60a5fa',
-        result.readerBrightness !== undefined ? result.readerBrightness : 0.7
+        result.readerBrightness !== undefined ? result.readerBrightness : 0.7,
+        result.readerVideoOpacity !== undefined ? result.readerVideoOpacity : 0.8
       );
     });
   }
