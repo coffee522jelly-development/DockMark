@@ -28,9 +28,11 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       border-color: var(--mb-reader-bg) !important;
     }
 
-    /* Global background and text overrides with exclusion for video players */
-    div:not([class*="player"]):not([id*="player"]):not([class*="video"]):not([id*="video"]):not(.ytp-ad-overlay-container),
-    section, article, main, header, footer, nav, aside, table, tr, td, th, ul, ol, li, details, summary {
+    /* Global background and text overrides with extremely strict exclusion for any media containers */
+    div:not([class*="player"]):not([id*="player"]):not([class*="video"]):not([id*="video"]):not([class*="ytp-"]):not([id*="ytp-"]):not([class*="vjs-"]):not([class*="jw-"]):not([class*="plyr"]):not(:has(video)):not(:has(iframe)),
+    section:not(:has(video)):not(:has(iframe)),
+    article:not(:has(video)):not(:has(iframe)),
+    main, header, footer, nav, aside, table, tr, td, th, ul, ol, li, details, summary {
       background-color: var(--mb-reader-bg) !important;
       color: var(--mb-reader-text) !important;
       border-color: var(--mb-reader-bg) !important;
@@ -38,14 +40,22 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       outline-color: var(--mb-reader-bg) !important;
     }
 
-    /* Ensure video player components are transparent */
-    [class*="player"], [id*="player"], [class*="video"], [id*="video"], .ytp-chrome-bottom, .ytp-chrome-top, .ytp-gradient-bottom, .ytp-gradient-top {
+    /* Force transparency on ALL elements within a suspected player or containing media */
+    [class*="player"], [id*="player"], [class*="video"], [id*="video"], [class*="ytp-"], [id*="ytp-"],
+    [class*="player"] *, [id*="player"] *, [class*="video"] *, [id*="video"] *, [class*="ytp-"] *, [id*="ytp-"] *,
+    video, iframe, canvas, .ytp-chrome-bottom, .ytp-gradient-bottom, .ytp-gradient-top {
       background-color: transparent !important;
     }
 
-    /* Target specific YouTube controls to keep them visible but dark-ish */
-    .ytp-button, .ytp-time-display, .ytp-settings-button {
+    /* Specifically ensure video overlays and ads don't get covered */
+    .ytp-ad-overlay-container, .ytp-ad-image-overlay, .ytp-iv-video-content, .ytp-upnext {
+      background-color: transparent !important;
+    }
+
+    /* Target specific controls to keep them readable but non-blocking */
+    .ytp-button, .ytp-time-display, .ytp-settings-button, .ytp-volume-panel, .ytp-fullscreen-button {
       color: var(--mb-reader-text) !important;
+      background: transparent !important;
     }
 
     /* Text elements */
@@ -60,19 +70,19 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       text-decoration-color: var(--mb-reader-link) !important;
     }
 
-    /* Media handling */
-    img, video, canvas, iframe, svg {
+    /* Media handling - specifically excludes video from filters to avoid double-dimming */
+    img, canvas, iframe, svg {
       filter: brightness(var(--mb-reader-brightness)) contrast(1.1) !important;
       transition: filter 0.3s ease !important;
       border-color: transparent !important;
     }
 
-    /* Do NOT apply background to video tags directly */
+    /* Videos remain at 100% brightness as per user request */
     video {
-      background-color: transparent !important;
+      filter: none !important;
     }
 
-    img:hover, video:hover, svg:hover {
+    img:hover, svg:hover {
       filter: brightness(1) contrast(1) !important;
     }
 
@@ -83,8 +93,8 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, lin
       border-color: var(--mb-reader-bg) !important;
     }
 
-    /* Force hide white backgrounds in icon containers, but check it's not a video component */
-    [class*="icon"]:not([class*="player"]), [class*="logo"], .fa, .fas, .far, .fab, .material-icons {
+    /* Force hide white backgrounds in icon containers */
+    [class*="icon"]:not([class*="player"]):not([class*="ytp-"]), [class*="logo"], .fa, .fas, .far, .fab, .material-icons {
       background-color: transparent !important;
       border-color: transparent !important;
       box-shadow: none !important;

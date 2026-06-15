@@ -19,6 +19,15 @@ export function useStorage<T>(key: string, initialValue: T, type: 'local' | 'syn
           setStoredValue(result[key]);
         }
       });
+
+      // Listen for changes to keep state in sync across different extension parts
+      const listener = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
+        if (area === 'local' && changes[key]) {
+          setStoredValue(changes[key].newValue);
+        }
+      };
+      chrome.storage.onChanged.addListener(listener);
+      return () => chrome.storage.onChanged.removeListener(listener);
     }
   }, [key, type]);
 

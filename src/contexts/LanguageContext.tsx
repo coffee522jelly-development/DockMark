@@ -11,7 +11,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useStorage<Language>('app-language', 'en', 'localStorage');
+  const [language, setLanguage] = useStorage<Language>('language', 'en', 'local');
 
   const value = {
     language,
