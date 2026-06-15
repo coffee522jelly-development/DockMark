@@ -31,12 +31,13 @@ const App: React.FC = () => {
   const [readerEnabled, setReaderEnabled] = useStorage('readerEnabled', false, 'local');
   const [readerBg, setReaderBg] = useStorage('readerBg', '#1a1a1a', 'local');
   const [readerText, setReaderText] = useStorage('readerText', '#e5e5e5', 'local');
+  const [readerLink, setReaderLink] = useStorage('readerLink', '#60a5fa', 'local');
   const [readerBrightness, setReaderBrightness] = useStorage('readerBrightness', 0.7, 'local');
 
   // Temporary state for modal
   const [tempSettings, setTempSettings] = useState({
     userName, theme, clockFont, iconShape, iconSize, borderRadius,
-    readerEnabled, readerBg, readerText, readerBrightness
+    readerEnabled, readerBg, readerText, readerLink, readerBrightness
   });
 
   useEffect(() => {
@@ -80,7 +81,7 @@ const App: React.FC = () => {
   const openSettings = () => {
     setTempSettings({
       userName, theme, clockFont, iconShape, iconSize, borderRadius,
-      readerEnabled, readerBg, readerText, readerBrightness
+      readerEnabled, readerBg, readerText, readerLink, readerBrightness
     });
     setShowSettings(true);
   };
@@ -95,6 +96,7 @@ const App: React.FC = () => {
     setReaderEnabled(tempSettings.readerEnabled);
     setReaderBg(tempSettings.readerBg);
     setReaderText(tempSettings.readerText);
+    setReaderLink(tempSettings.readerLink);
     setReaderBrightness(tempSettings.readerBrightness);
     setShowSettings(false);
   };
@@ -188,6 +190,8 @@ const App: React.FC = () => {
         setReaderBg={(val) => setTempSettings({...tempSettings, readerBg: val})}
         readerText={tempSettings.readerText}
         setReaderText={(val) => setTempSettings({...tempSettings, readerText: val})}
+        readerLink={tempSettings.readerLink}
+        setReaderLink={(val) => setTempSettings({...tempSettings, readerLink: val})}
         readerBrightness={tempSettings.readerBrightness}
         setReaderBrightness={(val) => setTempSettings({...tempSettings, readerBrightness: val})}
       />

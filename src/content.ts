@@ -1,6 +1,6 @@
 const STYLE_ID = 'markbrew-dark-reader-style';
 
-function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, brightness: number) {
+function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, linkColor: string, brightness: number) {
   let styleTag = document.getElementById(STYLE_ID) as HTMLStyleElement;
 
   if (!enabled) {
@@ -11,7 +11,6 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, bri
   if (!styleTag) {
     styleTag = document.createElement('style');
     styleTag.id = STYLE_ID;
-    // Append to head if possible, otherwise documentElement
     (document.head || document.documentElement).appendChild(styleTag);
   }
 
@@ -19,49 +18,78 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, bri
     :root {
       --mb-reader-bg: ${bgColor} !important;
       --mb-reader-text: ${textColor} !important;
+      --mb-reader-link: ${linkColor} !important;
       --mb-reader-brightness: ${brightness} !important;
     }
 
-    html {
-      background-color: var(--mb-reader-bg) !important;
-    }
-
-    body {
-      background-color: var(--mb-reader-bg) !important;
-      color: var(--mb-reader-text) !important;
-    }
-
-    /* Global background and text overrides */
-    div, section, article, main, header, footer, nav, aside, table, tr, td, th {
+    html, body {
       background-color: var(--mb-reader-bg) !important;
       color: var(--mb-reader-text) !important;
       border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
+    /* Global background and text overrides with exclusion for video players */
+    div:not([class*="player"]):not([id*="player"]):not([class*="video"]):not([id*="video"]):not(.ytp-ad-overlay-container),
+    section, article, main, header, footer, nav, aside, table, tr, td, th, ul, ol, li, details, summary {
+      background-color: var(--mb-reader-bg) !important;
+      color: var(--mb-reader-text) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: none !important;
+      outline-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Ensure video player components are transparent */
+    [class*="player"], [id*="player"], [class*="video"], [id*="video"], .ytp-chrome-bottom, .ytp-chrome-top, .ytp-gradient-bottom, .ytp-gradient-top {
+      background-color: transparent !important;
+    }
+
+    /* Target specific YouTube controls to keep them visible but dark-ish */
+    .ytp-button, .ytp-time-display, .ytp-settings-button {
+      color: var(--mb-reader-text) !important;
+    }
+
     /* Text elements */
-    h1, h2, h3, h4, h5, h6, p, span, li, a, b, i, strong, em, small, code, pre {
+    h1, h2, h3, h4, h5, h6, p, span, li, b, i, strong, em, small, code, pre {
       color: var(--mb-reader-text) !important;
       background-color: transparent !important;
     }
 
     /* Links */
-    a {
-      color: #60a5fa !important;
-      text-decoration-color: rgba(96, 165, 250, 0.4) !important;
+    a, a * {
+      color: var(--mb-reader-link) !important;
+      text-decoration-color: var(--mb-reader-link) !important;
     }
 
-    /* Media handling with improved darkening */
+    /* Media handling */
     img, video, canvas, iframe, svg {
       filter: brightness(var(--mb-reader-brightness)) contrast(1.1) !important;
       transition: filter 0.3s ease !important;
+      border-color: transparent !important;
     }
 
-    /* Restore brightness on hover for better UX */
+    /* Do NOT apply background to video tags directly */
+    video {
+      background-color: transparent !important;
+    }
+
     img:hover, video:hover, svg:hover {
       filter: brightness(1) contrast(1) !important;
     }
 
-    /* Specific background-image handling for common containers */
+    /* Handle pseudo-elements */
+    *:before, *:after {
+      background-color: transparent !important;
+      color: var(--mb-reader-text) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Force hide white backgrounds in icon containers, but check it's not a video component */
+    [class*="icon"]:not([class*="player"]), [class*="logo"], .fa, .fas, .far, .fab, .material-icons {
+      background-color: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+
     [style*="background-image"] {
       filter: brightness(var(--mb-reader-brightness)) !important;
     }
@@ -76,11 +104,12 @@ function applyDarkMode(enabled: boolean, bgColor: string, textColor: string, bri
 }
 
 // Initial application
-chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerBrightness'], (result) => {
+chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness'], (result) => {
   applyDarkMode(
     result.readerEnabled || false,
     result.readerBg || '#1a1a1a',
     result.readerText || '#e5e5e5',
+    result.readerLink || '#60a5fa',
     result.readerBrightness !== undefined ? result.readerBrightness : 0.7
   );
 });
@@ -88,11 +117,12 @@ chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerBrig
 // Listen for changes
 chrome.storage.onChanged.addListener((_changes, area) => {
   if (area === 'local') {
-    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerBrightness'], (result) => {
+    chrome.storage.local.get(['readerEnabled', 'readerBg', 'readerText', 'readerLink', 'readerBrightness'], (result) => {
       applyDarkMode(
         result.readerEnabled || false,
         result.readerBg || '#1a1a1a',
         result.readerText || '#e5e5e5',
+        result.readerLink || '#60a5fa',
         result.readerBrightness !== undefined ? result.readerBrightness : 0.7
       );
     });

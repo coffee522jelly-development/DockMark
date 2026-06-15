@@ -28,6 +28,8 @@ interface SettingsModalProps {
   setReaderBg: (color: string) => void;
   readerText: string;
   setReaderText: (color: string) => void;
+  readerLink: string;
+  setReaderLink: (color: string) => void;
   readerBrightness: number;
   setReaderBrightness: (val: number) => void;
 }
@@ -182,33 +184,47 @@ const SettingsModal: React.FC<SettingsModalProps> = (props) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text text-xs">{t.settings.readerBg}</span>
+                    <span className="label-text text-[10px]">{t.settings.readerBg}</span>
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-center gap-1">
                     <input
                       type="color"
                       className="w-full h-10 rounded-lg cursor-pointer bg-transparent border-none"
                       value={props.readerBg}
                       onChange={(e) => props.setReaderBg(e.target.value)}
                     />
-                    <span className="text-[10px] opacity-50 uppercase">{props.readerBg}</span>
+                    <span className="text-[9px] opacity-50 uppercase">{props.readerBg}</span>
                   </div>
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text text-xs">{t.settings.readerText}</span>
+                    <span className="label-text text-[10px]">{t.settings.readerText}</span>
                   </label>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-center gap-1">
                     <input
                       type="color"
                       className="w-full h-10 rounded-lg cursor-pointer bg-transparent border-none"
                       value={props.readerText}
                       onChange={(e) => props.setReaderText(e.target.value)}
                     />
-                    <span className="text-[10px] opacity-50 uppercase">{props.readerText}</span>
+                    <span className="text-[9px] opacity-50 uppercase">{props.readerText}</span>
+                  </div>
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-[10px]">{t.settings.readerLink}</span>
+                  </label>
+                  <div className="flex flex-col items-center gap-1">
+                    <input
+                      type="color"
+                      className="w-full h-10 rounded-lg cursor-pointer bg-transparent border-none"
+                      value={props.readerLink}
+                      onChange={(e) => props.setReaderLink(e.target.value)}
+                    />
+                    <span className="text-[9px] opacity-50 uppercase">{props.readerLink}</span>
                   </div>
                 </div>
               </div>

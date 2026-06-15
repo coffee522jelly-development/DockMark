@@ -40,6 +40,7 @@ export const translations = {
       readerEnabled: 'Enable Reader',
       readerBg: 'Background Color',
       readerText: 'Text Color',
+      readerLink: 'Link Color',
       readerBrightness: 'Image Brightness',
       cancel: 'Cancel',
       save: 'Save Changes'
@@ -140,6 +141,7 @@ export const translations = {
       readerEnabled: 'リーダーを有効化',
       readerBg: '背景色',
       readerText: 'テキスト色',
+      readerLink: 'リンクの色',
       readerBrightness: '画像の明るさ',
       cancel: 'キャンセル',
       save: '変更を保存'
