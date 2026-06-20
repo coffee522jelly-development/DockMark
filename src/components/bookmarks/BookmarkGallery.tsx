@@ -333,9 +333,9 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
                   </div>
                   <GlassCard className="flex flex-wrap gap-3 p-6">
                     {items.map((bookmark) => (
-                      <div key={bookmark.id} className="group relative">
-                        <button onClick={() => window.open(bookmark.url, '_blank')} className={`btn btn-outline ${getFolderColor(bookmark.parentId)} normal-case font-medium pr-16 group-hover:shadow-md transition-all text-left block h-auto py-2 min-h-[2.5rem]`}>
-                          <span className="truncate max-w-[150px] block">{bookmark.title}</span>
+                      <div key={bookmark.id} className="group relative w-56">
+                        <button onClick={() => window.open(bookmark.url, '_blank')} className={`btn btn-outline w-full ${getFolderColor(bookmark.parentId)} normal-case font-medium pr-16 group-hover:shadow-md transition-all text-left block h-auto py-2 min-h-[2.5rem]`}>
+                          <span className="truncate w-full block">{bookmark.title}</span>
                         </button>
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">
@@ -351,9 +351,9 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
             ) : (
               <GlassCard className="flex flex-wrap gap-3 p-6">
                 {filteredBookmarks.map((bookmark) => (
-                  <div key={bookmark.id} className="group relative">
-                    <button onClick={() => window.open(bookmark.url, '_blank')} className={`btn btn-outline ${getFolderColor(bookmark.parentId)} normal-case font-medium pr-16 group-hover:shadow-md transition-all text-left block h-auto py-2 min-h-[2.5rem]`}>
-                      <span className="truncate max-w-[150px] block">{bookmark.title}</span>
+                  <div key={bookmark.id} className="group relative w-56">
+                    <button onClick={() => window.open(bookmark.url, '_blank')} className={`btn btn-outline w-full ${getFolderColor(bookmark.parentId)} normal-case font-medium pr-16 group-hover:shadow-md transition-all text-left block h-auto py-2 min-h-[2.5rem]`}>
+                      <span className="truncate w-full block">{bookmark.title}</span>
                     </button>
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={(e) => { e.stopPropagation(); handleDownloadMarkdown(bookmark); }} className="btn btn-ghost btn-xs btn-circle" title="Save as Markdown">
