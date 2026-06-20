@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Cpu, HardDrive } from 'lucide-react';
+import { Cpu, HardDrive, Monitor, Database } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import { useTranslation } from '../../contexts/LanguageContext';
 
@@ -7,6 +7,8 @@ const SystemMonitorWidget: React.FC = () => {
   const { t } = useTranslation();
   const [memoryInfo, setMemoryInfo] = useState<chrome.system.memory.MemoryInfo | null>(null);
   const [cpuInfo, setCpuInfo] = useState<chrome.system.cpu.CpuInfo | null>(null);
+  const [storageInfo, setStorageInfo] = useState<chrome.system.storage.StorageUnitInfo[]>([]);
+  const [displayInfo, setDisplayInfo] = useState<chrome.system.display.DisplayInfo[]>([]);
 
   useEffect(() => {
     const fetchSystemInfo = () => {
@@ -17,10 +19,18 @@ const SystemMonitorWidget: React.FC = () => {
         if (chrome.system.cpu) {
           chrome.system.cpu.getInfo((info) => setCpuInfo(info));
         }
+        if (chrome.system.storage) {
+          chrome.system.storage.getInfo((info) => setStorageInfo(info));
+        }
+        if (chrome.system.display) {
+          chrome.system.display.getInfo((info) => setDisplayInfo(info));
+        }
       } else {
         // Mock data for dev
         setMemoryInfo({ capacity: 17179869184, availableCapacity: 8589934592 });
-        setCpuInfo({ numOfProcessors: 8, modelName: "Mock CPU (8 cores)", archName: "x86_64", features: [], processors: new Array(8).fill({ usage: { kernel: 0, user: 0, idle: 0, total: 100 } }) });
+        setCpuInfo({ numOfProcessors: 8, modelName: "Mock CPU (8 cores)", archName: "x86_64", features: ['mmx', 'sse'], processors: new Array(8).fill({ usage: { kernel: 10, user: 20, idle: 70, total: 100 } }) });
+        setStorageInfo([{ id: '1', name: 'Macintosh HD', type: 'fixed', capacity: 512110190592 }]);
+        setDisplayInfo([{ id: '1', name: 'Built-in Retina Display', activeState: 'active', bounds: { left: 0, top: 0, width: 2560, height: 1600 } } as any]);
       }
     };
 
@@ -75,15 +85,65 @@ const SystemMonitorWidget: React.FC = () => {
               <Cpu size={14} /> CPU
             </div>
             {cpuInfo ? (
-              <div className="text-xs space-y-1 opacity-80">
+              <div className="text-xs space-y-2 opacity-80">
                 <p className="truncate" title={cpuInfo.modelName}>{cpuInfo.modelName}</p>
-                <p className="text-[10px] opacity-60">Architecture: {cpuInfo.archName}</p>
-                <p className="text-[10px] opacity-60">Logical Processors: {cpuInfo.processors.length}</p>
+                <div className="flex justify-between">
+                  <p className="text-[10px] opacity-60">Arch: {cpuInfo.archName}</p>
+                  <p className="text-[10px] opacity-60">Cores: {cpuInfo.numOfProcessors}</p>
+                </div>
+                <div className="grid grid-cols-4 gap-1 mt-2">
+                  {cpuInfo.processors.map((p, i) => {
+                    const usagePercent = p.usage.total > 0 ? Math.round(((p.usage.user + p.usage.kernel) / p.usage.total) * 100) : 0;
+                    return (
+                      <div key={i} className="text-[8px] flex flex-col items-center opacity-70">
+                        <div className="w-full bg-base-300 h-1 mb-1 rounded-full overflow-hidden">
+                          <div className="bg-info h-full transition-all" style={{ width: `${usagePercent}%` }} />
+                        </div>
+                        {usagePercent}%
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               <div className="text-xs opacity-50">Loading CPU Info...</div>
             )}
           </div>
+
+          {/* Displays Section */}
+          {displayInfo.length > 0 && (
+            <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
+              <div className="text-xs font-semibold flex items-center gap-1 mb-2">
+                <Monitor size={14} /> Displays
+              </div>
+              <div className="text-[10px] space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
+                {displayInfo.map((d) => (
+                  <div key={d.id} className="flex justify-between items-center bg-base-300/30 p-1 rounded">
+                    <span className="truncate max-w-[80px]" title={d.name}>{d.name}</span>
+                    <span>{d.bounds.width}x{d.bounds.height}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Storage Section */}
+          {storageInfo.length > 0 && (
+            <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
+              <div className="text-xs font-semibold flex items-center gap-1 mb-2">
+                <Database size={14} /> Storage Devices
+              </div>
+              <div className="text-[10px] space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
+                {storageInfo.map(s => (
+                  <div key={s.id} className="flex justify-between items-center bg-base-300/30 p-1 rounded">
+                    <span className="truncate max-w-[80px]" title={s.name}>{s.name} ({s.type})</span>
+                    <span>{formatBytes(s.capacity)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </GlassCard>
