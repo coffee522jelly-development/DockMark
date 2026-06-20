@@ -8,8 +8,9 @@ import TimerWidget from './widgets/TimerWidget';
 import WeatherWidget from './widgets/WeatherWidget';
 import RssWidget from './widgets/RssWidget';
 import BookmarksWidget from './widgets/BookmarksWidget';
+import SystemMonitorWidget from './widgets/SystemMonitorWidget';
 
-type WidgetId = 'clock' | 'calendar' | 'search' | 'weather' | 'timer' | 'todo' | 'notes' | 'rss' | 'bookmarks';
+type WidgetId = 'clock' | 'calendar' | 'search' | 'weather' | 'timer' | 'todo' | 'notes' | 'rss' | 'bookmarks' | 'system';
 
 const widgetComponents: Record<WidgetId, React.FC> = {
   clock: ClockWidget,
@@ -21,9 +22,10 @@ const widgetComponents: Record<WidgetId, React.FC> = {
   notes: NotesWidget,
   rss: RssWidget,
   bookmarks: BookmarksWidget,
+  system: SystemMonitorWidget,
 };
 
-const defaultOrder: WidgetId[] = ['clock', 'calendar', 'search', 'weather', 'timer', 'todo', 'notes', 'rss', 'bookmarks'];
+const defaultOrder: WidgetId[] = ['clock', 'calendar', 'search', 'weather', 'timer', 'todo', 'notes', 'rss', 'bookmarks', 'system'];
 
 const Dock: React.FC = () => {
   const [order, setOrder] = useState<WidgetId[]>(defaultOrder);

@@ -65,7 +65,8 @@ export const translations = {
       timer: { title: 'Timer', finished: 'Timer finished! Time to take a break.', add: 'Add', custom: 'min' },
       notes: { title: 'Sticky Note', placeholder: 'Type your notes here...' },
       rss: { title: 'RSS Reader', empty: 'No feeds registered or found.', help: 'Go to RSS Feeds to add some.' },
-      bookmarks: { title: 'Bookmarks', empty: 'No bookmarks in Bookmark Bar.' }
+      bookmarks: { title: 'Bookmarks', empty: 'No bookmarks in Bookmark Bar.' },
+      system: { title: 'System Monitor' }
     },
     snippets: {
       title: 'Code Snippets',
@@ -167,7 +168,8 @@ export const translations = {
       timer: { title: 'タイマー', finished: 'タイマー終了！休憩しましょう。', add: '追加', custom: '分' },
       notes: { title: '付箋', placeholder: 'メモを入力...' },
       rss: { title: 'RSSリーダー', empty: 'フィードが登録されていないか見つかりません。', help: 'RSSフィードから追加してください。' },
-      bookmarks: { title: 'ブックマーク', empty: 'ブックマークバーに項目がありません。' }
+      bookmarks: { title: 'ブックマーク', empty: 'ブックマークバーに項目がありません。' },
+      system: { title: 'システムモニター' }
     },
     snippets: {
       title: 'コードスニペット',
