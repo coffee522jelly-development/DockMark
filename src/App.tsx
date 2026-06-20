@@ -13,7 +13,6 @@ import { TabType, tabOrder } from './config';
 import { useTranslation } from './contexts/LanguageContext';
 
 const App: React.FC = () => {
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('dock');
   const [showSettings, setShowSettings] = useState(false);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: string }[]>([]);
@@ -118,13 +117,6 @@ const App: React.FC = () => {
 
       <main className="flex-1 overflow-auto p-4 lg:p-8 bg-transparent">
         <div className="max-w-7xl mx-auto">
-          <header className="mb-8 flex justify-between items-center">
-            <div className="bg-base-100/40 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-              <h2 className="text-3xl font-bold text-base-content">{t.header.welcome}, {userName}!</h2>
-              <p className="text-base-content/70">{t.header.happening}</p>
-            </div>
-          </header>
-
           {activeTab === 'dock' && <Dock />}
           {activeTab === 'bookmark' && <BookmarkManager />}
           {['buttons', 'cards', 'bookshelf', 'icons', 'tables', 'timeline'].includes(activeTab) && (
