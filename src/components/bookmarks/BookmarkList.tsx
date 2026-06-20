@@ -15,7 +15,7 @@ const BookmarkItem: React.FC<{
   onEdit: (node: BookmarkNode) => void,
   onMove: (id: string, parentId: string) => void
 }> = ({ node, depth, onDelete, onEdit, onMove }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(depth === 0);
   const [isDragOver, setIsDragOver] = useState(false);
   const isFolder = !!node.children;
 
