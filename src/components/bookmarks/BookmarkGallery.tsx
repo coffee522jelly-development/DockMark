@@ -690,7 +690,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               const chromeExtensionId = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome.runtime.id : '';
               const faviconUrl = `chrome-extension://${chromeExtensionId}/_favicon/?pageUrl=${encodeURIComponent(bookmark.url)}&size=64`;
               return (
-                <div key={bookmark.id} className={`group relative transition-all duration-200 ${draggedId === bookmark.id ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`} draggable onDragStart={() => handleDragStart(bookmark.id)} onDragOver={(e) => handleDragOver(e, bookmark.id)} onDragEnd={handleDragEnd}>
+                <div key={bookmark.id} className={`group relative transition-all duration-200 hover:z-50 ${draggedId === bookmark.id ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}`} draggable onDragStart={() => handleDragStart(bookmark.id)} onDragOver={(e) => handleDragOver(e, bookmark.id)} onDragEnd={handleDragEnd}>
                       <div onClick={() => window.open(bookmark.url, '_blank')} className="tooltip tooltip-bottom" data-tip={bookmark.title}>
                         <button className={`btn btn-ghost p-2 hover:bg-primary/20 hover:text-primary transition-all overflow-hidden border border-base-300 cursor-move shadow-sm relative group/fav`} style={{ width: `${iconSize}px`, height: `${iconSize}px`, borderRadius: iconShape === 'round' ? '9999px' : undefined }}>
                           <img
