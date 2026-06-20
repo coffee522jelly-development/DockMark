@@ -39,13 +39,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
         </div>
       </div>
 
-      <nav className="flex-1 px-2 py-4 space-y-2">
+      <nav className="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
         {menuItems.map((item) => (
           <React.Fragment key={item.id}>
             {item.divider && <div className="border-t border-base-300 my-2 opacity-50"></div>}
             <button
               onClick={() => setActiveTab(item.id as TabType)}
-              className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+              className={`w-full flex items-center justify-center lg:justify-start gap-3 py-2 px-3 rounded-xl transition-all ${
                 activeTab === item.id ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
               }`}
             >
@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, openSettings
       <div className="p-4 border-t border-base-300">
         <button
           onClick={openSettings}
-          className="w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
+          className="w-full flex items-center justify-center lg:justify-start gap-3 py-2 px-3 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
         >
           <Settings size={20} />
           <span className="font-medium hidden lg:block text-base-content text-left flex-1">{t.sidebar.settings}</span>
