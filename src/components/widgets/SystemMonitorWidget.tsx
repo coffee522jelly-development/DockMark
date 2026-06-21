@@ -7,6 +7,7 @@ const SystemMonitorWidget: React.FC = () => {
   const { t } = useTranslation();
   const [memoryInfo, setMemoryInfo] = useState<chrome.system.memory.MemoryInfo | null>(null);
   const [cpuInfo, setCpuInfo] = useState<chrome.system.cpu.CpuInfo | null>(null);
+  const [prevCpuInfo, setPrevCpuInfo] = useState<chrome.system.cpu.CpuInfo | null>(null);
   const [storageInfo, setStorageInfo] = useState<chrome.system.storage.StorageUnitInfo[]>([]);
   const [displayInfo, setDisplayInfo] = useState<chrome.system.display.DisplayInfo[]>([]);
 
@@ -17,7 +18,12 @@ const SystemMonitorWidget: React.FC = () => {
           chrome.system.memory.getInfo((info) => setMemoryInfo(info));
         }
         if (chrome.system.cpu) {
-          chrome.system.cpu.getInfo((info) => setCpuInfo(info));
+          chrome.system.cpu.getInfo((info) => {
+            setCpuInfo((prev) => {
+              if (prev) setPrevCpuInfo(prev);
+              return info;
+            });
+          });
         }
         if (chrome.system.storage) {
           chrome.system.storage.getInfo((info) => setStorageInfo(info));
@@ -93,7 +99,15 @@ const SystemMonitorWidget: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-4 gap-1 mt-2">
                   {cpuInfo.processors.map((p, i) => {
-                    const usagePercent = p.usage.total > 0 ? Math.round(((p.usage.user + p.usage.kernel) / p.usage.total) * 100) : 0;
+                    let usagePercent = 0;
+                    if (prevCpuInfo && prevCpuInfo.processors[i]) {
+                      const prevP = prevCpuInfo.processors[i];
+                      const active = (p.usage.user + p.usage.kernel) - (prevP.usage.user + prevP.usage.kernel);
+                      const total = p.usage.total - prevP.usage.total;
+                      usagePercent = total > 0 ? Math.round((active / total) * 100) : 0;
+                    } else {
+                      usagePercent = p.usage.total > 0 ? Math.round(((p.usage.user + p.usage.kernel) / p.usage.total) * 100) : 0;
+                    }
                     return (
                       <div key={i} className="text-[8px] flex flex-col items-center opacity-70">
                         <div className="w-full bg-base-300 h-1 mb-1 rounded-full overflow-hidden">

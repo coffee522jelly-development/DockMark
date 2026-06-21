@@ -54,7 +54,10 @@ export const translations = {
       timelineDesc: 'View your bookmarks in chronological order.',
       managerDesc: 'Organize and manage your browser bookmarks.',
       addFolder: 'New Folder',
-      folderName: 'Folder Name'
+      folderName: 'Folder Name',
+      galleryTitle: 'Bookmark {mode}',
+      galleryDesc: 'Browse and manage your bookmarks in {mode} view.',
+      gallerySearch: 'Search {mode}...'
     },
     widgets: {
       clock: { dateLocale: 'en-US' },
@@ -157,7 +160,10 @@ export const translations = {
       timelineDesc: 'ブックマークを登録日時の順に表示します。',
       managerDesc: 'ブラウザのブックマークを整理・管理します。',
       addFolder: '新規フォルダ',
-      folderName: 'フォルダ名'
+      folderName: 'フォルダ名',
+      galleryTitle: 'ブックマーク ({mode})',
+      galleryDesc: '{mode}表示でブックマークを閲覧・管理します。',
+      gallerySearch: '{mode}を検索...'
     },
     widgets: {
       clock: { dateLocale: 'ja-JP' },

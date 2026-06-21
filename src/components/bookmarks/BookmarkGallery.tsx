@@ -296,8 +296,8 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <PageHeader
-        title={viewMode === 'timeline' ? t.bookmarks.timelineTitle : `Bookmark ${viewMode.charAt(0).toUpperCase() + viewMode.slice(1)}`}
-        description={viewMode === 'timeline' ? t.bookmarks.timelineDesc : `Browse and manage your bookmarks in ${viewMode} view.`}
+        title={viewMode === 'timeline' ? t.bookmarks.timelineTitle : t.bookmarks.galleryTitle?.replace('{mode}', t.sidebar[viewMode]) || `Bookmark ${viewMode}`}
+        description={viewMode === 'timeline' ? t.bookmarks.timelineDesc : t.bookmarks.galleryDesc?.replace('{mode}', t.sidebar[viewMode]) || `Browse and manage your bookmarks in ${viewMode} view.`}
         icon={Bookmark}
         action={
           <div className="flex flex-wrap items-center gap-4">
@@ -311,7 +311,7 @@ const BookmarkGallery: React.FC<BookmarkGalleryProps> = ({ viewMode, iconShape =
               <span className="absolute inset-y-0 left-3 flex items-center text-base-content/40"><Search size={18} /></span>
               <input
                 type="text"
-                placeholder={`Search ${viewMode}...`}
+                placeholder={t.bookmarks.gallerySearch?.replace('{mode}', t.sidebar[viewMode]) || `Search ${viewMode}...`}
                 className="input input-bordered w-full pl-10 bg-base-100/50 border-white/10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
