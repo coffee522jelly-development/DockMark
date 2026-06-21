@@ -119,3 +119,21 @@ async function handleSaveSnippet(info: chrome.contextMenus.OnClickData, tab: chr
     console.error("Failed to extract text", err);
   }
 }
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'pomodoroTimer') {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'favicon.svg',
+      title: 'MarkBrew Timer',
+      message: 'タイマーが終了しました！ / Timer finished!',
+      priority: 2
+    });
+
+    // Clear the active timer state
+    chrome.storage.local.get(['timerState'], (result) => {
+      const state = result.timerState || {};
+      chrome.storage.local.set({ timerState: { ...state, endTime: null, isActive: false } });
+    });
+  }
+});

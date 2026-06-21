@@ -3,7 +3,7 @@
   "name": "MarkBrew",
   "version": "1.0.1",
   "description": "A productivity dashboard and bookmark organizer for your new tab.",
-  "permissions": ["bookmarks", "storage", "geolocation", "favicon", "contextMenus", "scripting", "tabGroups", "tabs", "sessions", "system.memory", "system.cpu", "system.storage", "system.display"],
+  "permissions": ["alarms", "notifications", "bookmarks", "storage", "geolocation", "favicon", "contextMenus", "scripting", "tabGroups", "tabs", "sessions", "system.memory", "system.cpu", "system.storage", "system.display"],
   "host_permissions": ["<all_urls>"],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"

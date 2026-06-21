@@ -6,12 +6,17 @@ import { useStorage } from '../../hooks/useStorage';
 
 const DEFAULT_PRESETS = [5, 15, 25, 45, 60, 90];
 
+interface TimerState {
+  isActive: boolean;
+  endTime: number | null;
+  duration: number;
+}
+
 const TimerWidget: React.FC = () => {
   const { t } = useTranslation();
   const [presets, setPresets] = useStorage<number[]>('timer-presets', DEFAULT_PRESETS, 'local');
-  const [duration, setDuration] = useState(25); // current selection in minutes
+  const [timerState, setTimerState] = useStorage<TimerState>('timerState', { isActive: false, endTime: null, duration: 25 }, 'local');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isActive, setIsActive] = useState(false);
   const [customValue, setCustomValue] = useState('');
   const [showPresets, setShowPresets] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -29,32 +34,68 @@ const TimerWidget: React.FC = () => {
   useEffect(() => {
     let interval: number | undefined;
 
-    if (isActive && timeLeft > 0) {
-      interval = window.setInterval(() => {
-        setTimeLeft((time) => time - 1);
-      }, 1000);
-    } else if (isActive && timeLeft === 0) {
-      setIsActive(false);
-      window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { message: t.widgets.timer.finished, type: 'success' }
-      }));
+    if (timerState.isActive && timerState.endTime) {
+      const updateTimer = () => {
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((timerState.endTime! - now) / 1000));
+        setTimeLeft(remaining);
+
+        if (remaining <= 0) {
+          setTimerState(prev => ({ ...prev, isActive: false, endTime: null }));
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: t.widgets.timer.finished, type: 'success' }
+          }));
+          if (typeof chrome !== 'undefined' && chrome.alarms) {
+            chrome.alarms.clear('pomodoroTimer');
+          }
+        }
+      };
+
+      updateTimer(); // Initial call
+      interval = window.setInterval(updateTimer, 1000);
+    } else {
+      // If inactive but duration changed, or reset
+      if (!timerState.isActive && !timerState.endTime) {
+         setTimeLeft(timerState.duration * 60);
+      }
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, t.widgets.timer.finished]);
+  }, [timerState, t.widgets.timer.finished, setTimerState]);
 
-  const toggleTimer = () => setIsActive(!isActive);
+  const toggleTimer = () => {
+    if (timerState.isActive) {
+      // Pause
+      setTimerState(prev => ({ ...prev, isActive: false, endTime: null }));
+      if (typeof chrome !== 'undefined' && chrome.alarms) {
+        chrome.alarms.clear('pomodoroTimer');
+      }
+    } else {
+      // Start or Resume
+      const newEndTime = Date.now() + timeLeft * 1000;
+      setTimerState(prev => ({ ...prev, isActive: true, endTime: newEndTime }));
+
+      if (typeof chrome !== 'undefined' && chrome.alarms) {
+        chrome.alarms.create('pomodoroTimer', { when: newEndTime });
+      }
+    }
+  };
 
   const resetTimer = useCallback(() => {
-    setIsActive(false);
-    setTimeLeft(duration * 60);
-  }, [duration]);
+    setTimerState({ isActive: false, endTime: null, duration: timerState.duration });
+    setTimeLeft(timerState.duration * 60);
+    if (typeof chrome !== 'undefined' && chrome.alarms) {
+      chrome.alarms.clear('pomodoroTimer');
+    }
+  }, [timerState.duration, setTimerState]);
 
   const selectPreset = (mins: number) => {
-    setDuration(mins);
+    setTimerState({ isActive: false, endTime: null, duration: mins });
     setTimeLeft(mins * 60);
-    setIsActive(false);
     setShowPresets(false);
+    if (typeof chrome !== 'undefined' && chrome.alarms) {
+      chrome.alarms.clear('pomodoroTimer');
+    }
   };
 
   const addCustomPreset = () => {
@@ -74,7 +115,7 @@ const TimerWidget: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((duration * 60 - timeLeft) / (duration * 60)) * 100;
+  const progress = ((timerState.duration * 60 - timeLeft) / (timerState.duration * 60)) * 100;
 
   return (
     <GlassCard className="h-80" noPadding>
@@ -98,7 +139,7 @@ const TimerWidget: React.FC = () => {
                 setShowPresets(!showPresets);
               }}
             >
-              {duration}{t.widgets.timer.custom} <ChevronDown size={12} />
+              {timerState.duration}{t.widgets.timer.custom} <ChevronDown size={12} />
             </button>
             {showPresets && (
               <div
@@ -129,7 +170,7 @@ const TimerWidget: React.FC = () => {
                           e.stopPropagation();
                           selectPreset(p);
                         }}
-                        className={duration === p ? 'active' : ''}
+                        className={timerState.duration === p ? 'active' : ''}
                       >
                         {p}{t.widgets.timer.custom}
                       </button>
@@ -160,9 +201,9 @@ const TimerWidget: React.FC = () => {
                 e.stopPropagation();
                 toggleTimer();
               }}
-              className={`btn btn-circle btn-md ${isActive ? 'btn-outline' : 'btn-primary shadow-lg shadow-primary/20'}`}
+              className={`btn btn-circle btn-md ${timerState.isActive ? 'btn-outline' : 'btn-primary shadow-lg shadow-primary/20'}`}
             >
-              {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-1" />}
+              {timerState.isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-1" />}
             </button>
             <button
               onClick={(e) => {
