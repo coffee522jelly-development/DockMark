@@ -69,7 +69,8 @@ export const translations = {
       notes: { title: 'Sticky Note', placeholder: 'Type your notes here...' },
       rss: { title: 'RSS Reader', empty: 'No feeds registered or found.', help: 'Go to RSS Feeds to add some.' },
       bookmarks: { title: 'Bookmarks', empty: 'No bookmarks in Bookmark Bar.' },
-      system: { title: 'System Monitor' }
+      system: { title: 'System Monitor' },
+      calculator: { title: 'Programmer Calc', error: 'Error' }
     },
     snippets: {
       title: 'Code Snippets',
@@ -175,7 +176,8 @@ export const translations = {
       notes: { title: '付箋', placeholder: 'メモを入力...' },
       rss: { title: 'RSSリーダー', empty: 'フィードが登録されていないか見つかりません。', help: 'RSSフィードから追加してください。' },
       bookmarks: { title: 'ブックマーク', empty: 'ブックマークバーに項目がありません。' },
-      system: { title: 'システムモニター' }
+      system: { title: 'システムモニター' },
+      calculator: { title: 'プログラマ電卓', error: 'エラー' }
     },
     snippets: {
       title: 'コードスニペット',

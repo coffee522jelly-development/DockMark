@@ -27,3 +27,5 @@ MarkBrewをご利用いただきありがとうございます。v1.0.1では、
 
 ### 🔧 修正・内部アップデート
 - `manifest.json` に新しくシステム情報、アラーム、通知を取得・操作するための権限 (`system.memory`, `system.cpu`, `system.storage`, `system.display`, `alarms`, `notifications`) を追加しました。
+- **プログラマ電卓ウィジェットの追加**:
+  - Dockに「プログラマ電卓ウィジェット」を追加しました。通常の計算機能に加え、入力値や計算結果をリアルタイムで16進数(HEX)、10進数(DEC)、2進数(BIN)に変換して表示します。
