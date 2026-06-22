@@ -33,7 +33,7 @@ const NotesWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="h-80 bg-yellow-100/80 text-yellow-950" noPadding>
+    <GlassCard className="aspect-square bg-yellow-100/80 text-yellow-950" noPadding>
       <div className="p-4 flex flex-col h-full">
         <h3 className="card-title flex items-center gap-2 mb-3">
           <StickyNote className="w-5 h-5" />

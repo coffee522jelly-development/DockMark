@@ -34,7 +34,7 @@ const TodoWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <h3 className="card-title text-base-content flex items-center gap-2 mb-4">
           <CheckSquare className="w-5 h-5 text-primary" />

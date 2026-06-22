@@ -86,7 +86,7 @@ const CalculatorWidget: React.FC = () => {
 
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-3 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center gap-2 mb-2">

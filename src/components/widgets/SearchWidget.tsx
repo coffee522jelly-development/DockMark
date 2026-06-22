@@ -16,7 +16,7 @@ const SearchWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="h-80">
+    <GlassCard className="aspect-square">
       <div className="flex flex-col h-full justify-center">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">

@@ -26,7 +26,7 @@ const CalendarWidget: React.FC = () => {
     : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-4">
           <CalendarIcon className="w-5 h-5 text-primary" />

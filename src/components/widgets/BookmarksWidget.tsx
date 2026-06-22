@@ -49,14 +49,14 @@ const BookmarksWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <GlassCard className="h-80 flex items-center justify-center">
+      <GlassCard className="aspect-square flex items-center justify-center">
         <span className="loading loading-spinner loading-md text-primary"></span>
       </GlassCard>
     );
   }
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
           <h2 className="card-title text-sm flex items-center gap-2 text-base-content">

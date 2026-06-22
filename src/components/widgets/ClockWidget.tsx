@@ -16,7 +16,7 @@ const ClockWidget: React.FC = () => {
   const dateString = time.toLocaleDateString(t.widgets.clock.dateLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <GlassCard className="h-80">
+    <GlassCard className="aspect-square">
       <div className="flex flex-col h-full items-center justify-center text-center">
         <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mb-4">
           <Clock size={24} />

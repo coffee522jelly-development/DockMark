@@ -55,7 +55,7 @@ const WeatherWidget: React.FC = () => {
 
   if (loading) {
     return (
-      <GlassCard className="h-80 flex items-center justify-center border-blue-500/30">
+      <GlassCard className="aspect-square flex items-center justify-center border-blue-500/30">
         <Loader2 className="w-8 h-8 animate-spin text-primary opacity-50" />
       </GlassCard>
     );
@@ -63,7 +63,7 @@ const WeatherWidget: React.FC = () => {
 
   if (error || !weather) {
     return (
-      <GlassCard className="h-80 flex items-center justify-center">
+      <GlassCard className="aspect-square flex items-center justify-center">
         <p className="text-error opacity-70">{t.widgets.weather.unavailable}</p>
       </GlassCard>
     );
@@ -73,7 +73,7 @@ const WeatherWidget: React.FC = () => {
   const daily = weather.daily;
 
   return (
-    <GlassCard className="h-80 bg-blue-500/20" noPadding>
+    <GlassCard className="aspect-square bg-blue-500/20" noPadding>
       <div className="p-6 flex flex-col h-full">
         <div className="flex justify-between items-start">
           <div>

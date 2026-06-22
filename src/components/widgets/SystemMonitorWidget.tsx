@@ -57,7 +57,7 @@ const SystemMonitorWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <h2 className="card-title text-sm flex items-center gap-2 text-base-content mb-4">
           <Cpu size={16} className="text-primary" />

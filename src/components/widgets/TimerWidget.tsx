@@ -118,7 +118,7 @@ const TimerWidget: React.FC = () => {
   const progress = ((timerState.duration * 60 - timeLeft) / (timerState.duration * 60)) * 100;
 
   return (
-    <GlassCard className="h-80" noPadding>
+    <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
           <h3 className="card-title text-sm text-base-content flex items-center gap-2">
