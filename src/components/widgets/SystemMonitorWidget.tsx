@@ -57,18 +57,18 @@ const SystemMonitorWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="aspect-square" noPadding>
+    <GlassCard className="aspect-square overflow-hidden" noPadding>
       <div className="p-4 flex flex-col h-full">
-        <h2 className="card-title text-sm flex items-center gap-2 text-base-content mb-4">
+        <h2 className="card-title text-sm flex items-center gap-1 text-base-content mb-1">
           <Cpu size={16} className="text-primary" />
           {/* @ts-ignore - system is dynamically added to widgets in our translation update */}
           {t.widgets?.system?.title || 'System Monitor'}
         </h2>
 
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
           {/* Memory Section */}
-          <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-base-200/50 p-1.5 rounded-xl border border-base-300">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold flex items-center gap-1">
                 <HardDrive size={14} /> Memory
               </span>
@@ -82,20 +82,20 @@ const SystemMonitorWidget: React.FC = () => {
                 style={{ width: `${getMemoryUsagePercent()}%` }}
               ></div>
             </div>
-            <div className="text-right text-[10px] opacity-50 mt-1">{getMemoryUsagePercent()}% Used</div>
+            <div className="text-right text-xs opacity-50 mt-1">{getMemoryUsagePercent()}% Used</div>
           </div>
 
           {/* CPU Section */}
-          <div className="bg-base-200/50 p-3 rounded-xl border border-base-300 flex-1 overflow-y-auto custom-scrollbar">
-            <div className="text-xs font-semibold flex items-center gap-1 mb-2">
+          <div className="bg-base-200/50 p-1.5 rounded-xl border border-base-300 flex-1 overflow-y-auto custom-scrollbar">
+            <div className="text-xs font-semibold flex items-center gap-1 mb-1">
               <Cpu size={14} /> CPU
             </div>
             {cpuInfo ? (
               <div className="text-xs space-y-2 opacity-80">
                 <p className="truncate" title={cpuInfo.modelName}>{cpuInfo.modelName}</p>
                 <div className="flex justify-between">
-                  <p className="text-[10px] opacity-60">Arch: {cpuInfo.archName}</p>
-                  <p className="text-[10px] opacity-60">Cores: {cpuInfo.numOfProcessors}</p>
+                  <p className="text-xs opacity-60">Arch: {cpuInfo.archName}</p>
+                  <p className="text-xs opacity-60">Cores: {cpuInfo.numOfProcessors}</p>
                 </div>
                 <div className="grid grid-cols-4 gap-1 mt-2">
                   {cpuInfo.processors.map((p, i) => {
@@ -109,7 +109,7 @@ const SystemMonitorWidget: React.FC = () => {
                       usagePercent = p.usage.total > 0 ? Math.round(((p.usage.user + p.usage.kernel) / p.usage.total) * 100) : 0;
                     }
                     return (
-                      <div key={i} className="text-[8px] flex flex-col items-center opacity-70">
+                      <div key={i} className="text-xs flex flex-col items-center opacity-70">
                         <div className="w-full bg-base-300 h-1 mb-1 rounded-full overflow-hidden">
                           <div className="bg-info h-full transition-all" style={{ width: `${usagePercent}%` }} />
                         </div>
@@ -126,11 +126,11 @@ const SystemMonitorWidget: React.FC = () => {
 
           {/* Displays Section */}
           {displayInfo.length > 0 && (
-            <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
-              <div className="text-xs font-semibold flex items-center gap-1 mb-2">
+            <div className="bg-base-200/50 p-1.5 rounded-xl border border-base-300">
+              <div className="text-xs font-semibold flex items-center gap-1 mb-1">
                 <Monitor size={14} /> Displays
               </div>
-              <div className="text-[10px] space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
+              <div className="text-xs space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
                 {displayInfo.map((d) => (
                   <div key={d.id} className="flex justify-between items-center bg-base-300/30 p-1 rounded">
                     <span className="truncate max-w-[80px]" title={d.name}>{d.name}</span>
@@ -143,11 +143,11 @@ const SystemMonitorWidget: React.FC = () => {
 
           {/* Storage Section */}
           {storageInfo.length > 0 && (
-            <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
-              <div className="text-xs font-semibold flex items-center gap-1 mb-2">
+            <div className="bg-base-200/50 p-1.5 rounded-xl border border-base-300">
+              <div className="text-xs font-semibold flex items-center gap-1 mb-1">
                 <Database size={14} /> Storage Devices
               </div>
-              <div className="text-[10px] space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
+              <div className="text-xs space-y-1 opacity-80 max-h-16 overflow-y-auto custom-scrollbar">
                 {storageInfo.map(s => (
                   <div key={s.id} className="flex justify-between items-center bg-base-300/30 p-1 rounded">
                     <span className="truncate max-w-[80px]" title={s.name}>{s.name} ({s.type})</span>
