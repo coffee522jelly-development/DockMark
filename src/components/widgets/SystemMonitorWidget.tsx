@@ -59,11 +59,13 @@ const SystemMonitorWidget: React.FC = () => {
   return (
     <GlassCard className="aspect-square overflow-hidden" noPadding>
       <div className="p-4 flex flex-col h-full">
-        <h2 className="card-title text-sm flex items-center gap-1 text-base-content mb-1">
-          <Cpu size={16} className="text-primary" />
-          {/* @ts-ignore - system is dynamically added to widgets in our translation update */}
-          {t.widgets?.system?.title || 'System Monitor'}
-        </h2>
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <Cpu className="w-5 h-5 text-primary" />
+            {/* @ts-ignore - system is dynamically added to widgets in our translation update */}
+            {t.widgets?.system?.title || 'System Monitor'}
+          </h3>
+        </div>
 
         <div className="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
           {/* Memory Section */}

@@ -59,10 +59,10 @@ const BookmarksWidget: React.FC = () => {
     <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="card-title text-sm flex items-center gap-2 text-base-content">
-            <Bookmark size={16} className="text-primary" />
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <Bookmark className="w-5 h-5 text-primary" />
             {t.widgets.bookmarks.title}
-          </h2>
+          </h3>
           <button
             onClick={fetchBookmarks}
             className="btn btn-ghost btn-xs btn-circle hover:bg-base-100/50"

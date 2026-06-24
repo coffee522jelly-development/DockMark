@@ -16,14 +16,15 @@ const SearchWidget: React.FC = () => {
   };
 
   return (
-    <GlassCard className="aspect-square">
-      <div className="flex flex-col h-full justify-center">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-            <Search size={20} />
-          </div>
-          <h3 className="font-bold text-lg text-base-content">{t.widgets.search.title}</h3>
+    <GlassCard className="aspect-square" noPadding>
+      <div className="p-4 flex flex-col h-full">
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <Search className="w-5 h-5 text-primary" />
+            {t.widgets.search.title}
+          </h3>
         </div>
+        <div className="flex-1 flex flex-col justify-center">
         <form onSubmit={handleSearch} className="form-control">
           <div className="relative group">
             <input
@@ -42,6 +43,7 @@ const SearchWidget: React.FC = () => {
           </div>
         </form>
         <p className="text-[10px] text-base-content/40 mt-4 text-center">{t.widgets.search.help}</p>
+        </div>
       </div>
     </GlassCard>
   );

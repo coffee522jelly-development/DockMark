@@ -83,7 +83,7 @@ const RssWidget: React.FC = () => {
     <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="card-title text-base-content flex items-center gap-2">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
             <Rss className="w-5 h-5 text-orange-500" />
             {t.widgets.rss.title}
           </h3>

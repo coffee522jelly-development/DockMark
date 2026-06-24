@@ -16,15 +16,21 @@ const ClockWidget: React.FC = () => {
   const dateString = time.toLocaleDateString(t.widgets.clock.dateLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <GlassCard className="aspect-square">
-      <div className="flex flex-col h-full items-center justify-center text-center">
-        <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mb-4">
-          <Clock size={24} />
+    <GlassCard className="aspect-square" noPadding>
+      <div className="p-4 flex flex-col h-full">
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <Clock className="w-5 h-5 text-primary" />
+            {/* @ts-ignore - clock is dynamically added to widgets in our translation update */}
+            {t.widgets?.clock?.title || 'Clock'}
+          </h3>
         </div>
-        <h2 className="text-4xl font-bold text-base-content break-all font-number">
-          {timeString}
-        </h2>
-        <p className="text-sm text-base-content/70 mt-3 font-medium">{dateString}</p>
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <h2 className="text-4xl font-bold text-base-content break-all font-number">
+            {timeString}
+          </h2>
+          <p className="text-sm text-base-content/70 mt-3 font-medium">{dateString}</p>
+        </div>
       </div>
     </GlassCard>
   );

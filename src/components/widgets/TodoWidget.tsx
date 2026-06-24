@@ -36,22 +36,29 @@ const TodoWidget: React.FC = () => {
   return (
     <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
-        <h3 className="card-title text-base-content flex items-center gap-2 mb-4">
-          <CheckSquare className="w-5 h-5 text-primary" />
-          {t.widgets.todo.title}
-        </h3>
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <CheckSquare className="w-5 h-5 text-primary" />
+            {t.widgets.todo.title}
+          </h3>
+        </div>
 
-        <form onSubmit={addTodo} className="flex gap-2 mb-4">
-          <input
-            type="text"
-            className="input input-bordered input-sm flex-1 bg-base-100/50 border-white/10"
-            placeholder={t.widgets.todo.placeholder}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary btn-sm btn-square">
-            <Plus className="w-4 h-4" />
-          </button>
+        <form onSubmit={addTodo} className="form-control mb-4">
+          <div className="relative group">
+            <input
+              type="text"
+              className="input input-bordered w-full pr-12 bg-base-100/50 border-white/10 focus:border-primary/50 transition-all"
+              placeholder={t.widgets.todo.placeholder}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary btn-sm btn-square"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
         </form>
 
         <div className="flex-1 overflow-auto space-y-2 pr-1 custom-scrollbar">

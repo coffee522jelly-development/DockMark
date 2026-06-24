@@ -75,21 +75,22 @@ const WeatherWidget: React.FC = () => {
   return (
     <GlassCard className="aspect-square bg-blue-500/20" noPadding>
       <div className="p-6 flex flex-col h-full">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-lg font-bold flex items-center gap-2 text-base-content">
-              <MapPin className="w-4 h-4 text-primary" /> {t.widgets.weather.title}
-            </h3>
-            <p className="text-xs opacity-50 mt-1">
-              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </p>
-          </div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <MapPin className="w-5 h-5 text-primary" /> {t.widgets.weather.title}
+          </h3>
+          <p className="text-[10px] opacity-50">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
           <div className="p-2 rounded-2xl bg-base-100/50">
             {getWeatherIcon(current.weather_code)}
           </div>
         </div>
 
-        <div className="flex items-center gap-6 my-6">
+        <div className="flex items-center gap-6 mb-6">
           <span className="text-6xl font-bold text-base-content font-number">{Math.round(current.temperature_2m)}°</span>
           <div className="text-sm">
             <p className="font-bold text-base-content text-lg">{getWeatherCondition(current.weather_code)}</p>

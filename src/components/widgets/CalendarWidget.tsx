@@ -29,8 +29,10 @@ const CalendarWidget: React.FC = () => {
     <GlassCard className="aspect-square" noPadding>
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-4">
-          <CalendarIcon className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-base-content">{monthName} {year}</h3>
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <CalendarIcon className="w-5 h-5 text-primary" />
+            {monthName} {year}
+          </h3>
         </div>
         <div className="grid grid-cols-7 gap-1 text-center text-xs flex-1">
           {dayNames.map(d => (

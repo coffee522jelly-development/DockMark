@@ -35,10 +35,12 @@ const NotesWidget: React.FC = () => {
   return (
     <GlassCard className="aspect-square bg-yellow-100/80 text-yellow-950" noPadding>
       <div className="p-4 flex flex-col h-full">
-        <h3 className="card-title flex items-center gap-2 mb-3">
-          <StickyNote className="w-5 h-5" />
-          {t.widgets.notes.title}
-        </h3>
+        <div className="flex items-center gap-2 mb-3">
+          <h3 className="text-base font-bold text-yellow-950 flex items-center gap-2 m-0">
+            <StickyNote className="w-5 h-5 text-yellow-950" />
+            {t.widgets.notes.title}
+          </h3>
+        </div>
         <textarea
           className="flex-1 bg-white/30 rounded-xl p-3 border-none focus:outline-none focus:bg-white/50 transition-all resize-none text-sm placeholder-yellow-800/40 leading-relaxed"
           placeholder={t.widgets.notes.placeholder}

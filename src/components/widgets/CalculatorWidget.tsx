@@ -120,8 +120,8 @@ const CalculatorWidget: React.FC = () => {
       <div className="p-2 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
-          <Calculator className="w-4 h-4 text-primary" />
-          <h3 className="card-title text-sm text-base-content m-0 leading-none">
+          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
+            <Calculator className="w-5 h-5 text-primary" />
             {t.widgets.calculator.title}
           </h3>
         </div>
