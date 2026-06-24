@@ -73,48 +73,53 @@ const WeatherWidget: React.FC = () => {
   const daily = weather.daily;
 
   return (
-    <GlassCard className="aspect-square bg-blue-500/20" noPadding>
-      <div className="p-6 flex flex-col h-full">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-base font-bold text-base-content flex items-center gap-2 m-0">
-            <MapPin className="w-5 h-5 text-primary" /> {t.widgets.weather.title}
-          </h3>
-          <p className="text-[10px] opacity-50">
-            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    <GlassCard className="aspect-square flex flex-col p-5 bg-blue-500/20">
+      <div className="flex items-center justify-between w-full mb-3">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-primary" />
+          <h3 className="text-base font-bold text-base-content m-0">{t.widgets.weather.title}</h3>
+        </div>
+        <p className="text-[10px] opacity-50">
+          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </p>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center min-h-0">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="p-2 rounded-2xl bg-base-100/50 shrink-0">
+            {getWeatherIcon(current.weather_code)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-base-content font-number leading-none tracking-tighter">
+                {Math.round(current.temperature_2m)}°
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-2">
+          <p className="font-bold text-base-content text-sm truncate">{getWeatherCondition(current.weather_code)}</p>
+          <p className="opacity-60 text-xs font-medium">
+            H:{Math.round(daily.temperature_2m_max[0])}° L:{Math.round(daily.temperature_2m_min[0])}°
           </p>
         </div>
 
-        <div className="flex justify-between items-center mb-4">
-          <div className="p-2 rounded-2xl bg-base-100/50">
-            {getWeatherIcon(current.weather_code)}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6 mb-6">
-          <span className="text-6xl font-bold text-base-content font-number">{Math.round(current.temperature_2m)}°</span>
-          <div className="text-sm">
-            <p className="font-bold text-base-content text-lg">{getWeatherCondition(current.weather_code)}</p>
-            <p className="opacity-60 font-medium">
-              H:{Math.round(daily.temperature_2m_max[0])}° L:{Math.round(daily.temperature_2m_min[0])}°
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 mt-auto pt-4 border-t border-white/10 text-[10px]">
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+        <div className="grid grid-cols-3 gap-1 mt-auto pt-2 border-t border-white/10 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-base-100/30">
             <Wind className="w-3 h-3 opacity-50" />
-            <span className="font-bold">{current.wind_speed_10m}</span>
+            <span className="font-bold truncate w-full text-center">{current.wind_speed_10m}</span>
             <span className="opacity-50 scale-90">km/h</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+          <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-base-100/30">
             <CloudRain className="w-3 h-3 opacity-50" />
-            <span className="font-bold">{getWeatherCondition(current.weather_code) === 'Rainy' ? 'High' : 'Low'}</span>
-            <span className="opacity-50 scale-90">{t.widgets.weather.precip}</span>
+            <span className="font-bold truncate w-full text-center">{getWeatherCondition(current.weather_code) === 'Rainy' ? 'High' : 'Low'}</span>
+            <span className="opacity-50 scale-90 truncate w-full text-center">{t.widgets.weather.precip}</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-base-100/30">
+          <div className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-base-100/30">
             <Cloud className="w-3 h-3 opacity-50" />
-            <span className="font-bold">{current.relative_humidity_2m}%</span>
-            <span className="opacity-50 scale-90">{t.widgets.weather.humidity}</span>
+            <span className="font-bold truncate w-full text-center">{current.relative_humidity_2m}%</span>
+            <span className="opacity-50 scale-90 truncate w-full text-center">{t.widgets.weather.humidity}</span>
           </div>
         </div>
       </div>
