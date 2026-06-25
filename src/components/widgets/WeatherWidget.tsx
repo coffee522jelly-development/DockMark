@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Cloud, CloudRain, Sun, Wind, MapPin, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Cloud, CloudRain, Sun, Wind, MapPin, Loader2, RefreshCw } from 'lucide-react';
 import GlassCard from '../common/GlassCard';
 import { useTranslation } from '../../contexts/LanguageContext';
 
@@ -9,7 +9,10 @@ const WeatherWidget: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchWeatherData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     const fetchWeather = async (lat: number, lon: number) => {
       try {
         const response = await fetch(
@@ -17,9 +20,9 @@ const WeatherWidget: React.FC = () => {
         );
         const data = await response.json();
         setWeather(data);
-        setLoading(false);
       } catch (err) {
         setError('Failed to fetch weather');
+      } finally {
         setLoading(false);
       }
     };
@@ -38,6 +41,10 @@ const WeatherWidget: React.FC = () => {
       fetchWeather(35.6895, 139.6917);
     }
   }, []);
+
+  useEffect(() => {
+    fetchWeatherData();
+  }, [fetchWeatherData]);
 
   const getWeatherIcon = (code: number) => {
     if (code === 0) return <Sun className="w-10 h-10 text-yellow-300" />;
@@ -63,8 +70,14 @@ const WeatherWidget: React.FC = () => {
 
   if (error || !weather) {
     return (
-      <GlassCard className="aspect-square flex items-center justify-center">
-        <p className="text-error opacity-70">{t.widgets.weather.unavailable}</p>
+      <GlassCard className="aspect-square flex flex-col items-center justify-center gap-2 p-4">
+        <p className="text-error opacity-70 text-sm text-center">{t.widgets.weather.unavailable}</p>
+        <button
+          onClick={fetchWeatherData}
+          className="btn btn-sm btn-ghost btn-circle"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       </GlassCard>
     );
   }
@@ -73,15 +86,24 @@ const WeatherWidget: React.FC = () => {
   const daily = weather.daily;
 
   return (
-    <GlassCard className="aspect-square flex flex-col p-5 bg-blue-500/20">
+    <GlassCard className="aspect-square flex flex-col p-5 bg-blue-500/20 group relative">
       <div className="flex items-center justify-between w-full mb-3">
         <div className="flex items-center gap-2">
           <MapPin className="w-5 h-5 text-primary" />
           <h3 className="text-base font-bold text-base-content m-0">{t.widgets.weather.title}</h3>
         </div>
-        <p className="text-[10px] opacity-50">
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchWeatherData}
+            className="opacity-0 group-hover:opacity-100 transition-opacity btn btn-ghost btn-xs btn-circle"
+            title="Refresh weather and location"
+          >
+            <RefreshCw className="w-3 h-3" />
+          </button>
+          <p className="text-[10px] opacity-50">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-h-0">
