@@ -23,7 +23,7 @@ const Snippets: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [columns, setColumns] = useState<1 | 2 | 4>(2);
+  const [columns, setColumns] = useState<1 | 2 | 4>(1);
 
   // New snippet modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
