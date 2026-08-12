@@ -83,10 +83,10 @@ const App: React.FC = () => {
           <h1 className="font-bold text-xl hidden lg:block text-base-content">DockMark</h1>
         </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-2">
+        <nav className="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
           <button
             onClick={() => setActiveTab('dock')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'dock' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -95,7 +95,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('bookmark')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'bookmark' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -104,7 +104,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('buttons')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'buttons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -113,7 +113,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('cards')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'cards' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -122,7 +122,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('icons')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'icons' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -131,7 +131,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('tables')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'tables' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -139,11 +139,11 @@ const App: React.FC = () => {
             <span className={`font-medium hidden lg:block text-left flex-1 ${activeTab === 'tables' ? 'text-primary-content' : 'text-base-content'}`}>Tables</span>
           </button>
 
-          <div className="border-t border-base-300 my-2 opacity-50"></div>
+          <div className="border-t border-base-300 my-1 opacity-50"></div>
 
           <button
             onClick={() => setActiveTab('snippets')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'snippets' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -152,7 +152,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('rss')}
-            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all ${
+            className={`w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl transition-all ${
               activeTab === 'rss' ? 'bg-primary text-primary-content shadow-lg' : 'hover:bg-base-200 text-base-content/70'
             }`}
           >
@@ -164,7 +164,7 @@ const App: React.FC = () => {
         <div className="p-4 border-t border-base-300">
           <button
             onClick={openSettings}
-            className="w-full flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
+            className="w-full flex items-center justify-center lg:justify-start gap-3 p-2 rounded-xl hover:bg-base-200 text-base-content/70 transition-all"
           >
             <Settings size={20} />
             <span className="font-medium hidden lg:block text-base-content text-left flex-1">Settings</span>
